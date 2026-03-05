@@ -8,8 +8,7 @@ export const mockFeatured: Content = {
   description:
     'Thomas Berthier a quitté Goldman Sachs à 31 ans pour fonder une néobanque dédiée aux indépendants. Trois ans plus tard : 200 000 clients, 40M€ levés, et une vision radicale du futur du travail.',
   youtube_url: '',
-  thumbnail_url:
-    'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1280&q=80&auto=format&fit=crop',
+  thumbnail_url: '/mock-interview.jpg',
   guest_name: 'Thomas Berthier',
   guest_title: 'CEO & Fondateur — Volt Banking',
   tags: ['fintech', 'entrepreneuriat', 'startups'],
@@ -29,10 +28,10 @@ export const mockInterviews: Content[] = [
     description:
       "Comment Sarah a transformé une marque locale en référence mondiale de la mode éthique, sans jamais compromettre ses valeurs.",
     youtube_url: '',
-    thumbnail_url:
-      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80&auto=format&fit=crop',
+    thumbnail_url: '/mock-interview.jpg',
     guest_name: 'Sarah Leclaire',
-    guest_title: 'Directrice Créative — Éclat Studio',
+    guest_title: 'Éclat Studio',
+    episode_number: 524,
     tags: ['mode', 'design', 'durabilité'],
     published: true,
     featured: false,
@@ -51,7 +50,8 @@ export const mockInterviews: Content[] = [
     thumbnail_url:
       'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80&auto=format&fit=crop',
     guest_name: 'Marc Dubois',
-    guest_title: 'Fondateur & Rédacteur en chef — Le Fil',
+    guest_title: 'Le Fil',
+    episode_number: 523,
     tags: ['médias', 'journalisme', 'indépendance'],
     published: true,
     featured: false,
@@ -70,7 +70,8 @@ export const mockInterviews: Content[] = [
     thumbnail_url:
       'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80&auto=format&fit=crop',
     guest_name: 'Elena Morin',
-    guest_title: 'Artiste & Chercheuse — Lab Lumière',
+    guest_title: 'Lab Lumière',
+    episode_number: 522,
     tags: ['art', 'IA', 'création'],
     published: true,
     featured: false,
@@ -89,7 +90,8 @@ export const mockInterviews: Content[] = [
     thumbnail_url:
       'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&q=80&auto=format&fit=crop',
     guest_name: 'Karim Hadj',
-    guest_title: 'Managing Partner — Futurs Fonds',
+    guest_title: 'Futurs Fonds',
+    episode_number: 521,
     tags: ['impact', 'investissement', 'climat'],
     published: true,
     featured: false,

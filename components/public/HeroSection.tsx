@@ -74,6 +74,18 @@ export default function HeroSection() {
     <div>
       {/* ── Hero ── */}
       <section className="relative overflow-hidden">
+        {/* Waves background */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: 'url(/waves-bg.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            mixBlendMode: 'screen',
+            opacity: 0.06,
+          }}
+        />
+
         {/* Background blob */}
         <div
           className="absolute top-0 right-0 pointer-events-none"

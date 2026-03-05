@@ -11,6 +11,7 @@ export interface Content {
   thumbnail_url?: string
   guest_name?: string
   guest_title?: string
+  episode_number?: number
   tags?: string[]
   published: boolean
   featured: boolean
