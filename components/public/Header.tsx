@@ -4,49 +4,71 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 export default function Header() {
-  const [scrolled, setScrolled] = useState(false)
+  const [scrollY, setScrollY] = useState(0)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
+    const onScroll = () => setScrollY(window.scrollY)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // progress 0 = top, 1 = fully collapsed (after 80px of scroll)
+  const progress = Math.min(scrollY / 80, 1)
+
+  const headerHeight = Math.round(88 - 24 * progress)   // 88px → 64px
+  const logoSize    = 2.25 - 0.75 * progress            // 2.25rem → 1.5rem
+  const navFontSize = 1 - 0.25 * progress               // 1rem → 0.75rem
+  const navGap      = 4 - 1.5 * progress                // 4rem → 2.5rem
+
+  // nav color: grey (#888) → cream (#F0EDE8)
+  const navR = Math.round(136 + 104 * progress)
+  const navG = Math.round(136 + 101 * progress)
+  const navB = Math.round(136 +  96 * progress)
+  const navColor = `rgb(${navR}, ${navG}, ${navB})`
+
+
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-bg/95 backdrop-blur-md border-b border-accent/30'
-          : 'bg-transparent border-b border-transparent'
-      }`}
+      style={{ height: `${headerHeight}px` }}
+      className="sticky top-0 z-50 overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between h-16">
+      {/* Dark layer: fades out as you scroll */}
+      <div
+        className="absolute inset-0 bg-bg pointer-events-none"
+        style={{ opacity: 1 - progress }}
+      />
+      {/* Blur layer: fades in as you scroll */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ backdropFilter: `blur(${progress * 24}px)` }}
+      />
+      <div
+        className="relative max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between"
+        style={{ height: `${headerHeight}px` }}
+      >
         <Link
           href="/"
-          className="font-display text-2xl font-black text-cream tracking-tight hover:text-accent transition-colors"
+          className="font-display font-black tracking-tight text-cream"
+          style={{ fontSize: `${logoSize}rem`, lineHeight: 1.1 }}
         >
           Spark
         </Link>
 
-        <nav className="flex items-center gap-8">
-          <Link
-            href="/"
-            className="font-body text-xs font-medium tracking-[0.15em] uppercase text-muted hover:text-cream transition-colors"
-          >
-            Interviews
-          </Link>
-          <Link
-            href="/blog"
-            className="font-body text-xs font-medium tracking-[0.15em] uppercase text-muted hover:text-cream transition-colors"
-          >
-            Blog
-          </Link>
-          <Link
-            href="/a-propos"
-            className="font-body text-xs font-medium tracking-[0.15em] uppercase text-muted hover:text-cream transition-colors"
-          >
-            À propos
-          </Link>
+        <nav className="flex items-center" style={{ gap: `${navGap}rem` }}>
+          {[
+            { href: '/',         label: 'Interviews' },
+            { href: '/blog',     label: 'Blog' },
+            { href: '/a-propos', label: 'À propos' },
+          ].map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className="font-body font-medium tracking-[0.15em] uppercase hover:opacity-100 transition-opacity"
+              style={{ fontSize: `${navFontSize}rem`, color: navColor }}
+            >
+              {label}
+            </Link>
+          ))}
         </nav>
       </div>
     </header>

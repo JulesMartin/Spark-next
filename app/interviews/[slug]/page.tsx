@@ -2,22 +2,19 @@ import Header from '@/components/public/Header'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { mockFeatured, mockInterviews } from '@/lib/mock-data'
 import { getYouTubeId, getYouTubeThumbnail } from '@/lib/youtube'
 import { Content } from '@/lib/types'
+import { createClient } from '@/lib/supabase/server'
 
 export const revalidate = 60
 
 async function getInterview(slug: string): Promise<Content | null> {
   // When Supabase is configured, replace with:
-  // const supabase = await createClient()
-  // const { data } = await supabase
-  //   .from('content').select('*')
-  //   .eq('slug', slug).eq('published', true).single()
-  // return data
-
-  const all = [mockFeatured, ...mockInterviews]
-  return all.find((i) => i.slug === slug) ?? null
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('content').select('*')
+    .eq('slug', slug).eq('published', true).single()
+  return data
 }
 
 function formatDate(dateStr: string) {

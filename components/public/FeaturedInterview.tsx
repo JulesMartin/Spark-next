@@ -9,13 +9,13 @@ export default function FeaturedInterview({ interview }: { interview: Content })
     (interview.youtube_url ? getYouTubeThumbnail(interview.youtube_url) : '/placeholder.jpg')
 
   return (
-    <section className="border-b border-edge">
+    <section>
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
           {/* Thumbnail */}
           <Link href={`/interviews/${interview.slug}`} className="group block relative">
-            <div className="relative aspect-video overflow-hidden border border-edge group-hover:border-accent/50 transition-colors duration-300">
+            <div className="relative aspect-square overflow-hidden border border-edge group-hover:border-accent/50 transition-colors duration-300">
               <Image
                 src={thumbnail}
                 alt={`${interview.guest_name} — ${interview.title}`}
