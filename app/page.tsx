@@ -29,7 +29,7 @@ async function getData() {
     .order('published_at', { ascending: false })
     .limit(20)
 
-  // Fall back to mock data while the database is empty
+  // Fall back to mock data while the database is empty.
   return {
     featured: featured ?? mockFeatured,
     interviews: interviews && interviews.length > 0 ? interviews : mockInterviews,
