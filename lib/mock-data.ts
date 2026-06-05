@@ -101,39 +101,4 @@ export const mockInterviews: Content[] = [
   },
 ]
 
-export const mockBlogPosts: Content[] = [
-  {
-    id: '6',
-    type: 'blog',
-    title: 'Pourquoi les meilleurs fondateurs lisent des romans',
-    slug: 'fondateurs-lisent-romans',
-    description:
-      'Une analyse des patterns de lecture des entrepreneurs les plus créatifs — et ce que cela nous dit sur la relation entre fiction et vision stratégique.',
-    body: `# Pourquoi les meilleurs fondateurs lisent des romans
-
-La fiction développe une capacité rare dans le monde des affaires : l'empathie systémique...`,
-    tags: ['lecture', 'entrepreneuriat', 'créativité'],
-    published: true,
-    featured: false,
-    published_at: '2024-01-17T10:00:00Z',
-    created_at: '2024-01-17T10:00:00Z',
-    updated_at: '2024-01-17T10:00:00Z',
-  },
-  {
-    id: '7',
-    type: 'blog',
-    title: 'Le paradoxe de la visibilité à l\'ère des réseaux',
-    slug: 'paradoxe-visibilite-reseaux',
-    description:
-      "Plus on est visible, moins on dit quelque chose. Comment les meilleurs créateurs naviguent cette tension entre présence et profondeur.",
-    body: `# Le paradoxe de la visibilité
-
-Dans un monde saturé d'opinions, le silence est devenu une forme de curation...`,
-    tags: ['médias', 'réseaux sociaux', 'création'],
-    published: true,
-    featured: false,
-    published_at: '2024-01-10T10:00:00Z',
-    created_at: '2024-01-10T10:00:00Z',
-    updated_at: '2024-01-10T10:00:00Z',
-  },
-]
+export const mockBlogPosts: Content[] = []

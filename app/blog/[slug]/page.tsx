@@ -1,18 +1,34 @@
 import Header from '@/components/public/Header'
+import Footer from '@/components/public/Footer'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { mockBlogPosts } from '@/lib/mock-data'
-import { Content } from '@/lib/types'
+import { sanityClient } from '@/lib/sanity/client'
 
-async function getBlogPost(slug: string): Promise<Content | null> {
-  // When Supabase is configured, replace with:
-  // const supabase = await createClient()
-  // const { data } = await supabase
-  //   .from('content').select('*')
-  //   .eq('slug', slug).eq('published', true).single()
-  // return data
+export const revalidate = 60
 
-  return mockBlogPosts.find((p) => p.slug === slug) ?? null
+interface SanityPost {
+  _id: string
+  title: string
+  slug: { current: string }
+  excerpt?: string
+  body?: string
+  tags?: string[]
+  publishedAt?: string
+  youtubeUrl?: string
+}
+
+async function getBlogPost(slug: string): Promise<SanityPost | null> {
+  return sanityClient.fetch(
+    `*[_type == "post" && status == "published" && slug.current == $slug][0]`,
+    { slug }
+  )
+}
+
+export async function generateStaticParams() {
+  const posts: SanityPost[] = await sanityClient.fetch(
+    `*[_type == "post" && status == "published"] { slug }`
+  )
+  return posts.map((p) => ({ slug: p.slug.current }))
 }
 
 function formatDate(dateStr: string) {
@@ -39,11 +55,11 @@ export default async function BlogPostPage({
 
       <article className="max-w-2xl mx-auto px-6 py-16 md:py-24">
         <Link
-          href="/"
+          href="/blog"
           className="inline-flex items-center gap-2 font-body text-xs uppercase tracking-[0.15em] text-muted hover:text-cream transition-colors mb-12 group"
         >
           <span className="inline-block transition-transform duration-200 group-hover:-translate-x-1">←</span>
-          Accueil
+          Blog
         </Link>
 
         <header className="mb-12 pb-12 border-b border-edge">
@@ -53,19 +69,25 @@ export default async function BlogPostPage({
           <h1 className="font-display text-4xl md:text-5xl font-black text-cream leading-tight mb-4">
             {post.title}
           </h1>
-          {post.description && (
+          {post.excerpt && (
             <p className="font-body text-cream/60 text-lg leading-relaxed mt-4">
-              {post.description}
+              {post.excerpt}
             </p>
           )}
-          {post.published_at && (
-            <p className="font-body text-muted text-sm mt-6">{formatDate(post.published_at)}</p>
+          {post.publishedAt && (
+            <p className="font-body text-muted text-sm mt-6">{formatDate(post.publishedAt)}</p>
           )}
         </header>
 
         {post.body && (
           <div className="font-body text-cream/80 leading-relaxed space-y-5">
             {post.body.split('\n').map((para, i) => {
+              if (para.startsWith('## '))
+                return (
+                  <h2 key={i} className="font-display text-2xl font-bold text-cream mt-10 mb-4">
+                    {para.replace('## ', '')}
+                  </h2>
+                )
               if (para.startsWith('# '))
                 return (
                   <h2 key={i} className="font-display text-2xl font-bold text-cream mt-10 mb-4">
@@ -96,6 +118,7 @@ export default async function BlogPostPage({
           </div>
         )}
       </article>
+      <Footer />
     </main>
   )
 }

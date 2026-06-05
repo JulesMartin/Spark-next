@@ -1,21 +1,38 @@
 import Header from '@/components/public/Header'
+import Footer from '@/components/public/Footer'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
-import { mockBlogPosts } from '@/lib/mock-data'
-import { Content } from '@/lib/types'
+import { sanityClient } from '@/lib/sanity/client'
 
 export const revalidate = 60
 
-async function getBlogPosts(): Promise<Content[]> {
-  const supabase = await createClient()
-  const { data } = await supabase
-    .from('content')
-    .select('*')
-    .eq('type', 'blog')
-    .eq('published', true)
-    .order('published_at', { ascending: false })
+interface SanityPost {
+  _id: string
+  title: string
+  slug: { current: string }
+  excerpt?: string
+  body?: string
+  tags?: string[]
+  publishedAt?: string
+}
 
-  return data && data.length > 0 ? data : mockBlogPosts
+async function getBlogPosts(): Promise<SanityPost[]> {
+  return sanityClient.fetch(
+    `*[_type == "post" && status == "published"] | order(publishedAt desc) {
+      _id, title, slug, excerpt, body, tags, publishedAt
+    }`
+  )
+}
+
+function getPreview(body: string, maxChars = 200): string {
+  const clean = body
+    .replace(/^#{1,6}\s+.+$/gm, '')   // strip headings
+    .replace(/\*\*(.+?)\*\*/g, '$1')  // strip bold
+    .replace(/\*(.+?)\*/g, '$1')      // strip italic
+    .replace(/\[(.+?)\]\(.+?\)/g, '$1') // strip links
+    .replace(/\n{2,}/g, '\n')
+    .trim()
+  const first = clean.split('\n').find((l) => l.trim().length > 0) ?? ''
+  return first.length > maxChars ? first.slice(0, maxChars).trimEnd() + '…' : first
 }
 
 function formatDate(dateStr: string) {
@@ -44,21 +61,21 @@ export default async function BlogPage() {
         ) : (
           <div className="flex flex-col divide-y divide-edge">
             {posts.map((post) => (
-              <article key={post.id} className="py-10 group">
-                <Link href={`/blog/${post.slug}`}>
+              <article key={post._id} className="py-10 group">
+                <Link href={`/blog/${post.slug.current}`}>
                   <div className="flex items-start justify-between gap-8">
                     <div className="flex-1">
-                      {post.published_at && (
+                      {post.publishedAt && (
                         <p className="font-body text-xs uppercase tracking-[0.15em] text-muted mb-3">
-                          {formatDate(post.published_at)}
+                          {formatDate(post.publishedAt)}
                         </p>
                       )}
                       <h2 className="font-display text-2xl md:text-3xl font-bold text-cream group-hover:text-accent transition-colors leading-snug mb-3">
                         {post.title}
                       </h2>
-                      {post.description && (
+                      {(post.body || post.excerpt) && (
                         <p className="font-body text-muted text-sm leading-relaxed">
-                          {post.description}
+                          {post.body ? getPreview(post.body) : post.excerpt}
                         </p>
                       )}
                       {post.tags && post.tags.length > 0 && (
@@ -84,6 +101,7 @@ export default async function BlogPage() {
           </div>
         )}
       </div>
+      <Footer />
     </main>
   )
 }
