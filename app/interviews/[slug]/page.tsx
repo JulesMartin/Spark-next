@@ -1,4 +1,5 @@
 import Header from '@/components/public/Header'
+import Footer from '@/components/public/Footer'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -132,6 +133,7 @@ export default async function InterviewPage({
           </div>
         )}
       </article>
+      <Footer />
     </main>
   )
 }

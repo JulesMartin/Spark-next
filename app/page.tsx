@@ -2,51 +2,25 @@ import Header from '@/components/public/Header'
 import HeroSection from '@/components/public/HeroSection'
 import FeaturedInterview from '@/components/public/FeaturedInterview'
 import InterviewGrid from '@/components/public/InterviewGrid'
-import { createClient } from '@/lib/supabase/server'
-import { mockFeatured, mockInterviews } from '@/lib/mock-data'
+import Newsletter from '@/components/public/Newsletter'
+import Footer from '@/components/public/Footer'
+import { fetchYouTubeVideos } from '@/lib/youtube-feed'
 
-export const revalidate = 60
-
-async function getData() {
-  const supabase = await createClient()
-
-  const { data: featured } = await supabase
-    .from('content')
-    .select('*')
-    .eq('type', 'interview')
-    .eq('published', true)
-    .eq('featured', true)
-    .order('published_at', { ascending: false })
-    .limit(1)
-    .single()
-
-  const { data: interviews } = await supabase
-    .from('content')
-    .select('*')
-    .eq('type', 'interview')
-    .eq('published', true)
-    .eq('featured', false)
-    .order('published_at', { ascending: false })
-    .limit(20)
-
-  // Fall back to mock data while the database is empty.
-  return {
-    featured: featured ?? mockFeatured,
-    interviews: interviews && interviews.length > 0 ? interviews : mockInterviews,
-  }
-}
+export const revalidate = 3600
 
 export default async function HomePage() {
-  const { featured, interviews } = await getData()
+  const videos = await fetchYouTubeVideos()
+  const featured = videos[0] ?? null
+  const rest = videos.slice(1)
 
   return (
     <main className="min-h-screen bg-bg">
       <Header />
-      <HeroSection />
-      <div id="interviews">
-        {featured && <FeaturedInterview interview={featured} />}
-        {interviews.length > 0 && <InterviewGrid interviews={interviews} />}
-      </div>
+      <HeroSection featured={featured} />
+      <FeaturedInterview video={featured} />
+      {rest.length > 0 && <InterviewGrid videos={rest} />}
+      <Newsletter />
+      <Footer />
     </main>
   )
 }

@@ -502,4 +502,48 @@ npx vercel --prod
 - The dashboard does **not** need to be beautiful — clean, functional, dark UI is fine.
 - The **public site** must be exceptional visually — editorial, sharp, memorable.
 - If a screenshot is provided by the user, extract exact colors, font weights, spacing ratios, and component layouts from it. Override the design tokens above accordingly.
-- Generate **realistic placeholder content** (3–5 interviews, 2 blog posts) via a seed script at `scripts/seed.ts` so the site looks complete from day one.
+
+---
+
+## Workflow Blog — URL YouTube → Draft Sanity
+
+### Commande déclencheur
+
+Quand l'utilisateur dit **"publie [url youtube]"** :
+
+**Étape 1 — Extraire les sous-titres automatiques**
+
+```bash
+yt-dlp --skip-download --write-auto-subs --sub-langs "fr,en" --convert-subs srt -o "/tmp/spark_transcript" "[URL]"
+```
+
+Lire ensuite le fichier généré (ex: `/tmp/spark_transcript.fr.srt` ou `/tmp/spark_transcript.en.srt`).
+Si plusieurs fichiers existent, préférer le français.
+Nettoyer le SRT : supprimer les lignes de numéro de séquence (nombres seuls) et les lignes de timestamp (`\d{2}:\d{2}:\d{2},\d{3} --> ...`), garder uniquement le texte.
+
+**Étape 2 — Générer l'article**
+
+Lire `/BLOG_PROMPT.md` pour les règles éditoriales.
+Appliquer ces règles au transcript nettoyé.
+Produire un objet JSON valide avec : `title`, `slug`, `excerpt`, `body` (markdown), `tags`, `youtubeUrl`.
+La `coverImageUrl` est calculée automatiquement par le script depuis `youtubeUrl`.
+
+**Étape 3 — Créer le draft dans Sanity**
+
+```bash
+echo '<json>' | node scripts/create-sanity-post.mjs
+```
+
+Le script vérifie les doublons de slug, crée le document en `status: "draft"`, et retourne l'ID + lien Sanity Studio.
+
+**Étape 4 — Confirmer**
+
+Afficher à l'utilisateur : titre, slug, lien direct vers le document dans Sanity Studio pour qu'il puisse relire et publier manuellement.
+
+### Sanity
+
+- Project ID : `u7ptqvl2`
+- Dataset : `production`
+- Script de création : `scripts/create-sanity-post.mjs` (lit `.env.local` automatiquement)
+- Les documents créés sont toujours en `status: "draft"` — l'utilisateur publie manuellement depuis Sanity Studio
+- Ne jamais créer de doublon : le script vérifie le slug avant de créer

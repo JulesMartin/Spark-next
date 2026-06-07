@@ -1,93 +1,181 @@
 import Image from 'next/image'
-import Link from 'next/link'
-import { Content } from '@/lib/types'
-import { getYouTubeThumbnail } from '@/lib/youtube'
+import { YouTubeVideo } from '@/lib/youtube-feed'
 
-export default function FeaturedInterview({ interview }: { interview: Content }) {
-  const thumbnail =
-    interview.thumbnail_url ||
-    (interview.youtube_url ? getYouTubeThumbnail(interview.youtube_url) : '/placeholder.jpg')
+function formatDate(iso?: string) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+export default function FeaturedInterview({ video }: { video: YouTubeVideo | null }) {
+  if (!video) return null
 
   return (
-    <section>
-      <div className="max-w-7xl mx-auto px-6 md:px-12 py-20 md:py-28">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-
+    <section
+      style={{
+        maxWidth: 1200,
+        marginInline: 'auto',
+        paddingInline: 'clamp(20px,5vw,56px)',
+        paddingBottom: 'clamp(36px,5vw,64px)',
+      }}
+    >
+      <a
+        href={video.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ textDecoration: 'none', display: 'block' }}
+      >
+        <div
+          style={{
+            overflow: 'hidden',
+            borderRadius: 32,
+            background: '#FFFFFF',
+            boxShadow: '0 2px 12px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04)',
+            display: 'grid',
+            gridTemplateColumns: '.92fr 1.08fr',
+            alignItems: 'stretch',
+            transition: 'box-shadow 200ms ease',
+          }}
+          className="feat-card"
+        >
           {/* Thumbnail */}
-          <Link href={`/interviews/${interview.slug}`} className="group block relative">
-            <div className="relative aspect-square overflow-hidden border border-edge group-hover:border-accent/50 transition-colors duration-300">
-              <Image
-                src={thumbnail}
-                alt={`${interview.guest_name} — ${interview.title}`}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-              {/* Dark overlay bottom */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-            </div>
-
+          <div style={{ position: 'relative', minHeight: 360 }}>
+            <Image
+              src={video.thumbnail}
+              alt={video.title}
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 860px) 100vw, 46vw"
+            />
             {/* Play button overlay */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center">
-                <svg className="w-6 h-6 text-bg ml-1" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'rgba(0,0,0,.15)',
+                transition: 'background 200ms ease',
+              }}
+              className="feat-overlay"
+            >
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,.92)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 16px rgba(0,0,0,.2)',
+                }}
+              >
+                <svg width="20" height="22" viewBox="0 0 20 22" fill="#1C1C1C">
+                  <path d="M0 0l20 11L0 22V0z" />
                 </svg>
               </div>
             </div>
-          </Link>
+          </div>
 
-          {/* Text content */}
-          <div className="flex flex-col gap-6">
-            <span className="font-body text-xs font-medium tracking-[0.25em] uppercase text-accent">
-              Dernière interview
+          {/* Content */}
+          <div
+            style={{
+              padding:
+                'clamp(26px,3vw,44px) clamp(24px,3vw,48px) clamp(26px,3vw,44px) clamp(24px,3vw,48px)',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                letterSpacing: '.08em',
+                textTransform: 'uppercase' as const,
+                color: '#EAAF48',
+              }}
+            >
+              Dernière vidéo
             </span>
 
-            <div>
-              <h2 className="font-display text-5xl md:text-6xl xl:text-7xl font-black text-cream leading-none tracking-tight">
-                {interview.guest_name}
-              </h2>
-              {interview.guest_title && (
-                <p className="font-body text-muted text-base mt-3">
-                  {interview.guest_title}
-                </p>
-              )}
-            </div>
+            <h2
+              style={{
+                fontSize: 'clamp(22px,2.8vw,34px)',
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.2,
+                color: '#1C1C1C',
+                marginTop: 14,
+                maxWidth: 460,
+              }}
+              className="font-display"
+            >
+              {video.title}
+            </h2>
 
-            {interview.description && (
-              <p className="font-body text-cream/70 text-base leading-relaxed max-w-md">
-                {interview.description}
+            {video.description && (
+              <p
+                style={{
+                  color: '#474747',
+                  fontSize: 16,
+                  lineHeight: 1.6,
+                  marginTop: 18,
+                  maxWidth: 480,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 4,
+                  WebkitBoxOrient: 'vertical' as const,
+                  overflow: 'hidden',
+                }}
+              >
+                {video.description}
               </p>
             )}
 
-            {interview.tags && interview.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {interview.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="font-body text-xs font-medium tracking-wider uppercase text-muted border border-edge px-2 py-1 rounded-sm"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            <div className="pt-2">
-              <Link
-                href={`/interviews/${interview.slug}`}
-                className="inline-flex items-center gap-3 font-body text-sm font-medium uppercase tracking-[0.15em] text-accent hover:text-accent-light transition-colors group"
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 20,
+                marginTop: 26,
+                flexWrap: 'wrap' as const,
+              }}
+            >
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  background: '#1C1C1C',
+                  color: '#fff',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  padding: '11px 22px',
+                  borderRadius: 10,
+                  letterSpacing: '-0.01em',
+                }}
               >
-                Regarder
-                <span className="inline-block transition-transform duration-200 group-hover:translate-x-1.5">
-                  →
+                Regarder sur YouTube <span>→</span>
+              </span>
+              {video.publishedAt && (
+                <span style={{ color: '#8A8A8A', fontSize: 14 }}>
+                  {formatDate(video.publishedAt)}
                 </span>
-              </Link>
+              )}
             </div>
           </div>
         </div>
-      </div>
+      </a>
+
+      <style>{`
+        .feat-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06); }
+        @media (max-width: 860px) {
+          .feat-card { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   )
 }
