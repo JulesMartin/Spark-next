@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { createServiceClient } from '@/lib/supabase/service'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
@@ -112,6 +110,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Send notification email
+    const resend = new Resend(process.env.RESEND_API_KEY)
     const { error: emailError } = await resend.emails.send({
       from: process.env.RESEND_FROM_EMAIL ?? 'Spark <candidatures@spark.fr>',
       to: process.env.CONTACT_EMAIL!,
