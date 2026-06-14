@@ -36,7 +36,7 @@ export default async function CapturePage({
       </nav>
 
       {/* Main */}
-      <main className="flex-1 flex items-center justify-center px-4 py-16">
+      <main className="flex-1 flex items-start justify-center px-4 py-16 min-h-0">
         <div className="w-full max-w-md">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 mb-6">

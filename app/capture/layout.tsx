@@ -17,7 +17,7 @@ const assistant = Assistant({
 
 export default function CaptureLayout({ children }: { children: ReactNode }) {
   return (
-    <div className={`${raleway.variable} ${assistant.variable}`}>
+    <div className={`${raleway.variable} ${assistant.variable} min-h-screen overflow-y-auto`}>
       {children}
     </div>
   )
