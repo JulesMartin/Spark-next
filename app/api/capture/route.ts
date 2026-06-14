@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     const email = body.email?.trim().toLowerCase()
-    const source = body.source ?? 'prompts-ia'
+    const campaign = body.campaign?.trim() ?? 'default'
 
     if (!email || !isValidEmail(email)) {
       return NextResponse.json({ error: 'Adresse email invalide.' }, { status: 400 })
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     if (!existing || existing.length === 0) {
       const { error: insertError } = await supabase.from('email_subscribers').insert({
         email,
-        source,
+        source: campaign,
       })
       if (insertError) {
         console.error('Supabase insert error:', insertError)
@@ -41,12 +41,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Add to Brevo — the welcome automation is triggered by the CAMPAIGN attribute
-    await upsertBrevoContact({ email, campaign: source })
+    await upsertBrevoContact({ email, campaign })
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Subscribe route error:', error)
+    console.error('Capture route error:', error)
     return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })
   }
 }

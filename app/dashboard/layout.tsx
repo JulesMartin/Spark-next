@@ -17,6 +17,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <nav className="flex flex-col gap-1 p-4 flex-1">
           <SidebarLink href="/dashboard" label="Contenus" icon="▤" />
           <SidebarLink href="/dashboard/new" label="Nouveau contenu" icon="+" />
+          <SidebarLink href="/dashboard/leads" label="Leads" icon="◉" />
         </nav>
 
         {/* Bottom */}

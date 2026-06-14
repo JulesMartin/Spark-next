@@ -507,6 +507,8 @@ npx vercel --prod
 
 ## Workflow Blog — URL YouTube → Draft Sanity
 
+Le workflow complet est documenté dans **`WORKFLOW_ARTICLE.md`**. Résumé ci-dessous.
+
 ### Commande déclencheur
 
 Quand l'utilisateur dit **"publie [url youtube]"** :
@@ -517,14 +519,14 @@ Quand l'utilisateur dit **"publie [url youtube]"** :
 yt-dlp --skip-download --write-auto-subs --sub-langs "fr,en" --convert-subs srt -o "/tmp/spark_transcript" "[URL]"
 ```
 
-Lire ensuite le fichier généré (ex: `/tmp/spark_transcript.fr.srt` ou `/tmp/spark_transcript.en.srt`).
+Lire ensuite le fichier généré (ex: `/tmp/spark_transcript.fr.vtt`).
 Si plusieurs fichiers existent, préférer le français.
-Nettoyer le SRT : supprimer les lignes de numéro de séquence (nombres seuls) et les lignes de timestamp (`\d{2}:\d{2}:\d{2},\d{3} --> ...`), garder uniquement le texte.
+Nettoyer : supprimer en-têtes WEBVTT, timestamps, numéros de séquence, balises HTML. Dédupliquer les lignes consécutives identiques.
 
 **Étape 2 — Générer l'article**
 
-Lire `/BLOG_PROMPT.md` pour les règles éditoriales.
-Appliquer ces règles au transcript nettoyé.
+Lire **`BLOG_PROMPT.md`** (style éditorial, anti-patterns IA) ET **`SEO-optimization.md`** (structure SEO, mots-clés, FAQ).
+Appliquer les deux simultanément — voir `WORKFLOW_ARTICLE.md` pour les règles de fusion en cas de conflit.
 Produire un objet JSON valide avec : `title`, `slug`, `excerpt`, `body` (markdown), `tags`, `youtubeUrl`.
 La `coverImageUrl` est calculée automatiquement par le script depuis `youtubeUrl`.
 
