@@ -95,7 +95,7 @@ function AvatarRow() {
         ))}
       </div>
       <span style={{ fontSize: 14, color: '#6E6E6E', fontWeight: 500, maxWidth: 220 }}>
-        +1000 personnes satisfaites
+        +100 personnes satisfaites
       </span>
     </div>
   )
@@ -106,8 +106,6 @@ interface Props {
 }
 
 export default function HeroSection({ featured }: Props) {
-  const portrait = featured?.thumbnail ?? null
-
   return (
     <section
       style={{
@@ -194,27 +192,6 @@ export default function HeroSection({ featured }: Props) {
             >
               Voir les vidéos
             </Link>
-            <a
-              href="https://www.youtube.com/@Z-Start-Web"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                background: '#fff',
-                color: '#1C1C1C',
-                fontSize: 15,
-                fontWeight: 600,
-                padding: '13px 24px',
-                borderRadius: 12,
-                textDecoration: 'none',
-                border: '1.5px solid #E9E9E9',
-                letterSpacing: '-0.01em',
-              }}
-            >
-              <span>▷</span> Chaîne YouTube
-            </a>
           </div>
 
           <div style={{ marginTop: 40 }}>
@@ -233,24 +210,14 @@ export default function HeroSection({ featured }: Props) {
               boxShadow: '0 24px 64px rgba(0,0,0,.18), 0 8px 24px rgba(0,0,0,.10)',
             }}
           >
-            {portrait ? (
-              <Image
-                src={portrait}
-                alt={featured?.title ?? 'Dernière vidéo Spark'}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 900px) 100vw, 45vw"
-              />
-            ) : (
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  background: '#E9E9E9',
-                }}
-              />
-            )}
+            <Image
+              src="/jules-hero.png"
+              alt="Jules Martin"
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 900px) 100vw, 45vw"
+            />
 
             {/* Bottom scrim + caption */}
             <div

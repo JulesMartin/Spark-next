@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { upsertBrevoContact } from '@/lib/brevo'
+import { upsertBrevoContact, sendCampaignEmail } from '@/lib/brevo'
+import { appendEmailToSheet } from '@/lib/google-sheets'
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -41,8 +42,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Add to Brevo — the welcome automation is triggered by the CAMPAIGN attribute
     await upsertBrevoContact({ email, campaign: source })
+    await sendCampaignEmail(email, source)
+    appendEmailToSheet(email, source).catch(console.error)
 
     return NextResponse.json({ success: true })
   } catch (error) {

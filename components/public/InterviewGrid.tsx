@@ -171,7 +171,7 @@ export default function InterviewGrid({ videos }: { videos: YouTubeVideo[] }) {
             textDecoration: 'none',
           }}
         >
-          Voir la chaîne <span aria-hidden="true">→</span>
+          Voir la chaîne YouTube <span aria-hidden="true">→</span>
         </a>
       </div>
 

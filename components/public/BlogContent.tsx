@@ -295,7 +295,7 @@ export default function BlogContent({ posts }: { posts: SanityPost[] }) {
             color: '#EAAF48',
           }}
         >
-          Le journal
+          Le blog
         </span>
 
         <h1
@@ -310,7 +310,7 @@ export default function BlogContent({ posts }: { posts: SanityPost[] }) {
           }}
           className="font-display"
         >
-          Coulisses, décryptages &amp; méthode
+          Guides pratiques &amp; ressources IA
         </h1>
 
         <p
@@ -322,8 +322,8 @@ export default function BlogContent({ posts }: { posts: SanityPost[] }) {
             lineHeight: 1.55,
           }}
         >
-          Ce que nous apprenons en filmant celles et ceux qui construisent — et
-          la façon dont nous fabriquons chaque épisode de Spark.
+          Des articles concrets pour intégrer l&apos;IA dans votre activité — outils,
+          prompts, automatisations et méthodes testées au quotidien.
         </p>
 
         {/* Filter pills */}

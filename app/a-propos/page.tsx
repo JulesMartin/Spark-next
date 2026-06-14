@@ -1,8 +1,8 @@
 import Image from 'next/image'
-import Link from 'next/link'
 import Header from '@/components/public/Header'
 import Footer from '@/components/public/Footer'
 import Newsletter from '@/components/public/Newsletter'
+import SkoolSection from '@/components/public/SkoolSection'
 
 export const revalidate = 60
 
@@ -17,7 +17,7 @@ const PRINCIPLES = [
   },
   {
     title: 'Orienté résultats business',
-    body: "L'IA ne sert que si elle génère des gains concrets. Mon contenu est calibré pour les entrepreneurs et indépendants, pas pour les chercheurs.",
+    body: "L'IA ne sert que si elle génère des gains concrets. Mon contenu est calibré pour les professionnels et indépendants, pas pour les chercheurs.",
   },
 ]
 
@@ -56,7 +56,7 @@ export default function AProposPage() {
                 color: '#EAAF48',
               }}
             >
-              À propos de Jules Martin
+              À propos de Jules-API
             </span>
 
             <h1
@@ -70,7 +70,7 @@ export default function AProposPage() {
               }}
               className="font-display"
             >
-              Créateur de contenu IA pour les entrepreneurs
+              Créateur de contenu IA pour les professionnels
             </h1>
 
             <p
@@ -83,7 +83,7 @@ export default function AProposPage() {
               }}
             >
               Je crée du contenu éducatif sur l&apos;intelligence artificielle — Claude,
-              les agents IA, l&apos;automatisation — pour aider les TPE et entrepreneurs
+              les agents IA, l&apos;automatisation — pour aider les TPE et professionnels
               à intégrer ces outils dans leur activité. Une vidéo tous les deux
               jours, en français.
             </p>
@@ -114,27 +114,8 @@ export default function AProposPage() {
                   letterSpacing: '-0.01em',
                 }}
               >
-                <span>▷</span> Voir la chaîne
+                <span>▷</span> Voir la chaîne YouTube
               </a>
-              <Link
-                href="/devenir-invite"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  background: '#fff',
-                  color: '#1C1C1C',
-                  fontSize: 15,
-                  fontWeight: 600,
-                  padding: '13px 24px',
-                  borderRadius: 12,
-                  textDecoration: 'none',
-                  border: '1.5px solid #E9E9E9',
-                  letterSpacing: '-0.01em',
-                }}
-              >
-                Proposer un invité
-              </Link>
             </div>
           </div>
 
@@ -149,8 +130,8 @@ export default function AProposPage() {
             }}
           >
             <Image
-              src="/jules-portrait.jpg"
-              alt="Jules Martin"
+              src="/jules-hero.png"
+              alt="Jules-API"
               fill
               className="object-cover"
               priority
@@ -278,12 +259,13 @@ export default function AProposPage() {
             className="font-display"
           >
             «&nbsp;L&apos;IA n&apos;est pas réservée aux grandes entreprises. Avec les bons outils,
-            un entrepreneur solo peut se doter de la puissance d&apos;une équipe
+            un professionnel solo peut se doter de la puissance d&apos;une équipe
             entière.&nbsp;»
           </p>
         </div>
       </section>
 
+      <SkoolSection />
       <Newsletter />
       <Footer />
 

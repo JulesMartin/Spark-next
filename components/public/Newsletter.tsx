@@ -1,3 +1,5 @@
+import SubscribeForm from './SubscribeForm'
+
 export default function Newsletter() {
   return (
     <section
@@ -46,7 +48,7 @@ export default function Newsletter() {
             }}
             className="font-display"
           >
-            233 prompts IA pour booster votre productivité — plus mes 10 skills Claude préférés
+            233 prompts IA et mes 10 skills Claude préférés
           </h2>
           <p
             style={{
@@ -57,7 +59,7 @@ export default function Newsletter() {
               lineHeight: 1.6,
             }}
           >
-            La boîte à outils que j&apos;utilise au quotidien, condensée en un guide gratuit à télécharger maintenant.
+            La boîte à outils que j&apos;utilise au quotidien, condensée en un guide gratuit envoyé directement dans ta boîte mail.
           </p>
         </div>
 
@@ -75,35 +77,7 @@ export default function Newsletter() {
               </li>
             ))}
           </ul>
-          <a
-            href="https://julesmartinlouisappledev.systeme.io/43220427?utm_source=site&utm_medium=cta"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              background: '#EAAF48',
-              color: '#1C1C1C',
-              border: 'none',
-              borderRadius: 12,
-              padding: '13px 26px',
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: 'pointer',
-              letterSpacing: '-0.01em',
-              textDecoration: 'none',
-              width: 'fit-content',
-            }}
-          >
-            Télécharger gratuitement
-            <svg viewBox="0 0 16 16" fill="none" width="16" height="16" style={{ flexShrink: 0 }}>
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </a>
-          <p style={{ color: 'rgba(255,255,255,.35)', fontSize: 12, margin: 0 }}>
-            Aucune carte bancaire requise.
-          </p>
+          <SubscribeForm dark />
         </div>
       </div>
 

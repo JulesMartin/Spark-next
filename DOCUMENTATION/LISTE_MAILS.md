@@ -6,12 +6,8 @@ Chaque email soumis via une page de capture est enregistré dans **Supabase**, t
 
 ### Accéder à la table
 
-**Lien direct :**
-👉 https://supabase.com/dashboard/project/emixscupfsvvehjzjykx/editor?schema=public&table=email_subscribers
-
-Ou manuellement :
 1. Va sur https://supabase.com/dashboard
-2. Ouvre le projet **spark-next** (`emixscupfsvvehjzjykx`)
+2. Ouvre le projet **spark-next**
 3. Sidebar → **Table Editor** → `email_subscribers`
 
 ### Colonnes de la table

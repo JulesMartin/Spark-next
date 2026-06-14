@@ -1,6 +1,7 @@
 import Header from '@/components/public/Header'
 import Footer from '@/components/public/Footer'
 import Newsletter from '@/components/public/Newsletter'
+import SkoolSection from '@/components/public/SkoolSection'
 import BlogContent, { type SanityPost } from '@/components/public/BlogContent'
 import { sanityClient } from '@/lib/sanity/client'
 
@@ -21,6 +22,7 @@ export default async function BlogPage() {
     <main className="min-h-screen bg-bg">
       <Header />
       <BlogContent posts={posts} />
+      <SkoolSection />
       <Newsletter />
       <Footer />
     </main>

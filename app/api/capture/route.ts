@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { upsertBrevoContact, sendCampaignEmail } from '@/lib/brevo'
+import { appendEmailToSheet } from '@/lib/google-sheets'
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -43,6 +44,7 @@ export async function POST(request: NextRequest) {
 
     await upsertBrevoContact({ email, campaign })
     await sendCampaignEmail(email, campaign)
+    appendEmailToSheet(email, campaign).catch(console.error)
 
     return NextResponse.json({ success: true })
   } catch (error) {
