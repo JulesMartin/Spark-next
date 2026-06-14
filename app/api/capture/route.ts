@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { upsertBrevoContact } from '@/lib/brevo'
+import { upsertBrevoContact, sendCampaignEmail } from '@/lib/brevo'
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
     }
 
     await upsertBrevoContact({ email, campaign })
+    await sendCampaignEmail(email, campaign)
 
     return NextResponse.json({ success: true })
   } catch (error) {
