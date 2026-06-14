@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import CaptureForm from '@/components/capture/CaptureForm'
+import Footer from '@/components/public/Footer'
 
 export const metadata: Metadata = {
   title: 'Ressource gratuite — Spark',
@@ -72,6 +73,8 @@ export default async function CapturePage({
           </div>
         </div>
       </main>
+
+      <Footer />
     </div>
   )
 }

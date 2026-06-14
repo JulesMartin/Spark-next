@@ -40,9 +40,9 @@ export default function Header() {
       >
         <span
           style={{
-            width: 12,
-            height: 12,
-            borderRadius: 3,
+            width: 10,
+            height: 10,
+            borderRadius: 2,
             background: '#EAAF48',
             transform: 'rotate(45deg)',
             display: 'inline-block',
@@ -51,7 +51,7 @@ export default function Header() {
         />
         <span
           style={{
-            fontSize: 22,
+            fontSize: 17,
             fontWeight: 700,
             letterSpacing: '-0.03em',
             color: '#1C1C1C',
@@ -81,6 +81,7 @@ export default function Header() {
                 paddingBottom: 3,
                 textDecoration: 'none',
                 transition: 'color 150ms ease',
+                whiteSpace: 'nowrap',
               }}
             >
               {label}
@@ -88,29 +89,6 @@ export default function Header() {
           )
         })}
       </nav>
-
-      {/* CTA */}
-      <a
-        href="https://www.youtube.com/@Z-Start-Web"
-        target="_blank"
-        rel="noopener noreferrer"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          background: '#1C1C1C',
-          color: '#fff',
-          fontSize: 14,
-          fontWeight: 600,
-          padding: '8px 18px',
-          borderRadius: 10,
-          textDecoration: 'none',
-          letterSpacing: '-0.01em',
-          boxShadow:
-            '0 1px 2px rgba(0,0,0,.15), inset 0 1px 0 rgba(255,255,255,.08)',
-        }}
-      >
-        S&apos;abonner
-      </a>
     </header>
   )
 }

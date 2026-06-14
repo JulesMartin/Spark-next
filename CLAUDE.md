@@ -1,551 +1,275 @@
-# Media Website — Claude Code Build Script
+# Spark — Claude Code Context
 
-## Project Overview
+## Qui / Quoi
 
-Build a full-stack media website + admin dashboard for publishing interviews, blog posts, and short-form content. The frontend is a minimal, editorial-style public site. The backend is a private dashboard for content management.
-
-**Stack:** TypeScript, React, Next.js (App Router), Tailwind CSS, Supabase (database + auth + storage), Vercel (deployment).
+**Spark** est le site média de Jules Martin, créateur de contenu IA pour les entrepreneurs et TPE. La chaîne YouTube s'appelle **Z-Start-Web** (ID canal : `UCbfucDBGTg_qarA8qJpMe-A`). Le site est à la fois un site éditorial public et un système de capture d'emails + candidatures.
 
 ---
 
-## Architecture
+## Stack technique
+
+| Couche | Outil |
+|---|---|
+| Framework | Next.js 15, App Router, TypeScript |
+| Style | Tailwind CSS + inline styles (design tokens custom) |
+| Base de données + Auth | Supabase (project `emixscupfsvvehjzjykx`) |
+| CMS blog | Sanity (project `u7ptqvl2`, dataset `production`) |
+| Email automation | Brevo (contacts + envois transactionnels) |
+| Email notif candidatures | Resend (domaine vérifié `jules-api.com`) |
+| Déploiement | Vercel |
+
+---
+
+## Architecture des pages publiques
 
 ```
-/
-├── app/
-│   ├── (public)/
-│   │   └── page.tsx              ← Homepage (interview list)
-│   │   └── interviews/[slug]/    ← Single interview page
-│   │   └── blog/[slug]/          ← Single blog post page
-│   ├── dashboard/
-│   │   ├── layout.tsx            ← Protected layout (auth guard)
-│   │   ├── page.tsx              ← Dashboard home (content list)
-│   │   ├── new/page.tsx          ← Create new content
-│   │   └── edit/[id]/page.tsx    ← Edit existing content
-│   └── api/
-│       └── revalidate/route.ts   ← On-demand ISR revalidation
-├── components/
-│   ├── public/
-│   │   ├── Header.tsx
-│   │   ├── FeaturedInterview.tsx
-│   │   └── InterviewGrid.tsx
-│   └── dashboard/
-│       ├── ContentForm.tsx
-│       └── ContentTable.tsx
-├── lib/
-│   ├── supabase/
-│   │   ├── client.ts
-│   │   └── server.ts
-│   └── types.ts
-└── middleware.ts                  ← Auth protection for /dashboard
+/                        → Homepage (RSS YouTube + Hero + Interviews)
+/interviews/[slug]       → Détail interview (Supabase table content)
+/blog                    → Liste articles (Sanity)
+/blog/[slug]             → Détail article (Sanity)
+/a-propos                → Page À propos de Jules Martin
+/devenir-invite          → Formulaire candidature invité
+/prompts-ia              → Lead magnet (233 prompts + 10 skills Claude)
+/capture?c=[slug]        → Page de capture générique par campagne
+/studio                  → Sanity Studio embarqué (Next.js route)
 ```
 
 ---
 
-## Step-by-Step Build Instructions
+## Sources de données par page
 
-### STEP 1 — Init the project
+**Homepage (`/`)** — lit le flux RSS YouTube via `lib/youtube-feed.ts`. `revalidate: 3600`. La première vidéo est "featured", les suivantes vont dans la grille.
 
-```bash
-npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir=false --import-alias="@/*"
-npm install @supabase/supabase-js @supabase/ssr
-```
+**Interviews (`/interviews/[slug]`)** — Supabase table `content`, filtre `type = 'interview'` + `published = true`. Les interviews sont créées depuis le dashboard.
 
----
+**Blog (`/blog` et `/blog/[slug]`)** — Sanity, type `post`, filtre `status == "published"`. Les drafts sont créés par le workflow "publie [url]".
 
-### STEP 2 — Supabase Setup
+**Capture (`/capture?c=[slug]`)** — formulaire générique. Le paramètre `c` définit la campagne. Appelle `/api/capture`.
 
-**Create a Supabase project at supabase.com, then run this SQL in the SQL editor:**
+**Prompts IA (`/prompts-ia`)** — lead magnet fixe. Appelle `/api/subscribe` (source `prompts-ia`).
 
-```sql
--- Content table (interviews, blog posts, short posts)
-create table content (
-  id uuid primary key default gen_random_uuid(),
-  type text not null check (type in ('interview', 'blog', 'post')),
-  title text not null,
-  slug text not null unique,
-  description text,
-  body text,                        -- markdown or rich text for blog/post
-  youtube_url text,                 -- for interviews
-  thumbnail_url text,               -- auto-extracted or uploaded
-  guest_name text,                  -- for interviews
-  guest_title text,                 -- for interviews
-  tags text[],
-  published boolean default false,
-  featured boolean default false,   -- pins to top as "latest interview"
-  published_at timestamptz,
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-
--- Auto-update updated_at
-create or replace function update_updated_at()
-returns trigger as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$ language plpgsql;
-
-create trigger content_updated_at
-  before update on content
-  for each row execute function update_updated_at();
-
--- RLS policies
-alter table content enable row level security;
-
--- Public can read published content
-create policy "Public can read published content"
-  on content for select
-  using (published = true);
-
--- Only authenticated users (you) can do everything
-create policy "Authenticated can manage content"
-  on content for all
-  using (auth.role() = 'authenticated');
-```
-
-**Add env variables to `.env.local`:**
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-```
+**Devenir invité (`/devenir-invite`)** — formulaire candidature. Appelle `/api/candidature`.
 
 ---
 
-### STEP 3 — Types (`lib/types.ts`)
+## Supabase — tables
 
-```typescript
-export type ContentType = 'interview' | 'blog' | 'post'
+### `content`
+Interviews gérées depuis le dashboard.
 
-export interface Content {
-  id: string
-  type: ContentType
-  title: string
-  slug: string
-  description?: string
-  body?: string
-  youtube_url?: string
-  thumbnail_url?: string
-  guest_name?: string
-  guest_title?: string
-  tags?: string[]
-  published: boolean
-  featured: boolean
-  published_at?: string
-  created_at: string
-  updated_at: string
+| Colonne | Type | Notes |
+|---|---|---|
+| `id` | uuid | PK |
+| `type` | text | `interview` / `blog` / `post` |
+| `title` | text | |
+| `slug` | text | unique |
+| `description` | text | |
+| `body` | text | markdown |
+| `youtube_url` | text | |
+| `thumbnail_url` | text | |
+| `guest_name` | text | |
+| `guest_title` | text | |
+| `episode_number` | int | |
+| `tags` | text[] | |
+| `published` | bool | RLS : public lit seulement si true |
+| `featured` | bool | épingle en hero |
+| `published_at` | timestamptz | |
+
+### `email_subscribers`
+Capturés depuis `/capture` et `/prompts-ia`.
+
+| Colonne | Type | Notes |
+|---|---|---|
+| `id` | uuid | PK |
+| `email` | text | lowercase, dédupliqué |
+| `source` | text | slug campagne (ex: `cowork-dm`, `prompts-ia`) |
+| `created_at` | timestamptz | |
+
+### `candidatures`
+Soumissions depuis `/devenir-invite`.
+
+| Colonne | Type | Notes |
+|---|---|---|
+| `id` | uuid | PK |
+| `name` | text | |
+| `email` | text | |
+| `business_type` | text | |
+| `monthly_revenue` | text | |
+| `monthly_clients` | text | |
+| `motivation` | text | optionnel |
+| `ip` | text | rate limiting |
+| `created_at` | timestamptz | |
+
+Lien dashboard Supabase : https://supabase.com/dashboard/project/emixscupfsvvehjzjykx
+
+---
+
+## API Routes
+
+| Route | Méthode | Rôle |
+|---|---|---|
+| `/api/capture` | POST | Capture email campagne → Supabase + Brevo upsert + envoi template |
+| `/api/subscribe` | POST | Lead magnet → Supabase + Brevo upsert (sans template) |
+| `/api/candidature` | POST | Candidature invité → Supabase + notif email Resend |
+| `/api/revalidate` | POST | ISR revalidation manuelle (`/` + `/interviews/[slug]` + `/blog/[slug]`) |
+| `/api/auth/signout` | POST | Déconnexion Supabase |
+
+---
+
+## Brevo — email automation
+
+Config dans `lib/brevo.ts`.
+
+**`CAMPAIGN_TEMPLATES`** : mappe un slug de campagne → ID template Brevo. Ajouter une ligne ici pour chaque nouvelle campagne.
+
+```ts
+const CAMPAIGN_TEMPLATES: Record<string, number> = {
+  'cowork-dm': 3,   // template "Ressource Cowork DM"
 }
 ```
 
----
+**Flux `/api/capture`** :
+1. Insert dans Supabase `email_subscribers` (si email nouveau)
+2. `upsertBrevoContact` → crée/met à jour le contact avec attribut `CAMPAIGN = slug`
+3. `sendCampaignEmail` → envoie le template Brevo correspondant au slug
 
-### STEP 4 — Supabase clients
+**Flux `/api/subscribe`** (`/prompts-ia`) :
+1. Insert dans Supabase `email_subscribers`
+2. `upsertBrevoContact` seulement — pas d'envoi de template (l'automation Brevo prend le relais via l'attribut CAMPAIGN)
 
-**`lib/supabase/client.ts`** (browser)
-```typescript
-import { createBrowserClient } from '@supabase/ssr'
+**Env vars Brevo** :
+- `BREVO_API_KEY` — clé API
+- `BREVO_LIST_ID` — ID liste Brevo (optionnel)
 
-export function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-}
-```
-
-**`lib/supabase/server.ts`** (server components)
-```typescript
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-
-export function createClient() {
-  const cookieStore = cookies()
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll() },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
-}
-```
+Voir `LISTE_MAILS.md` pour le guide complet d'ajout d'une nouvelle campagne.
 
 ---
 
-### STEP 5 — Middleware (auth guard for dashboard)
+## Resend — notifications candidatures
 
-**`middleware.ts`**
-```typescript
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+Utilisé uniquement pour `/api/candidature`. Envoie un email de notification à `CONTACT_EMAIL` (actuellement `julesmartinlouisappledev@hotmail.com`) à chaque nouvelle candidature.
 
-export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return request.cookies.getAll() },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
-
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-  return supabaseResponse
-}
-
-export const config = {
-  matcher: ['/dashboard/:path*'],
-}
-```
+**Env vars** :
+- `RESEND_API_KEY`
+- `RESEND_FROM_EMAIL` — ex: `Spark <contact@jules-api.com>`
+- `CONTACT_EMAIL` — destinataire des notifs
 
 ---
 
-### STEP 6 — Public Homepage (`app/page.tsx`)
+## Sanity CMS
 
-Design specs:
-- **Header**: Logo/name left, minimal nav right (no hamburger menu on desktop)
-- **Featured interview**: Full-width or large card — YouTube thumbnail, guest name + title, description. Bold, editorial feel.
-- **Interview grid**: Below the featured one, a clean grid (2 or 3 cols) of past interviews. Each card: thumbnail, guest name, title, short description, date.
-- **Style**: Dark editorial (near-black background `#0D0D0D`, off-white text `#F0EDE8`, accent color one bold tone — e.g. warm amber `#E8A320` or electric green). Typography: a strong serif or display font for titles (e.g. Playfair Display, Fraunces, or DM Serif Display from Google Fonts) paired with a clean sans for body (e.g. DM Sans, Outfit).
+- **Project ID** : `u7ptqvl2`
+- **Dataset** : `production`
+- **Studio local** : `http://localhost:3000/studio`
+- **Studio prod** : `https://spark-studio.sanity.studio`
+- **Client** : `lib/sanity/client.ts`
 
-```typescript
-// app/page.tsx
-import { createClient } from '@/lib/supabase/server'
-import Header from '@/components/public/Header'
-import FeaturedInterview from '@/components/public/FeaturedInterview'
-import InterviewGrid from '@/components/public/InterviewGrid'
+**Schema document `post`** : `_type`, `title`, `slug` (object), `excerpt`, `body` (markdown texte), `tags`, `youtubeUrl`, `coverImageUrl` (calculée auto depuis youtubeUrl), `publishedAt`, `status` (`draft` | `published`).
 
-export const revalidate = 60 // ISR: revalidate every 60 seconds
+Les drafts sont créés par le script `scripts/create-sanity-post.mjs` via le workflow "publie [url]". L'utilisateur publie manuellement depuis Sanity Studio. Ne jamais créer de doublon de slug.
 
-export default async function HomePage() {
-  const supabase = createClient()
+---
 
-  // Get the featured interview
-  const { data: featured } = await supabase
-    .from('content')
-    .select('*')
-    .eq('type', 'interview')
-    .eq('published', true)
-    .eq('featured', true)
-    .order('published_at', { ascending: false })
-    .limit(1)
-    .single()
+## Workflow "publie [url youtube]"
 
-  // Get other published interviews (exclude featured)
-  const { data: interviews } = await supabase
-    .from('content')
-    .select('*')
-    .eq('type', 'interview')
-    .eq('published', true)
-    .eq('featured', false)
-    .order('published_at', { ascending: false })
-    .limit(20)
+Déclenché quand l'utilisateur dit **"publie [url]"**. Voir `WORKFLOW_ARTICLE.md` pour le détail complet.
 
-  return (
-    <main>
-      <Header />
-      {featured && <FeaturedInterview interview={featured} />}
-      {interviews && interviews.length > 0 && (
-        <InterviewGrid interviews={interviews} />
-      )}
-    </main>
-  )
-}
+**Résumé** :
+1. `yt-dlp` → extrait les sous-titres automatiques (préférer `.fr`, sinon `.en`) → nettoie le VTT en texte brut
+2. Lire `BLOG_PROMPT.md` (style éditorial) ET `SEO-optimization.md` (SEO) → générer l'article en JSON `{ title, slug, excerpt, body, tags, youtubeUrl }`
+3. `echo '<json>' | node scripts/create-sanity-post.mjs` → crée le draft dans Sanity
+4. Afficher titre + slug + lien Studio prod à l'utilisateur
+
+---
+
+## Design system
+
+### Palette (site public sombre)
+```
+bg          #0D0D0D      (Tailwind: bg-bg)
+surface     #161616      (bg-surface)
+border      #222222      (border-border / border-edge)
+text        #F0EDE8      (text-cream)
+muted       #888888      (text-muted)
+accent      #EAAF48      (text-accent / bg-accent)
+```
+
+### Palette (pages capture — fond clair)
+```
+bg          #FCFCD0      (jaune paille)
+highlight   #FEE04F      (jaune vif — boutons, badges)
+text        #000000
+```
+
+### Typographie
+- **Display / titres** : Fraunces (variable `--font-fraunces`) → classe Tailwind `font-display`
+- **Body** : DM Sans (variable `--font-dm-sans`) → classe Tailwind `font-body`
+- **Pages capture uniquement** : Raleway (`--font-raleway`) + Assistant (`--font-assistant`) — chargés dans `app/capture/layout.tsx`
+
+### Règles visuelles site public
+- Pas de border-radius sur les éléments structurels (cards, containers) — editorial sharp
+- Border-radius 2–4px uniquement sur tags et badges
+- Hover cards : `translateY(-2px)` + accent border reveal, pas de shadow lourde
+- Pages capture : style différent (fond jaune, Raleway, coins nets, shadow néo-brutaliste `6px 6px 0 #1A1A1A`)
+
+---
+
+## Composants publics
+
+```
+components/public/
+  Header.tsx           ← sticky, blur, nav 3 liens (Interviews / Blog / À propos), logo Spark réduit (17px), sans bouton CTA
+  HeroSection.tsx      ← hero homepage avec vidéo featured
+  FeaturedInterview.tsx← grande card vidéo featured
+  InterviewGrid.tsx    ← grille 3 cols des autres vidéos
+  Newsletter.tsx       ← section abonnement newsletter
+  Footer.tsx           ← footer sombre 3 colonnes (Brand / Explorer / Spark)
+  BlogContent.tsx      ← liste articles blog
+  GuestCTA.tsx         ← CTA "Devenir invité"
+  GuestForm.tsx        ← formulaire candidature invité
+  SubscribeForm.tsx    ← formulaire lead magnet /prompts-ia
+  ParallaxBackground.tsx
+components/capture/
+  CaptureForm.tsx      ← formulaire générique pages capture (honeypot inclus)
+components/dashboard/
+  ContentForm.tsx      ← create/edit content
+  ContentTable.tsx     ← table avec filtres
 ```
 
 ---
 
-### STEP 7 — Public Components
+## État actuel du dashboard
 
-#### `components/public/Header.tsx`
-- Left: brand name (large, styled with display font)
-- Right: simple nav links — "Interviews", "Blog", maybe "À propos"
-- Sticky on scroll, with a subtle backdrop blur
-- No border by default, thin accent line on scroll
+Le dashboard (`/dashboard`) est **partiellement connecté**. Il utilise encore `lib/mock-data.ts` pour afficher du contenu. Les pages `/dashboard/new` et `/dashboard/edit/[id]` utilisent `ContentForm.tsx` mais leur connexion Supabase est à vérifier. Le middleware protège toutes les routes `/dashboard/*` (redirect vers `/login` si non authentifié).
 
-#### `components/public/FeaturedInterview.tsx`
-Props: `{ interview: Content }`
+---
 
-- Extract YouTube video ID from `youtube_url` and generate thumbnail: `https://img.youtube.com/vi/{VIDEO_ID}/maxresdefault.jpg`
-- Large image left (or full-width hero with overlay text)
-- Text right: label "DERNIÈRE INTERVIEW", guest name (huge display font), guest title, short description, "Regarder →" link
-- Link to `/interviews/[slug]`
+## Variables d'environnement (.env.local)
 
-#### `components/public/InterviewGrid.tsx`
-Props: `{ interviews: Content[] }`
-
-- Section title: "TOUTES LES INTERVIEWS"
-- Responsive grid: 1 col mobile, 2 cols tablet, 3 cols desktop
-- Each card: YouTube thumbnail (16:9), guest name, guest title, date, hover effect (slight scale + accent underline)
-
-**Utility — extract YouTube ID:**
-```typescript
-// lib/youtube.ts
-export function getYouTubeId(url: string): string | null {
-  const regex = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/
-  const match = url.match(regex)
-  return match ? match[1] : null
-}
-
-export function getYouTubeThumbnail(url: string): string {
-  const id = getYouTubeId(url)
-  return id ? `https://img.youtube.com/vi/${id}/maxresdefault.jpg` : '/placeholder.jpg'
-}
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+BREVO_API_KEY
+BREVO_LIST_ID                    # optionnel
+RESEND_API_KEY
+RESEND_FROM_EMAIL                # ex: Spark <contact@jules-api.com>
+CONTACT_EMAIL                    # destinataire notifs candidatures
+RESEND_AUDIENCE_ID               # Resend audience (non utilisé activement)
+NEXT_PUBLIC_SANITY_PROJECT_ID    # u7ptqvl2
+NEXT_PUBLIC_SANITY_DATASET       # production
+SANITY_API_TOKEN
 ```
 
 ---
 
-### STEP 8 — Interview Detail Page (`app/interviews/[slug]/page.tsx`)
+## Règles de développement
 
-- Embed the YouTube video (responsive iframe, aspect-ratio-video Tailwind class)
-- Guest name, title below
-- Description / body below that
-- Back link to homepage
-
----
-
-### STEP 9 — Dashboard Layout + Auth
-
-#### `app/login/page.tsx`
-Simple email/password login form using Supabase auth. After login → redirect to `/dashboard`.
-
-#### `app/dashboard/layout.tsx`
-- Sidebar navigation: Dashboard, Nouveau contenu, Se déconnecter
-- Protected: if no user, middleware already redirects to /login
-- Clean, dark sidebar with accent color, very different from public site
-
-#### `app/dashboard/page.tsx`
-- Table of all content (all types, all statuses)
-- Columns: Type, Title, Status (published/draft), Featured, Date, Actions (Edit, Delete, Toggle published)
-- Filter tabs: All | Interviews | Blog | Posts
-- Button: "+ Nouveau contenu"
-
----
-
-### STEP 10 — Content Form (`app/dashboard/new/page.tsx` + `app/dashboard/edit/[id]/page.tsx`)
-
-**`components/dashboard/ContentForm.tsx`** — unified create/edit form:
-
-Fields:
-- `type`: select — Interview / Blog / Post
-- `title`: text input
-- `slug`: auto-generated from title, editable
-- `description`: textarea
-- `body`: textarea (markdown, for blog/post)
-- `youtube_url`: text input (for interviews — show thumbnail preview on paste)
-- `thumbnail_url`: text input or file upload (optional override)
-- `guest_name`: text input (shown only when type = interview)
-- `guest_title`: text input (shown only when type = interview)
-- `tags`: tag input (comma-separated)
-- `published`: toggle switch
-- `featured`: toggle switch (only one interview should be featured at a time — warn if another is already featured)
-- `published_at`: date picker (defaults to now)
-
-**Auto-slug generation:**
-```typescript
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // remove accents
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-}
-```
-
-**On save:**
-1. Upsert to Supabase
-2. Call `/api/revalidate` to trigger ISR revalidation of homepage and content page
-3. Redirect to `/dashboard`
-
----
-
-### STEP 11 — ISR Revalidation (`app/api/revalidate/route.ts`)
-
-```typescript
-import { revalidatePath } from 'next/cache'
-import { NextRequest, NextResponse } from 'next/server'
-
-export async function POST(request: NextRequest) {
-  revalidatePath('/')
-  revalidatePath('/interviews/[slug]', 'page')
-  revalidatePath('/blog/[slug]', 'page')
-  return NextResponse.json({ revalidated: true })
-}
-```
-
----
-
-## Visual Design Directives
-
-Apply these strictly across all public-facing components:
-
-```css
-/* Design tokens */
---bg: #0D0D0D;
---surface: #161616;
---border: #222222;
---text-primary: #F0EDE8;
---text-secondary: #888888;
---accent: #E8A320;        /* warm amber — adjust to match screenshot */
---accent-hover: #F5B830;
-
-/* Typography */
---font-display: 'Fraunces', 'Playfair Display', Georgia, serif;  /* titles */
---font-body: 'DM Sans', 'Outfit', system-ui, sans-serif;          /* body */
-```
-
-Google Fonts import (add to `app/layout.tsx`):
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-```
-
-**Hover interactions:** cards should have a subtle `translateY(-2px)` + accent border reveal on hover. No heavy shadows — use borders and color instead.
-
-**No rounded corners** on main structural elements (cards, containers). Use sharp edges for an editorial feel. Small radius (2–4px) only for tags and badges.
-
----
-
-## Global Tailwind Config (`tailwind.config.ts`)
-
-```typescript
-import type { Config } from 'tailwindcss'
-
-const config: Config = {
-  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
-  theme: {
-    extend: {
-      colors: {
-        bg: '#0D0D0D',
-        surface: '#161616',
-        border: '#222222',
-        accent: '#E8A320',
-        'text-primary': '#F0EDE8',
-        'text-secondary': '#888888',
-      },
-      fontFamily: {
-        display: ['Fraunces', 'Playfair Display', 'Georgia', 'serif'],
-        body: ['DM Sans', 'Outfit', 'system-ui', 'sans-serif'],
-      },
-    },
-  },
-  plugins: [],
-}
-
-export default config
-```
-
----
-
-## Deployment
-
-```bash
-# Push to GitHub
-git init && git add . && git commit -m "init"
-gh repo create my-media-site --public --push
-
-# Deploy to Vercel
-npx vercel --prod
-# Set env vars in Vercel dashboard:
-# NEXT_PUBLIC_SUPABASE_URL
-# NEXT_PUBLIC_SUPABASE_ANON_KEY
-# SUPABASE_SERVICE_ROLE_KEY
-```
-
----
-
-## What to Build — Priority Order
-
-1. Supabase schema (SQL above)
-2. Next.js project init + Tailwind + Supabase clients
-3. Middleware (auth)
-4. Types + utilities (slugify, YouTube helpers)
-5. Public homepage (Header + FeaturedInterview + InterviewGrid)
-6. Interview detail page
-7. Login page
-8. Dashboard layout + content table
-9. Content form (create + edit)
-10. ISR revalidation endpoint
-11. Deploy to Vercel
-
----
-
-## Notes for Claude Code
-
-- Use **Server Components** by default. Only add `'use client'` when needed (forms, interactive elements, auth state).
-- Use **`next/image`** for all images with proper `width`/`height` or `fill` props.
-- The dashboard does **not** need to be beautiful — clean, functional, dark UI is fine.
-- The **public site** must be exceptional visually — editorial, sharp, memorable.
-- If a screenshot is provided by the user, extract exact colors, font weights, spacing ratios, and component layouts from it. Override the design tokens above accordingly.
-
----
-
-## Workflow Blog — URL YouTube → Draft Sanity
-
-Le workflow complet est documenté dans **`WORKFLOW_ARTICLE.md`**. Résumé ci-dessous.
-
-### Commande déclencheur
-
-Quand l'utilisateur dit **"publie [url youtube]"** :
-
-**Étape 1 — Extraire les sous-titres automatiques**
-
-```bash
-yt-dlp --skip-download --write-auto-subs --sub-langs "fr,en" --convert-subs srt -o "/tmp/spark_transcript" "[URL]"
-```
-
-Lire ensuite le fichier généré (ex: `/tmp/spark_transcript.fr.vtt`).
-Si plusieurs fichiers existent, préférer le français.
-Nettoyer : supprimer en-têtes WEBVTT, timestamps, numéros de séquence, balises HTML. Dédupliquer les lignes consécutives identiques.
-
-**Étape 2 — Générer l'article**
-
-Lire **`BLOG_PROMPT.md`** (style éditorial, anti-patterns IA) ET **`SEO-optimization.md`** (structure SEO, mots-clés, FAQ).
-Appliquer les deux simultanément — voir `WORKFLOW_ARTICLE.md` pour les règles de fusion en cas de conflit.
-Produire un objet JSON valide avec : `title`, `slug`, `excerpt`, `body` (markdown), `tags`, `youtubeUrl`.
-La `coverImageUrl` est calculée automatiquement par le script depuis `youtubeUrl`.
-
-**Étape 3 — Créer le draft dans Sanity**
-
-```bash
-echo '<json>' | node scripts/create-sanity-post.mjs
-```
-
-Le script vérifie les doublons de slug, crée le document en `status: "draft"`, et retourne l'ID + lien Sanity Studio.
-
-**Étape 4 — Confirmer**
-
-Afficher à l'utilisateur : titre, slug, lien direct vers le document dans Sanity Studio pour qu'il puisse relire et publier manuellement.
-
-### Sanity
-
-- Project ID : `u7ptqvl2`
-- Dataset : `production`
-- Script de création : `scripts/create-sanity-post.mjs` (lit `.env.local` automatiquement)
-- Les documents créés sont toujours en `status: "draft"` — l'utilisateur publie manuellement depuis Sanity Studio
-- Ne jamais créer de doublon : le script vérifie le slug avant de créer
+- **Server Components par défaut.** `'use client'` uniquement pour les formulaires, état interactif, hooks browser.
+- **`next/image`** pour toutes les images avec `fill` ou `width`/`height` explicites.
+- Le dashboard n'a pas besoin d'être beau — clean et fonctionnel suffit.
+- Le site public doit être exceptionnel visuellement — éditorial, sharp, mémorable.
+- Pas de commentaires sauf si le WHY est non-obvious.
+- Pas de gestion d'erreur pour des cas impossibles — faire confiance aux garanties framework.
+- Ne jamais publier directement dans Sanity — toujours `status: "draft"`.
+- Ne jamais créer de doublon de slug Sanity.
