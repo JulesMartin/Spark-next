@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { upsertBrevoContact, sendCampaignEmail } from '@/lib/brevo'
-import { appendEmailToSheet } from '@/lib/google-sheets'
+import { upsertEmailToSheet } from '@/lib/google-sheets'
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -11,13 +11,13 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    // Honeypot
     if (body.website) {
       return NextResponse.json({ success: true })
     }
 
     const email = body.email?.trim().toLowerCase()
     const campaign = body.campaign?.trim() ?? 'default'
+    const socialHandle = body.social_handle?.trim() || null
 
     if (!email || !isValidEmail(email)) {
       return NextResponse.json({ error: 'Adresse email invalide.' }, { status: 400 })
@@ -27,24 +27,45 @@ export async function POST(request: NextRequest) {
 
     const { data: existing } = await supabase
       .from('email_subscribers')
-      .select('id')
+      .select('id, campaigns')
       .eq('email', email)
-      .limit(1)
+      .maybeSingle()
 
-    if (!existing || existing.length === 0) {
+    const isNewCampaign = !existing?.campaigns?.includes(campaign)
+    const allCampaigns: string[] = existing
+      ? isNewCampaign
+        ? [...(existing.campaigns ?? []), campaign]
+        : (existing.campaigns ?? [campaign])
+      : [campaign]
+
+    if (!existing) {
       const { error: insertError } = await supabase.from('email_subscribers').insert({
         email,
         source: campaign,
+        campaigns: allCampaigns,
+        social_handle: socialHandle,
       })
       if (insertError) {
         console.error('Supabase insert error:', insertError)
         return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })
       }
+    } else if (isNewCampaign || socialHandle) {
+      await supabase
+        .from('email_subscribers')
+        .update({
+          campaigns: allCampaigns,
+          ...(socialHandle ? { social_handle: socialHandle } : {}),
+        })
+        .eq('email', email)
     }
 
-    await upsertBrevoContact({ email, campaign })
-    await sendCampaignEmail(email, campaign)
-    appendEmailToSheet(email, campaign).catch(console.error)
+    await upsertBrevoContact({ email, campaigns: allCampaigns, socialHandle })
+
+    if (isNewCampaign) {
+      await sendCampaignEmail(email, campaign)
+    }
+
+    upsertEmailToSheet(email, allCampaigns, socialHandle).catch(console.error)
 
     return NextResponse.json({ success: true })
   } catch (error) {

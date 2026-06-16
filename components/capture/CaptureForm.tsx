@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 export default function CaptureForm({ campaign }: { campaign: string }) {
   const [email, setEmail] = useState('')
+  const [socialHandle, setSocialHandle] = useState('')
   const [website, setWebsite] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -17,7 +18,12 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
       const res = await fetch('/api/capture', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim().toLowerCase(), campaign, website }),
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          campaign,
+          social_handle: socialHandle.trim() || undefined,
+          website,
+        }),
       })
       const data = await res.json()
 
@@ -72,6 +78,15 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="ton@email.com"
+        className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white mb-3"
+        style={{ fontFamily: 'var(--font-assistant)' }}
+      />
+
+      <input
+        type="text"
+        value={socialHandle}
+        onChange={(e) => setSocialHandle(e.target.value)}
+        placeholder="@ton_pseudo (Instagram, TikTok…) — optionnel"
         className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white mb-3"
         style={{ fontFamily: 'var(--font-assistant)' }}
       />

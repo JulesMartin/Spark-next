@@ -15,17 +15,23 @@ const CAMPAIGN_TEMPLATES: Record<string, number> = {
 
 type BrevoContactPayload = {
   email: string
-  campaign: string
+  campaigns: string[]
+  socialHandle?: string | null
 }
 
-export async function upsertBrevoContact({ email, campaign }: BrevoContactPayload) {
+export async function upsertBrevoContact({ email, campaigns, socialHandle }: BrevoContactPayload) {
   const apiKey = getApiKey()
   if (!apiKey) return
 
   const listId = Number(process.env.BREVO_LIST_ID)
+  const attributes: Record<string, string> = {
+    CAMPAIGNS: campaigns.join(','),
+  }
+  if (socialHandle) attributes.SOCIAL_HANDLE = socialHandle
+
   const body: Record<string, unknown> = {
     email,
-    attributes: { CAMPAIGN: campaign },
+    attributes,
     updateEnabled: true,
   }
   if (listId) body.listIds = [listId]

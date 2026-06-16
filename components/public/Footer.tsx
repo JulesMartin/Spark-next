@@ -3,8 +3,8 @@ import Link from 'next/link'
 const COLS = [
   {
     heading: 'Explorer',
-    links: ['Vidéos', 'Blog', 'À propos', 'Chaîne YouTube'],
-    hrefs: ['/', '/blog', '/a-propos', 'https://www.youtube.com/@Z-Start-Web'],
+    links: ['Vidéos', 'Services', 'Blog', 'À propos', 'Chaîne YouTube'],
+    hrefs: ['/', '/services', '/blog', '/a-propos', 'https://www.youtube.com/@Z-Start-Web'],
   },
   {
     heading: 'Spark',
