@@ -67,7 +67,6 @@ export default function ServicesPage() {
             fontSize: 19,
             color: '#474747',
             marginTop: 20,
-            maxWidth: 620,
             lineHeight: 1.6,
           }}
         >

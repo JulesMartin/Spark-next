@@ -11,6 +11,12 @@ function getApiKey() {
 const CAMPAIGN_TEMPLATES: Record<string, number> = {
   'cowork-dm': 3,
   'prompts-ia': Number(process.env.BREVO_TEMPLATE_PROMPTS_IA ?? '0'),
+  'contenu-dm': 7,
+  'audit-dm': 8,
+  'fable-dm': 9,
+  'photo-dm': 10,
+  'codex-dm': 11,
+  'stack-dm': 12,
 }
 
 type BrevoContactPayload = {

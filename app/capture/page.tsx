@@ -32,7 +32,7 @@ export default async function CapturePage({
           className="text-xs text-black/50 hover:text-black transition-colors"
           style={{ fontFamily: 'var(--font-assistant)' }}
         >
-          Retour au site
+          Accéder au site
         </a>
       </nav>
 
@@ -54,14 +54,14 @@ export default async function CapturePage({
             className="text-4xl sm:text-5xl font-black uppercase leading-[1.05] tracking-tight text-black mb-4"
             style={{ fontFamily: 'var(--font-raleway)' }}
           >
-            Reçois ta ressource dans ta boîte.
+            Reçois ta ressource dans ta boîte mail
           </h1>
 
           <p
             className="text-base text-black/60 mb-8"
             style={{ fontFamily: 'var(--font-assistant)' }}
           >
-            En 30 secondes. Directement dans ta boîte mail.
+            Pense bien à regarder dans l&apos;onglet <strong>Promotions</strong>, <strong>Spam</strong> ou <strong>Courrier indésirable</strong> pour trouver le mail.
           </p>
 
           {/* Form card */}

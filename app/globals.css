@@ -29,12 +29,13 @@ html {
   background-color: #F5F5F5;
   color: #1C1C1C;
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   font-family: var(--font-dm-sans), 'Outfit', system-ui, sans-serif;
   margin: 0;
-  overflow-x: clip;
+  overflow-x: hidden;
 }
 
 ::-webkit-scrollbar { width: 6px; }

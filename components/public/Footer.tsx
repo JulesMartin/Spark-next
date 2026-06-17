@@ -15,7 +15,7 @@ const COLS = [
 
 export default function Footer() {
   return (
-    <footer style={{ background: '#1C1C1C', color: 'rgba(255,255,255,.7)', marginTop: 0 }}>
+    <footer style={{ background: '#1C1C1C', color: 'rgba(255,255,255,.7)', marginTop: 0, width: '100%', boxSizing: 'border-box' }}>
       {/* Top grid */}
       <div
         style={{

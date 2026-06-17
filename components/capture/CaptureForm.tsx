@@ -86,7 +86,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         type="text"
         value={socialHandle}
         onChange={(e) => setSocialHandle(e.target.value)}
-        placeholder="@ton_pseudo (Instagram, TikTok…) — optionnel"
+        placeholder="@ton_pseudo (Instagram, TikTok…)"
         className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white mb-3"
         style={{ fontFamily: 'var(--font-assistant)' }}
       />
@@ -110,12 +110,6 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         </p>
       )}
 
-      <p
-        className="mt-3 text-xs text-black/50 text-center"
-        style={{ fontFamily: 'var(--font-assistant)' }}
-      >
-        Gratuit · Zéro spam · Désinscription en 1 clic
-      </p>
     </form>
   )
 }
