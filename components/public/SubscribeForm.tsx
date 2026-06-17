@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import posthog from 'posthog-js'
 
 export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
   const [email, setEmail] = useState('')
@@ -25,6 +26,8 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
         setErrorMsg(data.error ?? 'Une erreur est survenue.')
         setStatus('error')
       } else {
+        posthog.identify(email.trim().toLowerCase(), { email: email.trim().toLowerCase() })
+        posthog.capture('lead_magnet_subscribed', { source: 'prompts-ia' })
         setStatus('success')
       }
     } catch {

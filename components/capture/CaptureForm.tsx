@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import posthog from 'posthog-js'
 
 export default function CaptureForm({ campaign }: { campaign: string }) {
   const [email, setEmail] = useState('')
@@ -31,6 +32,8 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         setErrorMsg(data.error ?? 'Une erreur est survenue.')
         setStatus('error')
       } else {
+        posthog.identify(email.trim().toLowerCase(), { email: email.trim().toLowerCase() })
+        posthog.capture('capture_form_submitted', { campaign, has_social_handle: !!socialHandle.trim() })
         setStatus('success')
       }
     } catch {

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import posthog from 'posthog-js'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -29,6 +30,7 @@ export default function LoginPage() {
       setError(error.message)
       setLoading(false)
     } else {
+      posthog.identify(email, { email, role: 'admin' })
       router.push('/dashboard')
       router.refresh()
     }

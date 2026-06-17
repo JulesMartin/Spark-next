@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { upsertBrevoContact, sendCampaignEmail } from '@/lib/brevo'
 import { upsertEmailToSheet } from '@/lib/google-sheets'
+import { getPostHogClient } from '@/lib/posthog-server'
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -66,6 +67,18 @@ export async function POST(request: NextRequest) {
     }
 
     upsertEmailToSheet(email, allCampaigns, socialHandle).catch(console.error)
+
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: email,
+      event: 'email_captured',
+      properties: {
+        campaign,
+        is_new_subscriber: !existing,
+        is_new_campaign: isNewCampaign,
+      },
+    })
+    await posthog.shutdown()
 
     return NextResponse.json({ success: true })
   } catch (error) {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import posthog from 'posthog-js'
 
 const BUSINESS_TYPES = [
   'Agence (marketing, web, conseil...)',
@@ -148,6 +149,12 @@ export default function GuestForm() {
         return
       }
 
+      posthog.identify(email.trim().toLowerCase(), { email: email.trim().toLowerCase() })
+      posthog.capture('guest_candidature_submitted', {
+        business_type: businessType,
+        monthly_revenue: monthlyRevenue,
+        monthly_clients: monthlyClients,
+      })
       setState('success')
     } catch {
       setState('error')

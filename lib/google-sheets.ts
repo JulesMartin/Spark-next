@@ -45,7 +45,7 @@ export async function upsertEmailToSheet(
   const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY)
   const token = await getAccessToken(credentials)
   const sheetId = process.env.GOOGLE_SHEETS_ID
-  const range = encodeURIComponent('Feuille 1!A:E')
+  const range = encodeURIComponent('Liste mails - page de capture!A:E')
   const campaignsStr = campaigns.join(',')
   const now = new Date().toISOString()
 
@@ -61,7 +61,7 @@ export async function upsertEmailToSheet(
 
     if (rowIndex > -1) {
       const firstSeen = rows[rowIndex][3] ?? now
-      const updateRange = encodeURIComponent(`Feuille 1!A${rowIndex + 1}:E${rowIndex + 1}`)
+      const updateRange = encodeURIComponent(`Liste mails - page de capture!A${rowIndex + 1}:E${rowIndex + 1}`)
       await fetch(
         `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${updateRange}?valueInputOption=RAW`,
         {
