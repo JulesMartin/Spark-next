@@ -10,14 +10,14 @@ export const metadata: Metadata = {
 
 const META = {
   coaching: {
-    badge: '✦ Coaching IA 1-to-1',
+    badge: '✦ Coaching individuel',
     headline: 'Réserve ton appel découverte.',
-    sub: "Quelques questions pour préparer notre échange et construire un programme qui te correspond vraiment.",
+    sub: "Remplis ce formulaire afin que j'ai le maximum de détails sur tes besoins",
   },
   b2b: {
-    badge: '✦ Accompagnement B2B',
+    badge: '✦ Accompagnement Entreprise',
     headline: 'Parlons de votre projet.',
-    sub: "Remplissez ce formulaire pour qu'on prépare un échange ciblé sur vos enjeux et vos opportunités IA.",
+    sub: "Remplissez ce formulaire afin que j'ai le maximum de détails sur vos besoins",
   },
 }
 
@@ -46,7 +46,7 @@ export default async function ReserverPage({
           className="text-xs text-black/50 hover:text-black transition-colors"
           style={{ fontFamily: 'var(--font-assistant)' }}
         >
-          ← Retour aux services
+          Retour aux services
         </a>
       </nav>
 
@@ -95,7 +95,7 @@ export default async function ReserverPage({
                 fontFamily: 'var(--font-raleway)',
               }}
             >
-              Coaching 1-to-1
+              Coaching individuel
             </a>
             <a
               href="/reserver?type=b2b"
@@ -112,12 +112,12 @@ export default async function ReserverPage({
                 fontFamily: 'var(--font-raleway)',
               }}
             >
-              B2B
+              Accompagnement Entreprise
             </a>
           </div>
 
           {/* Form */}
-          <div className="bg-white border-2 border-black" style={{ boxShadow: '6px 6px 0 #1A1A1A' }}>
+          <div className="bg-white border-2 border-black" style={{ boxShadow: '6px 6px 0 #1A1A1A', padding: '32px' }}>
             {type === 'coaching' ? (
               <iframe
                 data-tally-src="https://tally.so/embed/xX675d?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
@@ -147,7 +147,7 @@ export default async function ReserverPage({
             className="mt-4 text-xs text-black/40 text-center"
             style={{ fontFamily: 'var(--font-assistant)' }}
           >
-            Tes informations restent confidentielles et ne sont jamais revendues.
+            Vos informations restent confidentielles et ne sont jamais revendues.
           </p>
         </div>
       </main>

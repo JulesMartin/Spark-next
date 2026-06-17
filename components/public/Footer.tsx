@@ -8,8 +8,8 @@ const COLS = [
   },
   {
     heading: 'Spark',
-    links: ['Ressource gratuite', 'Communauté Skool', 'TikTok', 'Instagram'],
-    hrefs: ['/#lead-magnet', 'https://www.skool.com/spark-1953', 'https://www.tiktok.com/@Z-Start-Web', 'https://www.instagram.com/Z-Start-Web'],
+    links: ['Ressource gratuite', 'Communauté Skool', 'Instagram', 'YouTube', 'TikTok'],
+    hrefs: ['/#lead-magnet', 'https://www.skool.com/spark-1953', 'https://www.instagram.com/Z-Start-Web', 'https://www.youtube.com/@Z-Start-Web', 'https://www.tiktok.com/@Z-Start-Web'],
   },
 ]
 
@@ -148,7 +148,7 @@ export default function Footer() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap' as const }}>
-          <span>© {new Date().getFullYear()} Spark Média. Tous droits réservés.</span>
+          <span>© {new Date().getFullYear()} Spark. Tous droits réservés.</span>
           <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
             {/* Instagram */}
             <a
@@ -164,18 +164,6 @@ export default function Footer() {
                 <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
               </svg>
             </a>
-            {/* TikTok */}
-            <a
-              href="https://www.tiktok.com/@Z-Start-Web"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="TikTok"
-              style={{ color: 'rgba(255,255,255,.55)', display: 'flex', alignItems: 'center', transition: 'color 150ms' }}
-            >
-              <svg width="16" height="18" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.73z"/>
-              </svg>
-            </a>
             {/* YouTube */}
             <a
               href="https://www.youtube.com/@Z-Start-Web"
@@ -186,6 +174,18 @@ export default function Footer() {
             >
               <svg width="20" height="15" viewBox="0 0 24 17" fill="currentColor">
                 <path d="M23.5 2.6s-.3-2-1.2-2.7C21.1-.9 19.7-.9 19 -1c-3.4-.3-8.5-.3-8.5-.3s-5.1 0-8.5.2C1.3-.9-.1-.9-1-.2-1.9.5-2.2 2.6-2.2 2.6S-2.5 5-2.5 7.4v2.2c0 2.4.3 4.8.3 4.8s.3 2 1.2 2.7c1.2.8 2.7.8 3.4.8 2.4.2 10.6.3 10.6.3s5.1 0 8.5-.3c.7-.1 2.1-.1 3-1 .9-.7 1.2-2.7 1.2-2.7s.3-2.4.3-4.8V7.4c0-2.4-.3-4.8-.3-4.8zM9.7 11.5V5.2l6.6 3.2-6.6 3.1z"/>
+              </svg>
+            </a>
+            {/* TikTok */}
+            <a
+              href="https://www.tiktok.com/@Z-Start-Web"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok"
+              style={{ color: 'rgba(255,255,255,.55)', display: 'flex', alignItems: 'center', transition: 'color 150ms' }}
+            >
+              <svg width="16" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.73z"/>
               </svg>
             </a>
           </div>

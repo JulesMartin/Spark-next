@@ -4,13 +4,13 @@ import Header from '@/components/public/Header'
 import Footer from '@/components/public/Footer'
 
 export const metadata: Metadata = {
-  title: 'Services — Spark',
-  description: "Coaching IA 1-to-1 et accompagnement B2B par Jules Martin. Passez à l'action avec l'intelligence artificielle.",
+  title: 'Mes services — Spark',
+  description: "Coaching IA 1-to-1 et accompagnement B2B par Jules Martin. Passez à l'action avec l'automatisation.",
 }
 
 const COACHING_FEATURES = [
-  'Sessions individuelles en visio, à votre rythme',
-  'Programme 100% adapté à votre niveau et objectifs',
+  'Sessions individuelles en visio, à ton rythme',
+  'Programme 100% adapté à ton niveau et tes objectifs',
   'Claude, automatisations, agents IA, workflows',
   'Exercices pratiques et suivi entre chaque session',
 ]
@@ -18,7 +18,7 @@ const COACHING_FEATURES = [
 const B2B_FEATURES = [
   "Audit de vos processus et identification des gains",
   "Intégration d'outils IA adaptés à votre secteur",
-  "Formation et montée en compétences de l'équipe",
+  "Respect des normes de sécurité, de vos données client, RGPD...",
   "Suivi, itérations et optimisation dans la durée",
 ]
 
@@ -46,7 +46,7 @@ export default function ServicesPage() {
             color: '#EAAF48',
           }}
         >
-          Services
+          Mes services
         </span>
         <h1
           style={{
@@ -60,19 +60,23 @@ export default function ServicesPage() {
           }}
           className="font-display"
         >
-          Passez à l&apos;action avec l&apos;IA
+          Passez à l&apos;action avec l&apos;automatisation
         </h1>
         <p
           style={{
             fontSize: 19,
             color: '#474747',
             marginTop: 20,
-            maxWidth: 520,
+            maxWidth: 620,
             lineHeight: 1.6,
           }}
         >
-          Solo ou en équipe, je vous accompagne pour passer de &laquo;&nbsp;j&apos;essaie des trucs&nbsp;&raquo;
-          à &laquo;&nbsp;je maîtrise vraiment&nbsp;&raquo;.
+          L&apos;IA transforme déjà la façon dont les professionnels travaillent et dont les entreprises opèrent.
+          La question n&apos;est plus de savoir si vous devez l&apos;intégrer, mais comment le faire efficacement.
+          <br /><br />
+          Que vous soyez un particulier ou un professionnel qui veut maîtriser les outils IA, ou une entreprise
+          qui cherche à automatiser ses processus métier, je vous accompagne avec des méthodes concrètes, testées,
+          directement applicables.
         </p>
       </section>
 
@@ -90,39 +94,53 @@ export default function ServicesPage() {
         }}
         className="services-grid"
       >
-        {/* Coaching card — dark */}
-        <div
-          style={{
-            background: '#1C1C1C',
-            padding: 'clamp(32px,4vw,56px)',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <span
+        {/* Coaching column */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {/* Unified block: yellow header + dark body */}
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <div
+              style={{
+                background: '#EAAF48',
+                padding: 'clamp(18px,2.5vw,28px) clamp(32px,4vw,56px)',
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: 'clamp(22px,2.5vw,34px)',
+                  fontWeight: 700,
+                  letterSpacing: '-0.03em',
+                  color: '#1C1C1C',
+                  lineHeight: 1.1,
+                  margin: 0,
+                }}
+                className="font-display"
+              >
+                Coaching de formation individuel
+              </h2>
+            </div>
+
+          {/* Coaching card — dark */}
+          <div
             style={{
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: '.08em',
-              textTransform: 'uppercase' as const,
-              color: '#EAAF48',
+              background: '#1C1C1C',
+              padding: 'clamp(32px,4vw,56px)',
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
             }}
           >
-            Coaching personnalisé
-          </span>
-
           <h2
             style={{
-              fontSize: 'clamp(26px,3vw,38px)',
+              fontSize: 'clamp(14px,3vw,26px)',
               fontWeight: 700,
               letterSpacing: '-0.02em',
               color: '#fff',
-              marginTop: 18,
+              marginTop: 0,
               lineHeight: 1.15,
             }}
             className="font-display"
           >
-            Apprends l&apos;IA à ton rythme
+            Apprends l&apos;automatisation IA à ton rythme
           </h2>
 
           <p
@@ -185,42 +203,59 @@ export default function ServicesPage() {
               Réserver un appel →
             </Link>
           </div>
+          </div>
+          </div>
         </div>
 
-        {/* B2B card — light */}
-        <div
-          style={{
-            background: '#fff',
-            border: '1.5px solid #E9E9E9',
-            padding: 'clamp(32px,4vw,56px)',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <span
+        {/* B2B column */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {/* Unified block: yellow header + white body */}
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <div
+              style={{
+                background: '#EAAF48',
+                padding: 'clamp(18px,2.5vw,28px) clamp(32px,4vw,56px)',
+              }}
+            >
+              <h2
+                style={{
+                  fontSize: 'clamp(22px,2.5vw,34px)',
+                  fontWeight: 700,
+                  letterSpacing: '-0.03em',
+                  color: '#1C1C1C',
+                  lineHeight: 1.1,
+                  margin: 0,
+                }}
+                className="font-display"
+              >
+                Implémentation d&apos;automatisation
+              </h2>
+            </div>
+
+          {/* B2B card — light */}
+          <div
             style={{
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: '.08em',
-              textTransform: 'uppercase' as const,
-              color: '#EAAF48',
+              background: '#fff',
+              border: '1.5px solid #E9E9E9',
+              borderTop: 'none',
+              padding: 'clamp(32px,4vw,56px)',
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
             }}
           >
-            Entreprises &amp; TPE
-          </span>
-
           <h2
             style={{
-              fontSize: 'clamp(26px,3vw,38px)',
+              fontSize: 'clamp(14px,3vw,26px)',
               fontWeight: 700,
               letterSpacing: '-0.02em',
               color: '#1C1C1C',
-              marginTop: 18,
+              marginTop: 0,
               lineHeight: 1.15,
             }}
             className="font-display"
           >
-            Intégrez l&apos;IA dans vos process
+            Intégrez l&apos;automatisation dans vos process
           </h2>
 
           <p
@@ -282,6 +317,8 @@ export default function ServicesPage() {
             >
               Réserver un appel →
             </Link>
+          </div>
+          </div>
           </div>
         </div>
       </section>

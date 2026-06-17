@@ -32,7 +32,7 @@ export default async function CapturePage({
           className="text-xs text-black/50 hover:text-black transition-colors"
           style={{ fontFamily: 'var(--font-assistant)' }}
         >
-          ← Retour au site
+          Retour au site
         </a>
       </nav>
 

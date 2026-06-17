@@ -62,7 +62,13 @@ function parseEntries(xml: string): YouTubeVideo[] {
 
 export async function fetchYouTubeVideos(): Promise<YouTubeVideo[]> {
   try {
-    const res = await fetch(RSS_URL, { next: { revalidate: 3600 } })
+    const res = await fetch(RSS_URL, {
+      next: { revalidate: 3600 },
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+        'Accept': 'application/atom+xml,application/xml,text/xml,*/*',
+      },
+    })
     if (!res.ok) return []
     const xml = await res.text()
     return parseEntries(xml)

@@ -50,7 +50,7 @@ function NotificationToast({ publishedAt }: { publishedAt?: string }) {
       </div>
       <div>
         <div style={{ fontSize: 11, color: '#8A8A8A', fontWeight: 500 }}>
-          YouTube · {publishedAt ? timeAgo(publishedAt) : '—'}
+          YouTube{publishedAt ? ` · ${timeAgo(publishedAt)}` : ''}
         </div>
         <div style={{ fontSize: 13, color: '#1C1C1C', fontWeight: 600 }}>
           Nouvel épisode en ligne
@@ -232,6 +232,7 @@ export default function HeroSection({ featured }: Props) {
               style={{
                 position: 'absolute',
                 left: 22,
+                right: 22,
                 bottom: 20,
                 color: '#fff',
               }}
@@ -257,7 +258,6 @@ export default function HeroSection({ featured }: Props) {
                   WebkitLineClamp: 2,
                   WebkitBoxOrient: 'vertical' as const,
                   overflow: 'hidden',
-                  maxWidth: 220,
                 }}
               >
                 {featured?.title ?? 'Spark'}
