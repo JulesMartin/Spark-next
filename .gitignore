@@ -43,3 +43,6 @@ next-env.d.ts
 # Claude Code local settings (contient les tokens API)
 .claude/settings.local.json
 .env.local
+
+# Documentation interne
+/DOCUMENTATION
