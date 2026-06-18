@@ -175,7 +175,7 @@ Les drafts sont créés par le script `scripts/create-sanity-post.mjs` via le wo
 Déclenché quand l'utilisateur dit **"publie [url]"**. Voir `documentation/WORKFLOW_ARTICLE.md` pour le détail complet.
 
 **Résumé** :
-1. `yt-dlp` → extrait les sous-titres automatiques (préférer `.fr`, sinon `.en`) → nettoie le VTT en texte brut
+1. `WebFetch` → récupère le transcript YouTube directement (préférer `.fr`, sinon `.en`) → nettoie en texte brut
 2. Lire `documentation/BLOG_PROMPT.md` (style éditorial) ET `documentation/SEO-optimization.md` (SEO) → générer l'article en JSON `{ title, slug, excerpt, body, tags, youtubeUrl }`
 3. `echo '<json>' | node scripts/create-sanity-post.mjs` → crée le draft dans Sanity
 4. Afficher titre + slug + lien Studio prod à l'utilisateur

@@ -6,14 +6,14 @@ Quand l'utilisateur dit **"publie [url youtube]"**, exécuter les étapes ci-des
 
 ---
 
-## Étape 1 — Extraire les sous-titres
+## Étape 1 — Récupérer le transcript
 
-```bash
-yt-dlp --skip-download --write-auto-subs --sub-langs "fr,en" --convert-subs srt -o "/tmp/spark_transcript" "[URL]"
-```
+Utiliser l'outil `WebFetch` pour récupérer le transcript YouTube directement, sans yt-dlp.
 
-- Préférer le fichier `.fr.vtt` ou `.fr.srt` s'il existe, sinon prendre `.en`.
-- Nettoyer le fichier : supprimer les en-têtes WEBVTT, les timestamps (`-->`) et les numéros de séquence. Supprimer les balises HTML (`<c>`, `<00:00:00.000>`). Dédupliquer les lignes consécutives identiques.
+- URL à fetcher : `https://www.youtube.com/watch?v=[VIDEO_ID]` (extraire l'ID depuis l'URL fournie)
+- Alternativement, utiliser un service de transcript comme `https://youtubetranscript.com/?server_vid2=[VIDEO_ID]`
+- Préférer la langue française si disponible, sinon anglais.
+- Nettoyer le texte brut : supprimer timestamps, balises HTML, doublons consécutifs.
 - Joindre en un seul bloc de texte continu.
 
 ---

@@ -8,18 +8,40 @@ export const metadata: Metadata = {
   robots: { index: false },
 }
 
-const META = {
+const SERVICES = {
   coaching: {
     badge: '✦ Coaching individuel',
     headline: 'Réserve ton appel découverte.',
-    sub: "Remplis ce formulaire afin que j'ai le maximum de détails sur tes besoins",
+    sub: `Remplis ce formulaire pour que j'aie le maximum de détails sur tes besoins`,
+    tallyId: 'xX675d',
   },
-  b2b: {
-    badge: '✦ Accompagnement Entreprise',
+  automatisation: {
+    badge: '✦ Automatisation',
+    headline: 'Automatisons ensemble.',
+    sub: `Remplis ce formulaire pour que j'aie le maximum de détails sur tes besoins`,
+    tallyId: 'RG2xZv',
+  },
+  'site-solo': {
+    badge: '✦ Création de site web',
+    headline: 'Parlons de ton projet.',
+    sub: `Remplis ce formulaire pour que j'aie le maximum de détails sur ton projet`,
+    tallyId: 'VLqGqM',
+  },
+  'automatisation-b2b': {
+    badge: '✦ Automatisation Entreprise',
+    headline: "Intégrons l'IA dans vos process.",
+    sub: `Remplissez ce formulaire pour que j'aie le maximum de détails sur vos besoins`,
+    tallyId: 'gDOVyl',
+  },
+  'site-b2b': {
+    badge: '✦ Création de site web',
     headline: 'Parlons de votre projet.',
-    sub: "Remplissez ce formulaire afin que j'ai le maximum de détails sur vos besoins",
+    sub: `Remplissez ce formulaire pour que j'aie le maximum de détails sur votre projet`,
+    tallyId: 'jagZXa',
   },
-}
+} as const
+
+type ServiceType = keyof typeof SERVICES
 
 export default async function ReserverPage({
   searchParams,
@@ -27,8 +49,11 @@ export default async function ReserverPage({
   searchParams: Promise<{ type?: string }>
 }) {
   const params = await searchParams
-  const type = params.type === 'b2b' ? 'b2b' : 'coaching'
-  const meta = META[type]
+  const type: ServiceType =
+    params.type && params.type in SERVICES
+      ? (params.type as ServiceType)
+      : 'coaching'
+  const service = SERVICES[type]
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#FCFCD0' }}>
@@ -59,7 +84,7 @@ export default async function ReserverPage({
               className="text-xs font-black uppercase tracking-[0.2em] text-black px-3 py-1 border-2 border-black"
               style={{ background: '#FEE04F', fontFamily: 'var(--font-raleway)' }}
             >
-              {meta.badge}
+              {service.badge}
             </span>
           </div>
 
@@ -68,79 +93,27 @@ export default async function ReserverPage({
             className="text-4xl sm:text-5xl font-black uppercase leading-[1.05] tracking-tight text-black mb-4"
             style={{ fontFamily: 'var(--font-raleway)' }}
           >
-            {meta.headline}
+            {service.headline}
           </h1>
 
           <p
-            className="text-base text-black/60 mb-8"
-            style={{ fontFamily: 'var(--font-assistant)' }}
+            className="text-lg text-black/60 mb-8"
+            style={{ fontFamily: 'var(--font-assistant)', fontWeight: 400 }}
           >
-            {meta.sub}
+            {service.sub}
           </p>
-
-          {/* Type switcher */}
-          <div className="flex gap-2 mb-8">
-            <a
-              href="/reserver?type=coaching"
-              style={{
-                border: '2px solid black',
-                padding: '6px 16px',
-                fontSize: 12,
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                color: 'black',
-                background: type === 'coaching' ? '#FEE04F' : 'transparent',
-                textDecoration: 'none',
-                fontFamily: 'var(--font-raleway)',
-              }}
-            >
-              Coaching individuel
-            </a>
-            <a
-              href="/reserver?type=b2b"
-              style={{
-                border: '2px solid black',
-                padding: '6px 16px',
-                fontSize: 12,
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.08em',
-                color: 'black',
-                background: type === 'b2b' ? '#FEE04F' : 'transparent',
-                textDecoration: 'none',
-                fontFamily: 'var(--font-raleway)',
-              }}
-            >
-              Accompagnement Entreprise
-            </a>
-          </div>
 
           {/* Form */}
           <div className="bg-white border-2 border-black" style={{ boxShadow: '6px 6px 0 #1A1A1A', padding: '32px' }}>
-            {type === 'coaching' ? (
-              <iframe
-                data-tally-src="https://tally.so/embed/xX675d?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
-                loading="lazy"
-                width="100%"
-                height="800"
-                frameBorder={0}
-                marginHeight={0}
-                marginWidth={0}
-                title="Coaching 1 to 1 avec Jules"
-              />
-            ) : (
-              <iframe
-                data-tally-src="https://tally.so/embed/gDOVyl?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1"
-                loading="lazy"
-                width="100%"
-                height="800"
-                frameBorder={0}
-                marginHeight={0}
-                marginWidth={0}
-                title="Intervention en entreprise de Jules"
-              />
-            )}
+            <iframe
+              src={`https://tally.so/embed/${service.tallyId}?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1`}
+              loading="lazy"
+              width="100%"
+              height="800"
+              frameBorder={0}
+              marginHeight={0}
+              marginWidth={0}
+            />
           </div>
 
           <p
