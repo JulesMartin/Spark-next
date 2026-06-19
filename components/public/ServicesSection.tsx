@@ -18,13 +18,6 @@ const AUTOMATION_SOLO_FEATURES = [
   'Connexion de tes outils : email, agenda, facturation, CRM…',
 ]
 
-const SITE_SOLO_FEATURES = [
-  'Site vitrine, portfolio ou page de vente',
-  'Design adapté à ton image et à ta cible',
-  'Formulaire de contact intégré',
-  'Rapide, optimisé mobile, prêt à publier',
-]
-
 const B2B_AUTO_FEATURES = [
   "Audit de vos processus et identification des gains",
   "Intégration d'outils IA adaptés à votre secteur",
@@ -32,13 +25,20 @@ const B2B_AUTO_FEATURES = [
   "Suivi, itérations et optimisation dans la durée",
 ]
 
-const SITE_B2B_FEATURES = [
-  'Design professionnel orienté crédibilité et conversion',
-  'SEO technique et éditorial pour être trouvé sur Google',
-  'Intégration prise de RDV et formulaires qualifiants',
-  'Analytics et suivi des performances',
-  'Hébergement et maintenance inclus',
+const WEBSITE_SOLO_FEATURES = [
+  'Site vitrine ou landing page sur-mesure',
+  "Implémentation des automatisations qu'il te faut",
+  "Formulaire de contact, capture d'emails et analytics intégrés si nécessaire",
+  'Optimisation SEO si nécessaire',
 ]
+
+const WEBSITE_B2B_FEATURES = [
+  "Implémentation des automatisations qu'il vous faut",
+  'Design adapté à votre charte graphique',
+  'Formulaires, analytics et intégrations CRM inclus',
+  'Optimisation SEO si nécessaire',
+]
+
 
 
 function FeatureList({ features, light }: { features: string[]; light?: boolean }) {
@@ -157,7 +157,7 @@ export default function ServicesSection() {
         <div style={{ background: '#EBEBEB', borderRadius: 16, padding: 10 }}>
 
           {/* Tabs */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 10 }} className="audience-grid">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 24 }} className="audience-grid">
             {AUDIENCES.map(({ key, label, sub }) => (
               <button
                 key={key}
@@ -208,11 +208,11 @@ export default function ServicesSection() {
               key={animKey}
               style={{
                 display: 'grid',
-                gridTemplateColumns: audience === 'solo' ? 'repeat(3,1fr)' : '1fr 1fr',
+                gridTemplateColumns: audience === 'solo' ? '1fr 1fr 1fr' : '1fr 1fr',
                 gap: 10,
                 animation: animKey > 0 ? `svc-slide-${animDir} .28s cubic-bezier(.25,.46,.45,.94) both` : undefined,
               }}
-              className="services-grid"
+              className={`services-grid ${audience === 'solo' ? 'services-grid-3' : ''}`}
             >
               {audience === 'solo' ? (
                 <>
@@ -232,11 +232,11 @@ export default function ServicesSection() {
                     light
                   />
                   <ServiceCard
-                    title="Création de site web"
-                    subtitle="Un site pro à ton image pour te faire connaître"
-                    features={SITE_SOLO_FEATURES}
+                    title="Création de site web automatisé"
+                    subtitle="Obtiens un site sur-mesure, livré rapidement"
+                    features={WEBSITE_SOLO_FEATURES}
                     cta="Réserver un appel"
-                    ctaHref="/reserver?type=site-solo"
+                    ctaHref="/reserver?type=site-web-solo"
                   />
                 </>
               ) : (
@@ -250,11 +250,11 @@ export default function ServicesSection() {
                     light
                   />
                   <ServiceCard
-                    title="Création de site web"
-                    subtitle="Un site professionnel qui génère des prospects"
-                    features={SITE_B2B_FEATURES}
+                    title="Création de site web automatisé"
+                    subtitle="Un site professionnel pour votre entreprise"
+                    features={WEBSITE_B2B_FEATURES}
                     cta="Réserver un appel"
-                    ctaHref="/reserver?type=site-b2b"
+                    ctaHref="/reserver?type=site-web-entreprise"
                   />
                 </>
               )}
@@ -271,6 +271,9 @@ export default function ServicesSection() {
         @keyframes svc-slide-left {
           from { opacity: 0; transform: translateX(-28px); }
           to   { opacity: 1; transform: translateX(0); }
+        }
+        @media (max-width: 1050px) {
+          .services-grid-3 { grid-template-columns: 1fr 1fr !important; }
         }
         @media (max-width: 900px) {
           .services-grid { grid-template-columns: 1fr !important; }

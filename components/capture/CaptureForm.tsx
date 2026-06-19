@@ -75,24 +75,34 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         autoComplete="off"
       />
 
-      <input
-        type="email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="ton@email.com"
-        className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white mb-3"
-        style={{ fontFamily: 'var(--font-assistant)' }}
-      />
+      <div className="w-full mb-3">
+        <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
+          Email — requis
+        </p>
+        <input
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="ton@email.com"
+          className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
+          style={{ fontFamily: 'var(--font-assistant)' }}
+        />
+      </div>
 
-      <input
-        type="text"
-        value={socialHandle}
-        onChange={(e) => setSocialHandle(e.target.value)}
-        placeholder="@ton_pseudo (Instagram, TikTok…)"
-        className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white mb-3"
-        style={{ fontFamily: 'var(--font-assistant)' }}
-      />
+      <div className="w-full mb-3">
+        <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
+          Pseudo — optionnel
+        </p>
+        <input
+          type="text"
+          value={socialHandle}
+          onChange={(e) => setSocialHandle(e.target.value)}
+          placeholder="@ton_pseudo (Instagram, TikTok…)"
+          className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
+          style={{ fontFamily: 'var(--font-assistant)' }}
+        />
+      </div>
 
       <button
         type="submit"

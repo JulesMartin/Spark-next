@@ -21,22 +21,22 @@ const SERVICES = {
     sub: `Remplis ce formulaire pour que j'aie le maximum de détails sur tes besoins`,
     tallyId: 'RG2xZv',
   },
-  'site-solo': {
-    badge: '✦ Création de site web',
-    headline: 'Parlons de ton projet.',
-    sub: `Remplis ce formulaire pour que j'aie le maximum de détails sur ton projet`,
-    tallyId: 'VLqGqM',
-  },
   'automatisation-b2b': {
     badge: '✦ Automatisation Entreprise',
     headline: "Intégrons l'IA dans vos process.",
     sub: `Remplissez ce formulaire pour que j'aie le maximum de détails sur vos besoins`,
     tallyId: 'gDOVyl',
   },
-  'site-b2b': {
-    badge: '✦ Création de site web',
-    headline: 'Parlons de votre projet.',
-    sub: `Remplissez ce formulaire pour que j'aie le maximum de détails sur votre projet`,
+  'site-web-solo': {
+    badge: '✦ Création de site web automatisé',
+    headline: 'Créons ton site web.',
+    sub: `Remplis ce formulaire pour que je comprenne bien ton projet`,
+    tallyId: 'VLqGqM',
+  },
+  'site-web-entreprise': {
+    badge: '✦ Site web Entreprise',
+    headline: 'Créons votre site web.',
+    sub: `Remplissez ce formulaire pour que je comprenne bien votre projet`,
     tallyId: 'jagZXa',
   },
 } as const
