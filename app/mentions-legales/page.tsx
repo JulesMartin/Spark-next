@@ -19,7 +19,6 @@ export default function MentionsLegalesPage() {
           paddingInline: 'clamp(20px,5vw,56px)',
           paddingTop: 'clamp(52px,7vw,100px)',
           paddingBottom: 'clamp(64px,9vw,120px)',
-          color: '#1C1C1C',
         }}
       >
         <h1
@@ -36,9 +35,16 @@ export default function MentionsLegalesPage() {
           Mentions légales
         </h1>
 
-        <Section title="Responsable de publication">
-          <p>Jules Martin</p>
+        <Section title="Éditeur du site">
+          <p><strong style={{ color: '#1C1C1C' }}>Jules Martin</strong></p>
+          <p>Entreprise Individuelle (EI)</p>
+          <p>SIREN : 988 699 591</p>
+          <p>32 Rue de la Beurelière<br />17740 Sainte-Marie-de-Ré<br />France</p>
           <p>Contact : <a href="mailto:contact@jules-api.xyz" style={{ color: '#EAAF48' }}>contact@jules-api.xyz</a></p>
+        </Section>
+
+        <Section title="Directeur de la publication">
+          <p>Jules Martin</p>
         </Section>
 
         <Section title="Hébergement">
@@ -46,13 +52,17 @@ export default function MentionsLegalesPage() {
           <ul style={{ paddingLeft: 20, marginTop: 4, listStyleType: 'disc' }}>
             <li style={{ marginBottom: 4 }}>Vercel Inc.</li>
             <li style={{ marginBottom: 4 }}>440 N Barranca Ave #4133, Covina, CA 91723, États-Unis</li>
-            <li style={{ marginBottom: 4 }}><a href="https://vercel.com" target="_blank" rel="noopener noreferrer" style={{ color: '#EAAF48' }}>vercel.com</a></li>
+            <li style={{ marginBottom: 4 }}>
+              <a href="https://vercel.com" target="_blank" rel="noopener noreferrer" style={{ color: '#EAAF48' }}>
+                vercel.com
+              </a>
+            </li>
           </ul>
         </Section>
 
         <Section title="Propriété intellectuelle">
           <p>
-            L&apos;ensemble des contenus publiés sur Spark (textes, images, vidéos) sont la propriété exclusive de Jules Martin, sauf mention contraire. Toute reproduction ou diffusion sans autorisation est interdite.
+            L&apos;ensemble des contenus publiés sur Spark (textes, images, vidéos) sont la propriété exclusive de Jules Martin, sauf mention contraire. Toute reproduction ou diffusion sans autorisation écrite préalable est interdite.
           </p>
         </Section>
 
