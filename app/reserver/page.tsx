@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const SERVICES = {
   coaching: {
     badge: '✦ Coaching automatisation',
-    headline: 'Réserve ton appel découverte.',
+    headline: 'Réservez votre appel découverte.',
     sub: `Veuillez remplir ce formulaire avant de réserver un appel de découverte d'une durée de 30min`,
     tallyId: 'NpE1Rl',
   },
