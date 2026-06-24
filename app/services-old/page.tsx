@@ -2,11 +2,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '@/components/public/Header'
 import Footer from '@/components/public/Footer'
-import ServicesOffers from '@/components/public/ServicesOffers'
+import ServicesSection from '@/components/public/ServicesSection'
 
 export const metadata: Metadata = {
   title: 'Mes services — Spark',
-  description: "Coaching et mise en place d'automatisation IA par Jules Martin. Pour les indépendants comme pour les entreprises.",
+  description: "Coaching IA, automatisation et création de site web par Jules Martin. Des solutions concrètes pour les indépendants et les entreprises.",
+  robots: { index: false, follow: false },
 }
 
 export default function ServicesPage() {
@@ -60,13 +61,13 @@ export default function ServicesPage() {
           L&apos;IA transforme déjà la façon dont les professionnels travaillent et dont les entreprises opèrent.
           La question n&apos;est plus de savoir si vous devez l&apos;intégrer, mais comment le faire efficacement.
           <br /><br />
-          Deux façons d&apos;avancer ensemble : je vous forme à l&apos;automatisation, ou je la mets en place
-          pour vous. Que vous travailliez seul ou avec une équipe.
+          Que vous travailliez seul ou avec une équipe, je vous accompagne avec des méthodes concrètes,
+          testées, directement applicables.
         </p>
       </section>
 
-      {/* Two offers */}
-      <ServicesOffers />
+      {/* Interactive services selector + grid */}
+      <ServicesSection />
 
       {/* Bottom CTA band */}
       <section

@@ -10,16 +10,16 @@ export const metadata: Metadata = {
 
 const SERVICES = {
   coaching: {
-    badge: '✦ Coaching individuel',
+    badge: '✦ Coaching automatisation',
     headline: 'Réserve ton appel découverte.',
-    sub: `Remplis ce formulaire pour que j'aie le maximum de détails sur tes besoins`,
-    tallyId: 'xX675d',
+    sub: `Veuillez remplir ce formulaire avant de réserver un appel de découverte d'une durée de 30min`,
+    tallyId: 'NpE1Rl',
   },
   automatisation: {
-    badge: '✦ Automatisation',
+    badge: "✦ Mise en place d'automatisation",
     headline: 'Automatisons ensemble.',
-    sub: `Remplis ce formulaire pour que j'aie le maximum de détails sur tes besoins`,
-    tallyId: 'RG2xZv',
+    sub: `Veuillez remplir ce formulaire avant de réserver un appel de découverte d'une durée de 30min`,
+    tallyId: '7RjrJ0',
   },
   'automatisation-b2b': {
     badge: '✦ Automatisation Entreprise',
