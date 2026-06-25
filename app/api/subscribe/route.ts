@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { upsertBrevoContact, sendCampaignEmail } from '@/lib/brevo'
-import { upsertEmailToSheet } from '@/lib/google-sheets'
 import { getPostHogClient } from '@/lib/posthog-server'
 
 function isValidEmail(email: string): boolean {
@@ -60,8 +59,6 @@ export async function POST(request: NextRequest) {
     if (isNewCampaign) {
       await sendCampaignEmail(email, source)
     }
-
-    upsertEmailToSheet(email, allCampaigns, null).catch(console.error)
 
     const posthog = getPostHogClient()
     posthog.capture({

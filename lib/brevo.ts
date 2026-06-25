@@ -57,6 +57,39 @@ export async function upsertBrevoContact({ email, campaigns, socialHandle }: Bre
   }
 }
 
+// Récupère tous les emails désabonnés (emailBlacklisted) de Brevo, en minuscules.
+// Source de vérité RGPD : Brevo gère le lien de désinscription légal dans les emails.
+export async function getBlacklistedEmails(): Promise<Set<string>> {
+  const apiKey = getApiKey()
+  const result = new Set<string>()
+  if (!apiKey) return result
+
+  const limit = 1000
+  let offset = 0
+
+  while (true) {
+    const res = await fetch(
+      `${BREVO_API}/contacts?limit=${limit}&offset=${offset}`,
+      { headers: { 'api-key': apiKey, Accept: 'application/json' } },
+    )
+    if (!res.ok) {
+      console.error('Brevo list contacts error:', await res.text().catch(() => ''))
+      break
+    }
+    const data = (await res.json()) as {
+      contacts?: { email?: string; emailBlacklisted?: boolean }[]
+    }
+    const contacts = data.contacts ?? []
+    for (const c of contacts) {
+      if (c.emailBlacklisted && c.email) result.add(c.email.toLowerCase())
+    }
+    if (contacts.length < limit) break
+    offset += limit
+  }
+
+  return result
+}
+
 export async function sendCampaignEmail(email: string, campaign: string) {
   const apiKey = getApiKey()
   if (!apiKey) return

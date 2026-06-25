@@ -1,11 +1,22 @@
 import { createSign } from 'crypto'
 
+// Onglet et schéma du Google Sheet (backup de email_subscribers).
+// Colonnes : A email | B campaigns | C social_handle | D first_seen | E last_updated | F unsubscribed
+export const SHEET_TAB = 'Liste mails - page de capture'
+export const SHEET_RANGE = `${SHEET_TAB}!A:F`
+
 function base64url(data: string | Buffer): string {
   const buf = typeof data === 'string' ? Buffer.from(data) : data
   return buf.toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '')
 }
 
-async function getAccessToken(credentials: { client_email: string; private_key: string }): Promise<string> {
+export async function getSheetAccessToken(): Promise<string | null> {
+  if (!process.env.GOOGLE_SERVICE_ACCOUNT_KEY) return null
+  const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY) as {
+    client_email: string
+    private_key: string
+  }
+
   const now = Math.floor(Date.now() / 1000)
   const header = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))
   const payload = base64url(JSON.stringify({
@@ -29,57 +40,51 @@ async function getAccessToken(credentials: { client_email: string; private_key: 
       assertion: jwt,
     }),
   })
-
-  const data = await res.json() as { access_token: string }
-  return data.access_token
+  const data = (await res.json()) as { access_token?: string }
+  return data.access_token ?? null
 }
 
-// Schema: email | campaigns (comma-sep) | social_handle | first_seen | last_updated
-export async function upsertEmailToSheet(
-  email: string,
-  campaigns: string[],
-  socialHandle: string | null,
-) {
-  if (!process.env.GOOGLE_SHEETS_ID || !process.env.GOOGLE_SERVICE_ACCOUNT_KEY) return
+function sheetId() {
+  return process.env.GOOGLE_SHEETS_ID
+}
 
-  const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_KEY)
-  const token = await getAccessToken(credentials)
-  const sheetId = process.env.GOOGLE_SHEETS_ID
-  const range = encodeURIComponent('Liste mails - page de capture!A:E')
-  const campaignsStr = campaigns.join(',')
-  const now = new Date().toISOString()
-
-  const getRes = await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}`,
+export async function readSheet(token: string, range = SHEET_RANGE): Promise<string[][]> {
+  const res = await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId()}/values/${encodeURIComponent(range)}`,
     { headers: { Authorization: `Bearer ${token}` } },
   )
+  if (!res.ok) throw new Error(`readSheet ${res.status}: ${await res.text()}`)
+  const { values } = (await res.json()) as { values?: string[][] }
+  return values ?? []
+}
 
-  if (getRes.ok) {
-    const { values } = await getRes.json() as { values?: string[][] }
-    const rows = values ?? []
-    const rowIndex = rows.findIndex(row => row[0]?.toLowerCase() === email)
-
-    if (rowIndex > -1) {
-      const firstSeen = rows[rowIndex][3] ?? now
-      const updateRange = encodeURIComponent(`Liste mails - page de capture!A${rowIndex + 1}:E${rowIndex + 1}`)
-      await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${updateRange}?valueInputOption=RAW`,
-        {
-          method: 'PUT',
-          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ values: [[email, campaignsStr, socialHandle ?? '', firstSeen, now]] }),
-        },
-      )
-      return
-    }
-  }
-
-  await fetch(
-    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}:append?valueInputOption=RAW`,
+// Ajoute des lignes en fin de feuille — ne touche jamais l'existant.
+export async function appendRows(token: string, rows: string[][]): Promise<void> {
+  if (rows.length === 0) return
+  const res = await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId()}/values/${encodeURIComponent(SHEET_RANGE)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
     {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ values: [[email, campaignsStr, socialHandle ?? '', now, now]] }),
+      body: JSON.stringify({ values: rows }),
     },
   )
+  if (!res.ok) throw new Error(`appendRows ${res.status}: ${await res.text()}`)
+}
+
+// Met à jour des cellules ciblées en un seul appel (ex. colonne unsubscribed).
+export async function batchUpdateCells(
+  token: string,
+  data: { range: string; values: string[][] }[],
+): Promise<void> {
+  if (data.length === 0) return
+  const res = await fetch(
+    `https://sheets.googleapis.com/v4/spreadsheets/${sheetId()}/values:batchUpdate`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ valueInputOption: 'RAW', data }),
+    },
+  )
+  if (!res.ok) throw new Error(`batchUpdateCells ${res.status}: ${await res.text()}`)
 }
