@@ -20,6 +20,7 @@ const CAMPAIGN_TEMPLATES: Record<string, number> = {
   'argent-dm': 13,
   'skill-dm': 14,
   'canva-dm': 15,
+  'video-dm': 19,
 }
 
 type BrevoContactPayload = {
