@@ -22,6 +22,7 @@ const CAMPAIGN_TEMPLATES: Record<string, number> = {
   'canva-dm': 15,
   'video-dm': 19,
   'setup-dm': 20,
+  'design-dm': 21,
 }
 
 type BrevoContactPayload = {
