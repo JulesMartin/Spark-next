@@ -60,8 +60,8 @@ export default function ServicesPage() {
           L&apos;IA transforme déjà la façon dont les professionnels travaillent et dont les entreprises opèrent.
           La question n&apos;est plus de savoir si vous devez l&apos;intégrer, mais comment le faire efficacement.
           <br /><br />
-          Deux façons d&apos;avancer ensemble : je vous forme à l&apos;automatisation, ou je la mets en place
-          pour vous. Que vous travailliez seul ou avec une équipe.
+          Trois façons d&apos;avancer ensemble : je vous forme à l&apos;automatisation, je la mets en place
+          pour vous, ou je crée votre site web et vos MVP. Que vous travailliez seul ou avec une équipe.
         </p>
       </section>
 

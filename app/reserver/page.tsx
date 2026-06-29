@@ -21,6 +21,12 @@ const SERVICES = {
     sub: `Veuillez remplir ce formulaire avant de réserver un appel de découverte d'une durée de 30min`,
     tallyId: 'BzgAK7',
   },
+  'site-web': {
+    badge: '✦ Création de site web / MVP',
+    headline: 'Donnons vie à votre projet.',
+    sub: `Remplissez ce formulaire pour que je comprenne bien votre projet de site ou de MVP`,
+    tallyId: 'Xxg8Jj',
+  },
   'automatisation-b2b': {
     badge: '✦ Automatisation Entreprise',
     headline: "Intégrons l'IA dans vos process.",

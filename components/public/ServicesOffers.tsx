@@ -20,6 +20,18 @@ const SETUP_EXTRA = [
   'Création de dashboard pour un meilleur suivi des métriques de votre business',
 ]
 
+const SITE_FEATURES = [
+  'Site vitrine, landing page ou MVP fonctionnel, conçu de A à Z',
+  'Design moderne, responsive et optimisé pour le SEO et la vitesse',
+  'Mise en ligne complète : nom de domaine, hébergement, déploiement',
+]
+
+const SITE_EXTRA = [
+  'Automatisations intégrées directement dans votre site',
+  'Connexion à vos outils : paiement, prise de rendez-vous, CRM…',
+  'Évolutions et maintenance après le lancement',
+]
+
 function FeatureList({ features, light, margin = '24px 0 0' }: { features: string[]; light?: boolean; margin?: string }) {
   return (
     <ul style={{ listStyle: 'none', padding: 0, margin, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -141,7 +153,7 @@ export default function ServicesOffers() {
         paddingBottom: 'clamp(64px,9vw,120px)',
       }}
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }} className="offers-grid">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }} className="offers-grid">
         <OfferCard
           title="Mise en place d'automatisation"
           subtitle="Je construis vos automatisations à votre place"
@@ -161,10 +173,24 @@ export default function ServicesOffers() {
           cta="Réserver un appel"
           ctaHref="/reserver?type=coaching"
         />
+        <OfferCard
+          title="Création de site web / MVP"
+          subtitle="Je conçois votre site ou votre produit de A à Z"
+          features={SITE_FEATURES}
+          extraLabel="Services supplémentaires :"
+          extraFeatures={SITE_EXTRA}
+          audience="Pour lancer une présence en ligne ou valider une idée de produit."
+          cta="Réserver un appel"
+          ctaHref="/reserver?type=site-web"
+          light
+        />
       </div>
 
       <style>{`
-        @media (max-width: 800px) {
+        @media (max-width: 1000px) {
+          .offers-grid { grid-template-columns: 1fr 1fr !important; }
+        }
+        @media (max-width: 700px) {
           .offers-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
