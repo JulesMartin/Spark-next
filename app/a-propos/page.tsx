@@ -84,8 +84,7 @@ export default function AProposPage() {
             >
               Je crée du contenu éducatif sur l&apos;intelligence artificielle — Claude,
               les agents IA, l&apos;automatisation — pour aider les TPE et professionnels
-              à intégrer ces outils dans leur activité. Une vidéo tous les deux
-              jours, en français.
+              à intégrer ces outils dans leur activité.
             </p>
 
             <div

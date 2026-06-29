@@ -13,13 +13,13 @@ const SERVICES = {
     badge: '✦ Coaching automatisation',
     headline: 'Réservez votre appel découverte.',
     sub: `Veuillez remplir ce formulaire avant de réserver un appel de découverte d'une durée de 30min`,
-    tallyId: 'NpE1Rl',
+    tallyId: 'WOgDLR',
   },
   automatisation: {
     badge: "✦ Mise en place d'automatisation",
     headline: 'Automatisons ensemble.',
     sub: `Veuillez remplir ce formulaire avant de réserver un appel de découverte d'une durée de 30min`,
-    tallyId: '7RjrJ0',
+    tallyId: 'BzgAK7',
   },
   'automatisation-b2b': {
     badge: '✦ Automatisation Entreprise',
