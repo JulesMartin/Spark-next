@@ -4,7 +4,8 @@ const COACHING_FEATURES = [
   'Sessions en visio, individuelles ou en équipe, à votre rythme',
   'Programme 100% adapté à votre niveau et vos objectifs',
   'Claude, automatisations N8N, agents IA, workflows, autres outils selon vos besoins',
-  'Exercices pratiques et suivi tout le long de la formation',
+  'Création de workflows que les entreprises adorent',
+  "Accès à mes prompts et templates prêts à l'emploi",
 ]
 
 const SETUP_FEATURES = [
