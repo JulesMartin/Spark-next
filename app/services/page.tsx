@@ -88,7 +88,7 @@ export default function ServicesPage() {
         >
           Pas sûr de l&apos;offre qui vous correspond ?{' '}
           <Link
-            href="/reserver"
+            href="https://calendly.com/jules-api/new-meeting"
             style={{ color: '#1C1C1C', fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: 3 }}
           >
             Réservez un appel

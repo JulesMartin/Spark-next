@@ -163,7 +163,7 @@ export default function ServicesOffers() {
           extraFeatures={SETUP_EXTRA}
           audience="Pour les indépendants comme pour les entreprises."
           cta="Réserver un appel"
-          ctaHref="/reserver?type=automatisation"
+          ctaHref="https://calendly.com/jules-api/new-meeting"
           light
         />
         <OfferCard
@@ -172,7 +172,7 @@ export default function ServicesOffers() {
           features={COACHING_FEATURES}
           audience="Disponible en individuel ou pour votre équipe."
           cta="Réserver un appel"
-          ctaHref="/reserver?type=coaching"
+          ctaHref="https://calendly.com/jules-api/new-meeting"
         />
         <OfferCard
           title="Création de site web / MVP"
@@ -182,7 +182,7 @@ export default function ServicesOffers() {
           extraFeatures={SITE_EXTRA}
           audience="Pour lancer une présence en ligne ou valider une idée de produit."
           cta="Réserver un appel"
-          ctaHref="/reserver?type=site-web"
+          ctaHref="https://calendly.com/jules-api/new-meeting"
           light
         />
       </div>

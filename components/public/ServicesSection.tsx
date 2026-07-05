@@ -221,14 +221,14 @@ export default function ServicesSection() {
                     subtitle="Apprends l'automatisation IA à ton rythme"
                     features={COACHING_FEATURES}
                     cta="Réserver un appel"
-                    ctaHref="/reserver?type=coaching"
+                    ctaHref="https://calendly.com/jules-api/new-meeting"
                   />
                   <ServiceCard
                     title="Automatisation"
                     subtitle="Automatise tes tâches répétitives, gagne du temps"
                     features={AUTOMATION_SOLO_FEATURES}
                     cta="Réserver un appel"
-                    ctaHref="/reserver?type=automatisation"
+                    ctaHref="https://calendly.com/jules-api/new-meeting"
                     light
                   />
                   <ServiceCard
@@ -236,7 +236,7 @@ export default function ServicesSection() {
                     subtitle="Obtiens un site sur-mesure, livré rapidement"
                     features={WEBSITE_SOLO_FEATURES}
                     cta="Réserver un appel"
-                    ctaHref="/reserver?type=site-web-solo"
+                    ctaHref="https://calendly.com/jules-api/new-meeting"
                   />
                 </>
               ) : (
@@ -246,7 +246,7 @@ export default function ServicesSection() {
                     subtitle="Intégrez l'automatisation dans vos process"
                     features={B2B_AUTO_FEATURES}
                     cta="Réserver un appel"
-                    ctaHref="/reserver?type=automatisation-b2b"
+                    ctaHref="https://calendly.com/jules-api/new-meeting"
                     light
                   />
                   <ServiceCard
@@ -254,7 +254,7 @@ export default function ServicesSection() {
                     subtitle="Un site professionnel pour votre entreprise"
                     features={WEBSITE_B2B_FEATURES}
                     cta="Réserver un appel"
-                    ctaHref="/reserver?type=site-web-entreprise"
+                    ctaHref="https://calendly.com/jules-api/new-meeting"
                   />
                 </>
               )}
