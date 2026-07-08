@@ -1,19 +1,12 @@
 import type { Metadata } from 'next'
-import { after } from 'next/server'
-import { headers } from 'next/headers'
 import CaptureForm from '@/components/capture/CaptureForm'
 import Footer from '@/components/public/Footer'
-import { triggerManyChatWaitFlow } from '@/lib/manychat'
 
 export const metadata: Metadata = {
   title: 'Ressource gratuite — Spark',
   description: 'Reçois ta ressource gratuite directement dans ta boîte mail.',
   robots: { index: false },
 }
-
-// Crawlers qui pré-chargent le lien pour générer un aperçu (ex: Messenger) —
-// ne comptent pas comme un vrai clic, donc ne doivent pas déclencher le flow ManyChat.
-const LINK_PREVIEW_BOTS = /facebookexternalhit|Meta-ExternalAgent|WhatsApp|Twitterbot/i
 
 export default async function CapturePage({
   searchParams,
@@ -25,14 +18,6 @@ export default async function CapturePage({
   // Ne garde que les chiffres : ManyChat peut envoyer l'ID entouré d'accolades
   // si la variable est mal insérée dans le lien (ex: {{1719778746}})
   const mcId = params.mc_id?.replace(/\D/g, '') || null
-
-  if (mcId) {
-    const requestHeaders = await headers()
-    const userAgent = requestHeaders.get('user-agent') ?? ''
-    if (!LINK_PREVIEW_BOTS.test(userAgent)) {
-      after(() => triggerManyChatWaitFlow(mcId))
-    }
-  }
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#FCFCD0' }}>
