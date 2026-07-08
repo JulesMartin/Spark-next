@@ -12,7 +12,14 @@ function getApiKey() {
 export async function triggerManyChatWaitFlow(subscriberId: string) {
   const apiKey = getApiKey()
   const flowNs = process.env.MANYCHAT_WAIT_FLOW_NS
-  if (!apiKey || !flowNs) return
+  if (!apiKey) {
+    console.error('ManyChat sendFlow skipped: MANYCHAT_API_KEY missing')
+    return
+  }
+  if (!flowNs) {
+    console.error('ManyChat sendFlow skipped: MANYCHAT_WAIT_FLOW_NS missing')
+    return
+  }
 
   const res = await fetch(`${MANYCHAT_API}/fb/sending/sendFlow`, {
     method: 'POST',
@@ -24,15 +31,25 @@ export async function triggerManyChatWaitFlow(subscriberId: string) {
     body: JSON.stringify({ subscriber_id: subscriberId, flow_ns: flowNs }),
   })
 
+  const responseBody = await res.text().catch(() => '')
   if (!res.ok) {
-    console.error('ManyChat sendFlow error:', await res.text().catch(() => ''))
+    console.error('ManyChat sendFlow error:', responseBody)
+  } else {
+    console.log('ManyChat sendFlow OK for subscriber', subscriberId, responseBody)
   }
 }
 
 export async function markManyChatFormCompleted(subscriberId: string) {
   const apiKey = getApiKey()
   const fieldId = process.env.MANYCHAT_FORM_COMPLETED_FIELD_ID
-  if (!apiKey || !fieldId) return
+  if (!apiKey) {
+    console.error('ManyChat setCustomField skipped: MANYCHAT_API_KEY missing')
+    return
+  }
+  if (!fieldId) {
+    console.error('ManyChat setCustomField skipped: MANYCHAT_FORM_COMPLETED_FIELD_ID missing')
+    return
+  }
 
   const res = await fetch(`${MANYCHAT_API}/fb/subscriber/setCustomField`, {
     method: 'POST',
@@ -48,7 +65,10 @@ export async function markManyChatFormCompleted(subscriberId: string) {
     }),
   })
 
+  const responseBody = await res.text().catch(() => '')
   if (!res.ok) {
-    console.error('ManyChat setCustomField error:', await res.text().catch(() => ''))
+    console.error('ManyChat setCustomField error:', responseBody)
+  } else {
+    console.log('ManyChat setCustomField OK for subscriber', subscriberId, responseBody)
   }
 }
