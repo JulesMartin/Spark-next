@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const campaign = body.campaign?.trim() ?? 'default'
     const socialHandle = body.social_handle?.trim() || null
     const phone = body.phone?.trim() || null
-    const mcId = body.mc_id?.trim() || null
+    const mcId = body.mc_id?.replace(/\D/g, '') || null
 
     if (!firstName) {
       return NextResponse.json({ error: 'Prénom requis.' }, { status: 400 })

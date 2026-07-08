@@ -22,7 +22,9 @@ export default async function CapturePage({
 }) {
   const params = await searchParams
   const campaign = params.c ?? 'default'
-  const mcId = params.mc_id?.trim() || null
+  // Ne garde que les chiffres : ManyChat peut envoyer l'ID entouré d'accolades
+  // si la variable est mal insérée dans le lien (ex: {{1719778746}})
+  const mcId = params.mc_id?.replace(/\D/g, '') || null
 
   if (mcId) {
     const requestHeaders = await headers()
