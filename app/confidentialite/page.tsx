@@ -51,6 +51,7 @@ export default function ConfidentialitePage() {
           <p>Spark collecte uniquement les données que vous fournissez volontairement via les formulaires du site :</p>
           <ul style={{ paddingLeft: 20, marginTop: 8, marginBottom: 0, listStyleType: 'disc' }}>
             <li style={{ marginBottom: 4 }}>Adresse email (formulaires de capture et lead magnet)</li>
+            <li style={{ marginBottom: 4 }}>Numéro de téléphone (formulaires de capture et lead magnet)</li>
             <li style={{ marginBottom: 4 }}>Nom, type d&apos;activité, chiffre d&apos;affaires et motivation (formulaire candidature invité)</li>
           </ul>
           <p style={{ marginTop: 12 }}>
@@ -63,6 +64,7 @@ export default function ConfidentialitePage() {
           <ul style={{ paddingLeft: 20, marginTop: 8, marginBottom: 0, listStyleType: 'disc' }}>
             <li style={{ marginBottom: 4 }}>L&apos;envoi de la ressource demandée par email <em style={{ color: '#888' }}>(exécution d&apos;un contrat)</em></li>
             <li style={{ marginBottom: 4 }}>L&apos;envoi de contenus éducatifs et d&apos;actualités Spark <em style={{ color: '#888' }}>(consentement)</em></li>
+            <li style={{ marginBottom: 4 }}>Vous recontacter par téléphone lorsque vous en faites la demande via un formulaire <em style={{ color: '#888' }}>(consentement)</em></li>
             <li style={{ marginBottom: 4 }}>Le traitement des candidatures pour devenir invité sur la chaîne <em style={{ color: '#888' }}>(intérêt légitime)</em></li>
           </ul>
         </Section>

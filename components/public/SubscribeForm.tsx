@@ -3,8 +3,11 @@
 import { useState } from 'react'
 import posthog from 'posthog-js'
 
+const CALENDLY_URL = 'https://calendly.com/jules-api/new-meeting'
+
 export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [website, setWebsite] = useState('')
@@ -18,7 +21,12 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
       const res = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, website, source: 'prompts-ia' }),
+        body: JSON.stringify({
+          email,
+          website,
+          source: 'prompts-ia',
+          phone: phone.trim(),
+        }),
       })
       const data = await res.json()
 
@@ -50,9 +58,27 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
         <p style={{ fontWeight: 700, fontSize: 16, color: dark ? '#fff' : '#1C1C1C', marginBottom: 6 }}>
           C&apos;est parti !
         </p>
-        <p style={{ fontSize: 13, color: mutedColor ?? '#6E6E6E', lineHeight: 1.5 }}>
+        <p style={{ fontSize: 13, color: mutedColor ?? '#6E6E6E', lineHeight: 1.5, marginBottom: 14 }}>
           Vérifie ta boîte mail — les 233 prompts et les 10 skills Claude arrivent dans quelques minutes.
         </p>
+        <a
+          href={CALENDLY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: 'inline-block',
+            background: '#EAAF48',
+            color: '#1C1C1C',
+            borderRadius: 10,
+            padding: '12px 20px',
+            fontSize: 14,
+            fontWeight: 700,
+            letterSpacing: '-0.01em',
+            textDecoration: 'none',
+          }}
+        >
+          Réserver un appel →
+        </a>
       </div>
     )
   }
@@ -72,24 +98,63 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
       />
 
       <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="ton@email.com"
-          style={{
-            width: '100%',
-            background: dark ? 'rgba(255,255,255,.07)' : '#fff',
-            border: `1.5px solid ${dark ? 'rgba(255,255,255,.15)' : '#E9E9E9'}`,
-            borderRadius: 10,
-            padding: '12px 16px',
-            fontSize: 14,
-            color: dark ? '#fff' : '#1C1C1C',
-            outline: 'none',
-            boxSizing: 'border-box' as const,
-          }}
-        />
+        <div>
+          <p style={{ fontSize: 12, color: mutedColor ?? '#6E6E6E', marginBottom: 6 }}>Email *</p>
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="ton@email.com"
+            style={{
+              width: '100%',
+              background: dark ? 'rgba(255,255,255,.07)' : '#fff',
+              border: `1.5px solid ${dark ? 'rgba(255,255,255,.15)' : '#E9E9E9'}`,
+              borderRadius: 10,
+              padding: '12px 16px',
+              fontSize: 14,
+              color: dark ? '#fff' : '#1C1C1C',
+              outline: 'none',
+              boxSizing: 'border-box' as const,
+            }}
+          />
+        </div>
+
+        <div>
+          <p style={{ fontSize: 12, color: mutedColor ?? '#6E6E6E', marginBottom: 6 }}>Téléphone *</p>
+          <input
+            type="tel"
+            required
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="06 12 34 56 78"
+            style={{
+              width: '100%',
+              background: dark ? 'rgba(255,255,255,.07)' : '#fff',
+              border: `1.5px solid ${dark ? 'rgba(255,255,255,.15)' : '#E9E9E9'}`,
+              borderRadius: 10,
+              padding: '12px 16px',
+              fontSize: 14,
+              color: dark ? '#fff' : '#1C1C1C',
+              outline: 'none',
+              boxSizing: 'border-box' as const,
+            }}
+          />
+        </div>
+
+        <p style={{ fontSize: 10, color: mutedColor ?? '#6E6E6E', lineHeight: 1.4, textAlign: 'center' as const }}>
+          Informations utilisées uniquement pour t&apos;envoyer le guide et te recontacter si besoin. Jamais revendues. Jamais de spam.
+          <br />
+          <a
+            href="/confidentialite"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: mutedColor ?? '#6E6E6E', textDecoration: 'underline' }}
+          >
+            Politique de confidentialité
+          </a>
+        </p>
+
         <button
           type="submit"
           disabled={status === 'loading'}

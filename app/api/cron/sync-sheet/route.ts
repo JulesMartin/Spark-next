@@ -18,6 +18,7 @@ type Subscriber = {
   social_handle: string | null
   created_at: string
   unsubscribed: boolean
+  phone: string | null
 }
 
 async function fetchAllSubscribers(
@@ -29,7 +30,7 @@ async function fetchAllSubscribers(
   while (true) {
     const { data, error } = await supabase
       .from('email_subscribers')
-      .select('email, campaigns, social_handle, created_at, unsubscribed')
+      .select('email, campaigns, social_handle, created_at, unsubscribed, phone')
       .order('created_at', { ascending: true })
       .range(from, from + pageSize - 1)
     if (error) throw new Error(`Supabase select: ${error.message}`)
@@ -98,7 +99,7 @@ export async function GET(request: NextRequest) {
     const unsub = s.unsubscribed ? 'TRUE' : ''
     const existing = sheetMap.get(key)
     if (!existing) {
-      newRows.push([s.email, campaigns, s.social_handle ?? '', s.created_at, now, unsub])
+      newRows.push([s.email, campaigns, s.social_handle ?? '', s.created_at, now, unsub, s.phone ?? ''])
     } else if (s.unsubscribed && existing.unsub !== 'TRUE') {
       flagUpdates.push({ range: `${SHEET_TAB}!F${existing.row}`, values: [['TRUE']] })
     }

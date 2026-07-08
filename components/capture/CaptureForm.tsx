@@ -3,8 +3,11 @@
 import { useState } from 'react'
 import posthog from 'posthog-js'
 
+const CALENDLY_URL = 'https://calendly.com/jules-api/new-meeting'
+
 export default function CaptureForm({ campaign }: { campaign: string }) {
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [socialHandle, setSocialHandle] = useState('')
   const [website, setWebsite] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -24,6 +27,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           campaign,
           social_handle: socialHandle.trim() || undefined,
           website,
+          phone: phone.trim(),
         }),
       })
       const data = await res.json()
@@ -33,7 +37,10 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         setStatus('error')
       } else {
         posthog.identify(email.trim().toLowerCase(), { email: email.trim().toLowerCase() })
-        posthog.capture('capture_form_submitted', { campaign, has_social_handle: !!socialHandle.trim() })
+        posthog.capture('capture_form_submitted', {
+          campaign,
+          has_social_handle: !!socialHandle.trim(),
+        })
         setStatus('success')
       }
     } catch {
@@ -54,9 +61,18 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         >
           C&apos;est dans ta boîte.
         </p>
-        <p className="text-sm text-black/70" style={{ fontFamily: 'var(--font-assistant)' }}>
+        <p className="text-sm text-black/70 mb-5" style={{ fontFamily: 'var(--font-assistant)' }}>
           Vérifie tes mails — ça arrive dans quelques minutes.
         </p>
+        <a
+          href={CALENDLY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block border-2 border-black px-6 py-3 text-sm font-black uppercase tracking-widest text-black transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+          style={{ background: '#FEE04F', boxShadow: '3px 3px 0 #1A1A1A', fontFamily: 'var(--font-raleway)' }}
+        >
+          Réserver un appel →
+        </a>
       </div>
     )
   }
@@ -77,7 +93,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
 
       <div className="w-full mb-3">
         <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
-          Email — requis
+          Email *
         </p>
         <input
           type="email"
@@ -92,7 +108,22 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
 
       <div className="w-full mb-3">
         <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
-          Pseudo — optionnel
+          Téléphone *
+        </p>
+        <input
+          type="tel"
+          required
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="06 12 34 56 78"
+          className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
+          style={{ fontFamily: 'var(--font-assistant)' }}
+        />
+      </div>
+
+      <div className="w-full mb-3">
+        <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
+          Pseudo
         </p>
         <input
           type="text"
@@ -103,6 +134,14 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           style={{ fontFamily: 'var(--font-assistant)' }}
         />
       </div>
+
+      <p className="text-[10px] text-black/60 mb-3 text-center" style={{ fontFamily: 'var(--font-assistant)' }}>
+        Informations utilisées uniquement pour t&apos;envoyer le guide et te recontacter si besoin. Jamais revendues. Jamais de spam.
+        <br />
+        <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="underline">
+          Politique de confidentialité
+        </a>
+      </p>
 
       <button
         type="submit"
