@@ -58,17 +58,35 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
         <p style={{ fontWeight: 700, fontSize: 16, color: dark ? '#fff' : '#1C1C1C', marginBottom: 6 }}>
           C&apos;est parti !
         </p>
-        <p style={{ fontSize: 13, color: mutedColor ?? '#6E6E6E', lineHeight: 1.5, marginBottom: 14 }}>
+        <p style={{ fontSize: 13, color: mutedColor ?? '#6E6E6E', lineHeight: 1.5, marginBottom: 10 }}>
           Vérifie ta boîte mail — les 233 prompts et les 10 skills Claude arrivent dans quelques minutes.
         </p>
+        <div
+          style={{
+            background: dark ? 'rgba(255,255,255,.06)' : '#F2F1EC',
+            borderRadius: 10,
+            padding: '14px 16px',
+            marginBottom: 14,
+            width: 'calc(100% + 6px)',
+            marginInline: '-3px',
+            boxSizing: 'border-box' as const,
+          }}
+        >
+          <p style={{ fontSize: 14, color: dark ? 'rgba(255,255,255,.85)' : '#1C1C1C', lineHeight: 1.5 }}>
+            Si tu souhaites faire un <strong>audit gratuit</strong> de ton business,{' '}
+            <strong>apprendre</strong> les <strong>automatisations</strong>, ou <strong>créer</strong>{' '}
+            un <strong>site web/MVP</strong>, on peut organiser un appel de 30 min.
+          </p>
+        </div>
         <a
           href={CALENDLY_URL}
           target="_blank"
           rel="noopener noreferrer"
           style={{
             display: 'inline-block',
-            background: '#EAAF48',
+            background: '#FFFFFF',
             color: '#1C1C1C',
+            border: `1.5px solid ${dark ? 'rgba(255,255,255,.15)' : '#E9E9E9'}`,
             borderRadius: 10,
             padding: '12px 20px',
             fontSize: 14,
@@ -143,8 +161,9 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
         </div>
 
         <p style={{ fontSize: 10, color: mutedColor ?? '#6E6E6E', lineHeight: 1.4, textAlign: 'center' as const }}>
-          Informations utilisées uniquement pour t&apos;envoyer le guide et te recontacter si besoin. Jamais revendues. Jamais de spam.
+          Informations utilisées uniquement pour t&apos;envoyer le guide et te recontacter si besoin.
           <br />
+          Jamais revendues. Jamais de spam.{' '}
           <a
             href="/confidentialite"
             target="_blank"

@@ -61,15 +61,28 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         >
           C&apos;est dans ta boîte.
         </p>
-        <p className="text-sm text-black/70 mb-5" style={{ fontFamily: 'var(--font-assistant)' }}>
+        <p className="text-sm text-black/70 mb-4" style={{ fontFamily: 'var(--font-assistant)' }}>
           Vérifie tes mails — ça arrive dans quelques minutes.
         </p>
+        <div
+          className="border-2 border-black px-4 py-3 mb-5"
+          style={{ background: '#FCFCD0', width: 'calc(100% + 40px)', marginInline: '-20px' }}
+        >
+          <p
+            className="text-black"
+            style={{ fontFamily: 'var(--font-assistant)', fontSize: '15px', lineHeight: 1.5 }}
+          >
+            Si tu souhaites faire un <strong>audit gratuit</strong> de ton business,{' '}
+            <strong>apprendre</strong> les <strong>automatisations</strong>, ou <strong>créer</strong>{' '}
+            un <strong>site web/MVP</strong>, on peut organiser un appel de 30 min.
+          </p>
+        </div>
         <a
           href={CALENDLY_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block border-2 border-black px-6 py-3 text-sm font-black uppercase tracking-widest text-black transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-          style={{ background: '#FEE04F', boxShadow: '3px 3px 0 #1A1A1A', fontFamily: 'var(--font-raleway)' }}
+          style={{ background: '#FFFFFF', boxShadow: '3px 3px 0 #1A1A1A', fontFamily: 'var(--font-raleway)' }}
         >
           Réserver un appel →
         </a>
@@ -136,8 +149,9 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
       </div>
 
       <p className="text-[10px] text-black/60 mb-3 text-center" style={{ fontFamily: 'var(--font-assistant)' }}>
-        Informations utilisées uniquement pour t&apos;envoyer le guide et te recontacter si besoin. Jamais revendues. Jamais de spam.
+        Informations utilisées uniquement pour t&apos;envoyer le guide et te recontacter si besoin.
         <br />
+        Jamais revendues. Jamais de spam.{' '}
         <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="underline">
           Politique de confidentialité
         </a>
