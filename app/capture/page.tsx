@@ -11,13 +11,10 @@ export const metadata: Metadata = {
 export default async function CapturePage({
   searchParams,
 }: {
-  searchParams: Promise<{ c?: string; mc_id?: string }>
+  searchParams: Promise<{ c?: string }>
 }) {
   const params = await searchParams
   const campaign = params.c ?? 'default'
-  // Ne garde que les chiffres : ManyChat peut envoyer l'ID entouré d'accolades
-  // si la variable est mal insérée dans le lien (ex: {{1719778746}})
-  const mcId = params.mc_id?.replace(/\D/g, '') || null
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#FCFCD0' }}>
@@ -72,7 +69,7 @@ export default async function CapturePage({
             className="bg-white border-2 border-black p-6"
             style={{ boxShadow: '6px 6px 0 #1A1A1A' }}
           >
-            <CaptureForm campaign={campaign} mcId={mcId} />
+            <CaptureForm campaign={campaign} />
           </div>
         </div>
       </main>
