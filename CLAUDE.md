@@ -82,6 +82,7 @@ Capturés depuis `/capture` et `/prompts-ia`.
 |---|---|---|
 | `id` | uuid | PK |
 | `email` | text | lowercase, dédupliqué |
+| `first_name` | text | requis sur `/capture` et `/prompts-ia` |
 | `source` | text | slug campagne (ex: `cowork-dm`, `prompts-ia`) |
 | `created_at` | timestamptz | |
 

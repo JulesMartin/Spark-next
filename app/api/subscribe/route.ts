@@ -15,10 +15,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true })
     }
 
+    const firstName = body.first_name?.trim() || null
     const email = body.email?.trim().toLowerCase()
     const source = body.source ?? 'prompts-ia'
     const phone = body.phone?.trim() || null
 
+    if (!firstName) {
+      return NextResponse.json({ error: 'Prénom requis.' }, { status: 400 })
+    }
     if (!email || !isValidEmail(email)) {
       return NextResponse.json({ error: 'Adresse email invalide.' }, { status: 400 })
     }
@@ -47,22 +51,24 @@ export async function POST(request: NextRequest) {
         source,
         campaigns: allCampaigns,
         phone,
+        first_name: firstName,
       })
       if (insertError) {
         console.error('Supabase insert error:', insertError)
         return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })
       }
-    } else if (isNewCampaign || phone) {
+    } else if (isNewCampaign || phone || firstName) {
       await supabase
         .from('email_subscribers')
         .update({
           campaigns: allCampaigns,
           ...(phone ? { phone } : {}),
+          ...(firstName ? { first_name: firstName } : {}),
         })
         .eq('email', email)
     }
 
-    await upsertBrevoContact({ email, campaigns: allCampaigns, phone })
+    await upsertBrevoContact({ email, campaigns: allCampaigns, phone, firstName })
 
     if (isNewCampaign) {
       await sendCampaignEmail(email, source)

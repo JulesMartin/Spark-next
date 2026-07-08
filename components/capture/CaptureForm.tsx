@@ -6,6 +6,7 @@ import posthog from 'posthog-js'
 const CALENDLY_URL = 'https://calendly.com/jules-api/new-meeting'
 
 export default function CaptureForm({ campaign }: { campaign: string }) {
+  const [firstName, setFirstName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [socialHandle, setSocialHandle] = useState('')
@@ -23,6 +24,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          first_name: firstName.trim(),
           email: email.trim().toLowerCase(),
           campaign,
           social_handle: socialHandle.trim() || undefined,
@@ -104,48 +106,67 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         autoComplete="off"
       />
 
-      <div className="w-full mb-3">
-        <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
-          Email *
-        </p>
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="ton@email.com"
-          className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
-          style={{ fontFamily: 'var(--font-assistant)' }}
-        />
+      <div className="w-full mb-3 flex flex-col min-[480px]:flex-row gap-3">
+        <div className="flex-1">
+          <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
+            Prénom *
+          </p>
+          <input
+            type="text"
+            required
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Ton prénom"
+            className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
+            style={{ fontFamily: 'var(--font-assistant)' }}
+          />
+        </div>
+
+        <div className="flex-1">
+          <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
+            Pseudo
+          </p>
+          <input
+            type="text"
+            value={socialHandle}
+            onChange={(e) => setSocialHandle(e.target.value)}
+            placeholder="@ton_pseudo"
+            className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
+            style={{ fontFamily: 'var(--font-assistant)' }}
+          />
+        </div>
       </div>
 
-      <div className="w-full mb-3">
-        <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
-          Téléphone *
-        </p>
-        <input
-          type="tel"
-          required
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="06 12 34 56 78"
-          className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
-          style={{ fontFamily: 'var(--font-assistant)' }}
-        />
-      </div>
+      <div className="w-full mb-3 flex flex-col min-[480px]:flex-row gap-3">
+        <div className="flex-1">
+          <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
+            Email *
+          </p>
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="ton@email.com"
+            className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
+            style={{ fontFamily: 'var(--font-assistant)' }}
+          />
+        </div>
 
-      <div className="w-full mb-3">
-        <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
-          Pseudo
-        </p>
-        <input
-          type="text"
-          value={socialHandle}
-          onChange={(e) => setSocialHandle(e.target.value)}
-          placeholder="@ton_pseudo (Instagram, TikTok…)"
-          className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
-          style={{ fontFamily: 'var(--font-assistant)' }}
-        />
+        <div className="flex-1">
+          <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
+            Téléphone *
+          </p>
+          <input
+            type="tel"
+            required
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="06 12 34 56 78"
+            className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
+            style={{ fontFamily: 'var(--font-assistant)' }}
+          />
+        </div>
       </div>
 
       <p className="text-[10px] text-black/60 mb-3 text-center" style={{ fontFamily: 'var(--font-assistant)' }}>

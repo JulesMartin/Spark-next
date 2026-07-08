@@ -6,6 +6,7 @@ import posthog from 'posthog-js'
 const CALENDLY_URL = 'https://calendly.com/jules-api/new-meeting'
 
 export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
+  const [firstName, setFirstName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -22,6 +23,7 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          first_name: firstName.trim(),
           email,
           website,
           source: 'prompts-ia',
@@ -117,13 +119,13 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
 
       <div style={{ display: 'flex', flexDirection: 'column' as const, gap: 10 }}>
         <div>
-          <p style={{ fontSize: 12, color: mutedColor ?? '#6E6E6E', marginBottom: 6 }}>Email *</p>
+          <p style={{ fontSize: 12, color: mutedColor ?? '#6E6E6E', marginBottom: 6 }}>Prénom *</p>
           <input
-            type="email"
+            type="text"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="ton@email.com"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            placeholder="Ton prénom"
             style={{
               width: '100%',
               background: dark ? 'rgba(255,255,255,.07)' : '#fff',
@@ -138,26 +140,50 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
           />
         </div>
 
-        <div>
-          <p style={{ fontSize: 12, color: mutedColor ?? '#6E6E6E', marginBottom: 6 }}>Téléphone *</p>
-          <input
-            type="tel"
-            required
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="06 12 34 56 78"
-            style={{
-              width: '100%',
-              background: dark ? 'rgba(255,255,255,.07)' : '#fff',
-              border: `1.5px solid ${dark ? 'rgba(255,255,255,.15)' : '#E9E9E9'}`,
-              borderRadius: 10,
-              padding: '12px 16px',
-              fontSize: 14,
-              color: dark ? '#fff' : '#1C1C1C',
-              outline: 'none',
-              boxSizing: 'border-box' as const,
-            }}
-          />
+        <div className="flex flex-col min-[480px]:flex-row" style={{ gap: 10 }}>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 12, color: mutedColor ?? '#6E6E6E', marginBottom: 6 }}>Email *</p>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="ton@email.com"
+              style={{
+                width: '100%',
+                background: dark ? 'rgba(255,255,255,.07)' : '#fff',
+                border: `1.5px solid ${dark ? 'rgba(255,255,255,.15)' : '#E9E9E9'}`,
+                borderRadius: 10,
+                padding: '12px 16px',
+                fontSize: 14,
+                color: dark ? '#fff' : '#1C1C1C',
+                outline: 'none',
+                boxSizing: 'border-box' as const,
+              }}
+            />
+          </div>
+
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 12, color: mutedColor ?? '#6E6E6E', marginBottom: 6 }}>Téléphone *</p>
+            <input
+              type="tel"
+              required
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="06 12 34 56 78"
+              style={{
+                width: '100%',
+                background: dark ? 'rgba(255,255,255,.07)' : '#fff',
+                border: `1.5px solid ${dark ? 'rgba(255,255,255,.15)' : '#E9E9E9'}`,
+                borderRadius: 10,
+                padding: '12px 16px',
+                fontSize: 14,
+                color: dark ? '#fff' : '#1C1C1C',
+                outline: 'none',
+                boxSizing: 'border-box' as const,
+              }}
+            />
+          </div>
         </div>
 
         <p style={{ fontSize: 10, color: mutedColor ?? '#6E6E6E', lineHeight: 1.4, textAlign: 'center' as const }}>

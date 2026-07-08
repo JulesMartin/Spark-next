@@ -15,11 +15,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true })
     }
 
+    const firstName = body.first_name?.trim() || null
     const email = body.email?.trim().toLowerCase()
     const campaign = body.campaign?.trim() ?? 'default'
     const socialHandle = body.social_handle?.trim() || null
     const phone = body.phone?.trim() || null
 
+    if (!firstName) {
+      return NextResponse.json({ error: 'Prénom requis.' }, { status: 400 })
+    }
     if (!email || !isValidEmail(email)) {
       return NextResponse.json({ error: 'Adresse email invalide.' }, { status: 400 })
     }
@@ -49,23 +53,25 @@ export async function POST(request: NextRequest) {
         campaigns: allCampaigns,
         social_handle: socialHandle,
         phone,
+        first_name: firstName,
       })
       if (insertError) {
         console.error('Supabase insert error:', insertError)
         return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })
       }
-    } else if (isNewCampaign || socialHandle || phone) {
+    } else if (isNewCampaign || socialHandle || phone || firstName) {
       await supabase
         .from('email_subscribers')
         .update({
           campaigns: allCampaigns,
           ...(socialHandle ? { social_handle: socialHandle } : {}),
           ...(phone ? { phone } : {}),
+          ...(firstName ? { first_name: firstName } : {}),
         })
         .eq('email', email)
     }
 
-    await upsertBrevoContact({ email, campaigns: allCampaigns, socialHandle, phone })
+    await upsertBrevoContact({ email, campaigns: allCampaigns, socialHandle, phone, firstName })
 
     if (isNewCampaign) {
       await sendCampaignEmail(email, campaign)

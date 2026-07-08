@@ -4,11 +4,13 @@ Chaque inscription via `/api/capture` et `/api/subscribe` est écrite en parall�
 
 ## Structure de la Sheet
 
-| A — email | B — source | C — created_at |
-|---|---|---|
-| test@test.com | cowork-dm | 2026-06-14T... |
+| A — email | B — campaigns | C — social_handle | D — first_seen | E — last_updated | F — unsubscribed | G — phone | H — first_name |
+|---|---|---|---|---|---|---|---|
+| test@test.com | cowork-dm | @test | 2026-06-14T... | 2026-07-08T... | | 0612345678 | Jules |
 
-Nom de l'onglet attendu : **`Feuille 1`**
+Nom de l'onglet attendu : **`Liste mails - page de capture`** (voir `SHEET_TAB` dans `lib/google-sheets.ts`)
+
+La colonne H (`first_name`) doit être ajoutée manuellement dans la Sheet existante — le sync (`/api/cron/sync-sheet`) n'ajoute que des lignes en fin de feuille, il ne modifie jamais l'en-tête ni les colonnes existantes.
 
 ## Variables d'environnement requises
 

@@ -1,9 +1,9 @@
 import { createSign } from 'crypto'
 
 // Onglet et schéma du Google Sheet (backup de email_subscribers).
-// Colonnes : A email | B campaigns | C social_handle | D first_seen | E last_updated | F unsubscribed | G phone
+// Colonnes : A email | B campaigns | C social_handle | D first_seen | E last_updated | F unsubscribed | G phone | H first_name
 export const SHEET_TAB = 'Liste mails - page de capture'
-export const SHEET_RANGE = `${SHEET_TAB}!A:G`
+export const SHEET_RANGE = `${SHEET_TAB}!A:H`
 
 function base64url(data: string | Buffer): string {
   const buf = typeof data === 'string' ? Buffer.from(data) : data

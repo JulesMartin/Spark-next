@@ -31,9 +31,10 @@ type BrevoContactPayload = {
   campaigns: string[]
   socialHandle?: string | null
   phone?: string | null
+  firstName?: string | null
 }
 
-export async function upsertBrevoContact({ email, campaigns, socialHandle, phone }: BrevoContactPayload) {
+export async function upsertBrevoContact({ email, campaigns, socialHandle, phone, firstName }: BrevoContactPayload) {
   const apiKey = getApiKey()
   if (!apiKey) return
 
@@ -43,6 +44,7 @@ export async function upsertBrevoContact({ email, campaigns, socialHandle, phone
   }
   if (socialHandle) attributes.SOCIAL_HANDLE = socialHandle
   if (phone) attributes.PHONE = phone
+  if (firstName) attributes.FIRSTNAME = firstName
 
   const body: Record<string, unknown> = {
     email,

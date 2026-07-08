@@ -50,7 +50,7 @@ export default function ConfidentialitePage() {
         <Section title="Données collectées">
           <p>Spark collecte uniquement les données que vous fournissez volontairement via les formulaires du site :</p>
           <ul style={{ paddingLeft: 20, marginTop: 8, marginBottom: 0, listStyleType: 'disc' }}>
-            <li style={{ marginBottom: 4 }}>Adresse email (formulaires de capture et lead magnet)</li>
+            <li style={{ marginBottom: 4 }}>Prénom et adresse email (formulaires de capture et lead magnet)</li>
             <li style={{ marginBottom: 4 }}>Numéro de téléphone (formulaires de capture et lead magnet)</li>
             <li style={{ marginBottom: 4 }}>Nom, type d&apos;activité, chiffre d&apos;affaires et motivation (formulaire candidature invité)</li>
           </ul>
