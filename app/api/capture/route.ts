@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { upsertBrevoContact, sendCampaignEmail } from '@/lib/brevo'
+import { markManyChatFormCompleted } from '@/lib/manychat'
 import { getPostHogClient } from '@/lib/posthog-server'
 
 function isValidEmail(email: string): boolean {
@@ -20,6 +21,7 @@ export async function POST(request: NextRequest) {
     const campaign = body.campaign?.trim() ?? 'default'
     const socialHandle = body.social_handle?.trim() || null
     const phone = body.phone?.trim() || null
+    const mcId = body.mc_id?.trim() || null
 
     if (!firstName) {
       return NextResponse.json({ error: 'Prénom requis.' }, { status: 400 })
@@ -75,6 +77,10 @@ export async function POST(request: NextRequest) {
 
     if (isNewCampaign) {
       await sendCampaignEmail(email, campaign)
+    }
+
+    if (mcId) {
+      await markManyChatFormCompleted(mcId)
     }
 
     const posthog = getPostHogClient()

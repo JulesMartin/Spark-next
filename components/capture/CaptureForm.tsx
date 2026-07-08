@@ -5,7 +5,7 @@ import posthog from 'posthog-js'
 
 const CALENDLY_URL = 'https://calendly.com/jules-api/new-meeting'
 
-export default function CaptureForm({ campaign }: { campaign: string }) {
+export default function CaptureForm({ campaign, mcId }: { campaign: string; mcId?: string | null }) {
   const [firstName, setFirstName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -30,6 +30,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           social_handle: socialHandle.trim() || undefined,
           website,
           phone: phone.trim(),
+          mc_id: mcId || undefined,
         }),
       })
       const data = await res.json()
