@@ -82,12 +82,18 @@ export async function GET(request: NextRequest) {
   const subscribers = await fetchAllSubscribers(supabase)
   const sheetRows = await readSheet(token)
 
-  // Map email (lowercase) → { row (1-based), unsubscribedCell }
-  const sheetMap = new Map<string, { row: number; unsub: string }>()
+  // Map email (lowercase) → { row (1-based), campaigns, unsub, phone, firstName }
+  const sheetMap = new Map<string, { row: number; campaigns: string; unsub: string; phone: string; firstName: string }>()
   sheetRows.forEach((r, i) => {
     const email = (r[0] ?? '').toLowerCase().trim()
     if (!email || email === 'email') return
-    sheetMap.set(email, { row: i + 1, unsub: r[5] ?? '' })
+    sheetMap.set(email, {
+      row: i + 1,
+      campaigns: r[1] ?? '',
+      unsub: r[5] ?? '',
+      phone: r[6] ?? '',
+      firstName: r[7] ?? '',
+    })
   })
 
   const now = new Date().toISOString()
@@ -97,12 +103,35 @@ export async function GET(request: NextRequest) {
   for (const s of subscribers) {
     const key = s.email.toLowerCase().trim()
     const campaigns = (s.campaigns ?? []).join(',')
+    const phone = s.phone ?? ''
+    const firstName = s.first_name ?? ''
     const unsub = s.unsubscribed ? 'TRUE' : ''
     const existing = sheetMap.get(key)
     if (!existing) {
-      newRows.push([s.email, campaigns, s.social_handle ?? '', s.created_at, now, unsub, s.phone ?? '', s.first_name ?? ''])
-    } else if (s.unsubscribed && existing.unsub !== 'TRUE') {
+      newRows.push([s.email, campaigns, s.social_handle ?? '', s.created_at, now, unsub, phone, firstName])
+      continue
+    }
+
+    let rowChanged = false
+    if (s.unsubscribed && existing.unsub !== 'TRUE') {
       flagUpdates.push({ range: `${SHEET_TAB}!F${existing.row}`, values: [['TRUE']] })
+      rowChanged = true
+    }
+    // Backfill : téléphone/prénom/campagnes ajoutés ou modifiés après le premier import du contact
+    if (campaigns !== existing.campaigns) {
+      flagUpdates.push({ range: `${SHEET_TAB}!B${existing.row}`, values: [[campaigns]] })
+      rowChanged = true
+    }
+    if (phone !== existing.phone) {
+      flagUpdates.push({ range: `${SHEET_TAB}!G${existing.row}`, values: [[phone]] })
+      rowChanged = true
+    }
+    if (firstName !== existing.firstName) {
+      flagUpdates.push({ range: `${SHEET_TAB}!H${existing.row}`, values: [[firstName]] })
+      rowChanged = true
+    }
+    if (rowChanged) {
+      flagUpdates.push({ range: `${SHEET_TAB}!E${existing.row}`, values: [[now]] })
     }
   }
 

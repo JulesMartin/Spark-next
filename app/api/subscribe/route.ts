@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { upsertBrevoContact, sendCampaignEmail } from '@/lib/brevo'
 import { getPostHogClient } from '@/lib/posthog-server'
-
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-}
+import { sanitizeName, sanitizeEmail, sanitizePhone, sanitizeCampaign } from '@/lib/sanitize'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,19 +12,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true })
     }
 
-    const firstName = body.first_name?.trim() || null
-    const email = body.email?.trim().toLowerCase()
-    const source = body.source ?? 'prompts-ia'
-    const phone = body.phone?.trim() || null
+    const firstName = sanitizeName(body.first_name)
+    const email = sanitizeEmail(body.email)
+    const source = sanitizeCampaign(body.source, 'prompts-ia')
+    const phone = sanitizePhone(body.phone)
 
     if (!firstName) {
       return NextResponse.json({ error: 'Prénom requis.' }, { status: 400 })
     }
-    if (!email || !isValidEmail(email)) {
+    if (!email) {
       return NextResponse.json({ error: 'Adresse email invalide.' }, { status: 400 })
     }
     if (!phone) {
       return NextResponse.json({ error: 'Numéro de téléphone requis.' }, { status: 400 })
+    }
+    if (!source) {
+      return NextResponse.json({ error: 'Source invalide.' }, { status: 400 })
     }
 
     const supabase = createServiceClient()
