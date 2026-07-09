@@ -71,7 +71,7 @@ export default function PhoneInput({
           value={dialCode}
           onChange={(e) => onDialCodeChange(e.target.value)}
           style={{
-            width: 48,
+            width: `calc(${Math.max(dialCode.length, 2)}ch + 14px)`,
             alignSelf: 'center',
             border: isBrutalist ? '1.5px solid rgba(0,0,0,.35)' : `1.5px solid ${dark ? 'rgba(255,255,255,.25)' : '#D8D6CE'}`,
             borderRadius: 4,
