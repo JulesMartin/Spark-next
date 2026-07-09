@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import posthog from 'posthog-js'
+import PhoneInput from '@/components/shared/PhoneInput'
+import { DEFAULT_PHONE_COUNTRY } from '@/lib/phone-country-codes'
 
 const CALENDLY_URL = 'https://calendly.com/jules-api/new-meeting'
 
@@ -9,6 +11,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
   const [firstName, setFirstName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [dialCode, setDialCode] = useState(DEFAULT_PHONE_COUNTRY.dial)
   const [socialHandle, setSocialHandle] = useState('')
   const [website, setWebsite] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -29,7 +32,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           campaign,
           social_handle: socialHandle.trim() || undefined,
           website,
-          phone: phone.trim(),
+          phone: `${dialCode.trim()} ${phone.trim()}`,
         }),
       })
       const data = await res.json()
@@ -137,8 +140,8 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         </div>
       </div>
 
-      <div className="w-full mb-3 flex flex-col min-[480px]:flex-row gap-3">
-        <div className="flex-1">
+      <div className="w-full mb-3 flex flex-col gap-3">
+        <div className="min-w-0">
           <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
             Email *
           </p>
@@ -153,18 +156,16 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           />
         </div>
 
-        <div className="flex-1">
+        <div className="min-w-0">
           <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
             Téléphone *
           </p>
-          <input
-            type="tel"
-            required
+          <PhoneInput
+            variant="brutalist"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="06 12 34 56 78"
-            className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
-            style={{ fontFamily: 'var(--font-assistant)' }}
+            onChange={setPhone}
+            dialCode={dialCode}
+            onDialCodeChange={setDialCode}
           />
         </div>
       </div>

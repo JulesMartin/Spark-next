@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import posthog from 'posthog-js'
+import PhoneInput from '@/components/shared/PhoneInput'
+import { DEFAULT_PHONE_COUNTRY } from '@/lib/phone-country-codes'
 
 const CALENDLY_URL = 'https://calendly.com/jules-api/new-meeting'
 
@@ -9,6 +11,7 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
   const [firstName, setFirstName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
+  const [dialCode, setDialCode] = useState(DEFAULT_PHONE_COUNTRY.dial)
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [website, setWebsite] = useState('')
@@ -27,7 +30,7 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
           email,
           website,
           source: 'prompts-ia',
-          phone: phone.trim(),
+          phone: `${dialCode.trim()} ${phone.trim()}`,
         }),
       })
       const data = await res.json()
@@ -140,8 +143,8 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
           />
         </div>
 
-        <div className="flex flex-col min-[480px]:flex-row" style={{ gap: 10 }}>
-          <div style={{ flex: 1 }}>
+        <div className="flex flex-col" style={{ gap: 10 }}>
+          <div className="min-w-0">
             <p style={{ fontSize: 12, color: mutedColor ?? '#6E6E6E', marginBottom: 6 }}>Email *</p>
             <input
               type="email"
@@ -163,25 +166,15 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
             />
           </div>
 
-          <div style={{ flex: 1 }}>
+          <div className="min-w-0">
             <p style={{ fontSize: 12, color: mutedColor ?? '#6E6E6E', marginBottom: 6 }}>Téléphone *</p>
-            <input
-              type="tel"
-              required
+            <PhoneInput
+              variant="rounded"
+              dark={dark}
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="06 12 34 56 78"
-              style={{
-                width: '100%',
-                background: dark ? 'rgba(255,255,255,.07)' : '#fff',
-                border: `1.5px solid ${dark ? 'rgba(255,255,255,.15)' : '#E9E9E9'}`,
-                borderRadius: 10,
-                padding: '12px 16px',
-                fontSize: 14,
-                color: dark ? '#fff' : '#1C1C1C',
-                outline: 'none',
-                boxSizing: 'border-box' as const,
-              }}
+              onChange={setPhone}
+              dialCode={dialCode}
+              onDialCodeChange={setDialCode}
             />
           </div>
         </div>
