@@ -101,8 +101,7 @@ export default function PhoneInput({
             border: 'none',
             borderLeft: '2.5px solid #000',
             cursor: 'pointer',
-            width: 32,
-            padding: 0,
+            padding: '0 8px',
             lineHeight: 1,
           }}
         >
