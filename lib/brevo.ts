@@ -38,7 +38,10 @@ export async function upsertBrevoContact({ email, campaigns, socialHandle, phone
   const apiKey = getApiKey()
   if (!apiKey) return
 
-  const listId = Number(process.env.BREVO_LIST_ID)
+  // Liste #5 : déclenche l'automation "séquence commune" (#2) dans Brevo
+  const listIds = [process.env.BREVO_LIST_ID, process.env.BREVO_SEQUENCE_LIST_ID ?? '5']
+    .map(Number)
+    .filter(Boolean)
   const attributes: Record<string, string> = {
     CAMPAIGNS: campaigns.join(','),
   }
@@ -51,7 +54,7 @@ export async function upsertBrevoContact({ email, campaigns, socialHandle, phone
     attributes,
     updateEnabled: true,
   }
-  if (listId) body.listIds = [listId]
+  if (listIds.length) body.listIds = listIds
 
   const res = await fetch(`${BREVO_API}/contacts`, {
     method: 'POST',

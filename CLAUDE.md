@@ -141,6 +141,7 @@ const CAMPAIGN_TEMPLATES: Record<string, number> = {
 **Env vars Brevo** :
 - `BREVO_API_KEY` — clé API
 - `BREVO_LIST_ID` — ID liste Brevo (optionnel)
+- `BREVO_SEQUENCE_LIST_ID` — ID liste "séquence commune" (optionnel) : tout lead capturé y est ajouté, une automation Brevo déclenchée par l'ajout à cette liste envoie la séquence
 
 Voir `documentation/LISTE_MAILS.md` pour le guide complet d'ajout d'une nouvelle campagne.
 
@@ -253,6 +254,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
 BREVO_API_KEY
 BREVO_LIST_ID                    # optionnel
+BREVO_SEQUENCE_LIST_ID           # optionnel — liste qui déclenche la séquence commune
 RESEND_API_KEY
 RESEND_FROM_EMAIL                # ex: Spark <contact@jules-api.com>
 CONTACT_EMAIL                    # destinataire notifs candidatures
