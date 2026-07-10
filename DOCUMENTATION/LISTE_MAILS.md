@@ -132,5 +132,6 @@ La page lit automatiquement le paramètre `c`.
 | `argent-dm` | 13             | Ressource Argent DM       |
 | `skill-dm`  | 14             | Ressource Skill DM        |
 | `canva-dm`  | 15             | Ressource Canva DM        |
+| `video2-dm` | 30             | Ressource Vidéo 2 DM      |
 
 > Mets à jour ce tableau à chaque nouvelle campagne.
