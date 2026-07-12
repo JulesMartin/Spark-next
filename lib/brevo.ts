@@ -9,6 +9,7 @@ function getApiKey() {
 // Map campaign slug → Brevo template ID
 // Add one line here for each new campaign
 const CAMPAIGN_TEMPLATES: Record<string, number> = {
+  'audit-instagram-avec-claude-fr-dm': 44,
   'graph-dm-dm': 37,
   'cowork-dm': 3,
   'prompts-ia': Number(process.env.BREVO_TEMPLATE_PROMPTS_IA ?? '0'),
