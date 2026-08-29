@@ -64,7 +64,7 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
           C&apos;est parti !
         </p>
         <p style={{ fontSize: 13, color: mutedColor ?? '#6E6E6E', lineHeight: 1.5, marginBottom: 10 }}>
-          Vérifie ta boîte mail — les 233 prompts et les 10 skills Claude arrivent dans quelques minutes.
+          Vérifie ta boîte mail — c&apos;est probablement dans ton onglet spam ou promotion.
         </p>
         <div
           style={{
@@ -78,9 +78,9 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
           }}
         >
           <p style={{ fontSize: 14, color: dark ? 'rgba(255,255,255,.85)' : '#1C1C1C', lineHeight: 1.5 }}>
-            Si tu souhaites faire un <strong>audit gratuit</strong> de ton business,{' '}
-            <strong>apprendre</strong> les <strong>automatisations</strong>, ou <strong>créer</strong>{' '}
-            un <strong>site web/MVP</strong>, on peut organiser un appel de 30 min.
+            Si tu souhaites faire un <strong>audit gratuit</strong> de ton business ou te{' '}
+            <strong>former</strong> à vendre des <strong>automatisations</strong> et{' '}
+            <strong>sites web</strong>, tu peux réserver un appel avec moi.
           </p>
         </div>
         <a
@@ -100,7 +100,7 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
             textDecoration: 'none',
           }}
         >
-          Réserver un appel →
+          Réserver un appel
         </a>
       </div>
     )
@@ -180,9 +180,7 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
         </div>
 
         <p style={{ fontSize: 10, color: mutedColor ?? '#6E6E6E', lineHeight: 1.4, textAlign: 'center' as const }}>
-          Informations utilisées uniquement pour t&apos;envoyer le guide et te recontacter si besoin.
-          <br />
-          Jamais revendues. Jamais de spam.{' '}
+          Informations jamais revendues.{' '}
           <a
             href="/confidentialite"
             target="_blank"
@@ -210,7 +208,7 @@ export default function SubscribeForm({ dark = false }: { dark?: boolean }) {
             transition: 'opacity 150ms',
           }}
         >
-          {status === 'loading' ? 'Envoi…' : 'Recevoir gratuitement →'}
+          {status === 'loading' ? 'Envoi…' : 'Recevoir gratuitement'}
         </button>
       </div>
 
