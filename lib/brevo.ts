@@ -1,4 +1,10 @@
+import { createUnsubscribeToken } from './unsubscribe-token'
+
 const BREVO_API = 'https://api.brevo.com/v3'
+
+function getSequenceListId() {
+  return Number(process.env.BREVO_SEQUENCE_LIST_ID ?? '5')
+}
 
 function getApiKey() {
   const key = process.env.BREVO_API_KEY
@@ -48,12 +54,14 @@ export async function upsertBrevoContact({ email, campaigns, socialHandle, phone
   if (!apiKey) return
 
   // Liste #5 : déclenche l'automation "séquence commune" (#2) dans Brevo
-  const listIds = [process.env.BREVO_LIST_ID, process.env.BREVO_SEQUENCE_LIST_ID ?? '5']
+  const listIds = [process.env.BREVO_LIST_ID, getSequenceListId()]
     .map(Number)
     .filter(Boolean)
   const attributes: Record<string, string> = {
     CAMPAIGNS: campaigns.join(','),
   }
+  const unsubToken = createUnsubscribeToken(email)
+  if (unsubToken) attributes.UNSUB_TOKEN = unsubToken
   if (socialHandle) attributes.SOCIAL_HANDLE = socialHandle
   if (phone) attributes.PHONE = phone
   if (firstName) attributes.FIRSTNAME = firstName
@@ -108,6 +116,34 @@ export async function getBlacklistedEmails(): Promise<Set<string>> {
   }
 
   return result
+}
+
+// Désinscription : sortie de la liste séquence, tags vidés, blacklist Brevo.
+// La blacklist est ce qui coupe réellement une automation déjà démarrée.
+export async function unsubscribeBrevoContact(email: string) {
+  const apiKey = getApiKey()
+  if (!apiKey) return
+
+  const headers = { 'api-key': apiKey, 'Content-Type': 'application/json', Accept: 'application/json' }
+
+  const removeRes = await fetch(`${BREVO_API}/contacts/lists/${getSequenceListId()}/contacts/remove`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ emails: [email] }),
+  })
+  // 400 = contact déjà hors de la liste, 404 = contact inconnu de Brevo : sans gravité
+  if (!removeRes.ok && ![400, 404].includes(removeRes.status)) {
+    console.error('Brevo list remove error:', await removeRes.text().catch(() => ''))
+  }
+
+  const updateRes = await fetch(`${BREVO_API}/contacts/${encodeURIComponent(email)}`, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify({ attributes: { CAMPAIGNS: '' }, emailBlacklisted: true }),
+  })
+  if (!updateRes.ok && updateRes.status !== 404) {
+    console.error('Brevo blacklist error:', await updateRes.text().catch(() => ''))
+  }
 }
 
 export async function sendCampaignEmail(email: string, campaign: string) {
