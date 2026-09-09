@@ -16,6 +16,6 @@ export default defineCliConfig({
 
 Ajout blog post
 
-it add 'app/blog/[slug]/page.tsx' app/blog/page.tsx lib/mock-data.ts lib/sanity/client.ts BLOG_PROMPT.md lib/sanity/
+git add 'app/blog/[slug]/page.tsx' app/blog/page.tsx lib/mock-data.ts lib/sanity/client.ts BLOG_PROMPT.md lib/sanity/
   git commit -m "Connect blog pages to Sanity, remove mock posts, add humanizer rules"
   git push
