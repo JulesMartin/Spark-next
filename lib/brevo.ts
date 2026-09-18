@@ -15,6 +15,7 @@ function getApiKey() {
 // Map campaign slug → Brevo template ID
 // Add one line here for each new campaign
 const CAMPAIGN_TEMPLATES: Record<string, number> = {
+  'prospecthalo-mcp-claude-prospection-linkedin-1-dm': 52,
   'installer-omniroute-avec-claude-code-dm': 51,
   'guide-acces-gpt6-astra-dm': 50,
   '5-plugins-claude-code-dm': 49,
