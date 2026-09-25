@@ -20,7 +20,7 @@ avant chaque envoi, donc plus aucune histoire de condition de sortie de workflow
 ```
 Capture (/api/capture ou /api/subscribe)
         ↓
-email_subscribers.sequence_started_at = now()   ← uniquement à la 1ère capture
+email_subscribers.sequence_started_at = now()   ← si nouvelle campagne et champ vide
         ↓
 Cron quotidien 9h (/api/cron/sync-sheet)
         ↓  étape A : synchro blacklist Brevo → Supabase
@@ -50,8 +50,11 @@ environ 1h après la capture, il part maintenant le lendemain à 9h UTC (11h Par
 
 - **Une seule étape par contact et par passage.** Un contact en retard rattrape une
   étape par jour au lieu de recevoir trois emails d'un coup.
-- **Une seule séquence par personne, à vie.** `sequence_started_at` n'est posé qu'à
-  l'insertion du contact : redemander une ressource ne rejoue pas la séquence.
+- **Une seule séquence par personne, à vie.** `sequence_started_at` est posé à la
+  première capture, ou au retour d'un contact déjà en base sur une **nouvelle**
+  campagne — c'est ce que faisait le workflow Brevo, qui redémarrait à chaque ajout à
+  la liste #5. Une fois posé, le champ ne bouge plus : redemander la même ressource,
+  ou une autre plus tard, ne rejoue jamais la séquence. Les désinscrits sont exclus.
 - **Plafond d'envoi.** `SEQUENCE_DAILY_CAP` (défaut 120) limite chaque passage. Au-delà,
   les contacts restent dus et partent au passage suivant — rien n'est perdu. À garder
   sous les 300 emails/jour de l'offre gratuite Brevo, ressources de capture comprises
@@ -70,6 +73,11 @@ donc le compteur d'automatisations Brevo a cessé d'augmenter.
 
 Le workflow Brevo pourra être mis en pause une fois que plus personne n'y est actif
 (≈ 8 jours après la bascule).
+
+Angle mort assumé pendant ces 8 jours : un contact entré dans le workflow Brevo juste
+avant la bascule, qui capture une **nouvelle** campagne avant d'avoir fini, démarre
+notre séquence tout en recevant la fin de l'ancienne. Population concernée très
+faible, fenêtre courte, et le workflow en pause referme le sujet.
 
 ## Tester
 

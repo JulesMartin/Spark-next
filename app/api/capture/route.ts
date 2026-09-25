@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     const { data: existing } = await supabase
       .from('email_subscribers')
-      .select('id, campaigns, unsubscribed')
+      .select('id, campaigns, unsubscribed, sequence_started_at')
       .eq('email', email)
       .maybeSingle()
 
@@ -43,6 +43,10 @@ export async function POST(request: NextRequest) {
     // par la séquence : on garde son statut pour que Brevo ne le remette pas en liste #5
     const unsubscribed = existing?.unsubscribed === true
     const isNewCampaign = !existing?.campaigns?.includes(campaign)
+    // La séquence démarre à la première capture, et pour un contact déjà en base qui
+    // revient sur une nouvelle campagne — c'est ce que faisait le workflow Brevo.
+    // Jamais deux fois : `sequence_started_at` posé une fois ne bouge plus.
+    const startSequence = isNewCampaign && !unsubscribed && !existing?.sequence_started_at
     const allCampaigns: string[] = existing
       ? isNewCampaign
         ? [...(existing.campaigns ?? []), campaign]
@@ -50,8 +54,6 @@ export async function POST(request: NextRequest) {
       : [campaign]
 
     if (!existing) {
-      // Démarre la séquence de bienvenue (cron quotidien, lib/sequence.ts).
-      // Uniquement à la première capture : on ne rejoue jamais la séquence.
       const { error: insertError } = await supabase.from('email_subscribers').insert({
         sequence_started_at: new Date().toISOString(),
         email,
@@ -70,6 +72,7 @@ export async function POST(request: NextRequest) {
         .from('email_subscribers')
         .update({
           campaigns: allCampaigns,
+          ...(startSequence ? { sequence_started_at: new Date().toISOString() } : {}),
           ...(socialHandle ? { social_handle: socialHandle } : {}),
           ...(phone ? { phone } : {}),
           ...(firstName ? { first_name: firstName } : {}),
