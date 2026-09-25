@@ -45,10 +45,8 @@ async function fetchAllSubscribers(
 }
 
 export async function GET(request: NextRequest) {
-  if (
-    process.env.CRON_SECRET &&
-    request.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`
-  ) {
+  const cronSecret = process.env.CRON_SECRET
+  if (!cronSecret || request.headers.get('authorization') !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

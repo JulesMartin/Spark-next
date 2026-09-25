@@ -7,9 +7,9 @@ export async function GET() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  const { count } = await supabase
-    .from('email_subscribers')
-    .select('*', { count: 'exact', head: true })
+  // Requête minimale : le but est d'empêcher la mise en pause du projet Supabase.
+  // Le nombre d'abonnés ne sort pas d'ici — la route est publique.
+  await supabase.from('email_subscribers').select('id', { count: 'exact', head: true })
 
-  return NextResponse.json({ ok: true, subscribers: count ?? 0 })
+  return NextResponse.json({ ok: true })
 }

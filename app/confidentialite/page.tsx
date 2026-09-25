@@ -52,7 +52,6 @@ export default function ConfidentialitePage() {
           <ul style={{ paddingLeft: 20, marginTop: 8, marginBottom: 0, listStyleType: 'disc' }}>
             <li style={{ marginBottom: 4 }}>Prénom et adresse email (formulaires de capture et lead magnet)</li>
             <li style={{ marginBottom: 4 }}>Numéro de téléphone (formulaires de capture et lead magnet)</li>
-            <li style={{ marginBottom: 4 }}>Nom, type d&apos;activité, chiffre d&apos;affaires et motivation (formulaire candidature invité)</li>
           </ul>
           <p style={{ marginTop: 12 }}>
             Des données de navigation anonymisées sont également collectées via PostHog (voir section Analytics).
@@ -64,8 +63,7 @@ export default function ConfidentialitePage() {
           <ul style={{ paddingLeft: 20, marginTop: 8, marginBottom: 0, listStyleType: 'disc' }}>
             <li style={{ marginBottom: 4 }}>L&apos;envoi de la ressource demandée par email <em style={{ color: '#888' }}>(exécution d&apos;un contrat)</em></li>
             <li style={{ marginBottom: 4 }}>L&apos;envoi de contenus éducatifs et d&apos;actualités Spark <em style={{ color: '#888' }}>(consentement)</em></li>
-            <li style={{ marginBottom: 4 }}>Vous recontacter par téléphone lorsque vous en faites la demande via un formulaire <em style={{ color: '#888' }}>(consentement)</em></li>
-            <li style={{ marginBottom: 4 }}>Le traitement des candidatures pour devenir invité sur la chaîne <em style={{ color: '#888' }}>(intérêt légitime)</em></li>
+            <li style={{ marginBottom: 4 }}>Vous recontacter par téléphone ou par message au sujet des ressources demandées et des offres Spark <em style={{ color: '#888' }}>(consentement)</em></li>
           </ul>
         </Section>
 
@@ -83,7 +81,7 @@ export default function ConfidentialitePage() {
           <ul style={{ paddingLeft: 20, marginTop: 8, marginBottom: 0, listStyleType: 'disc' }}>
             <li style={{ marginBottom: 4 }}><strong style={{ color: '#1C1C1C' }}>Brevo</strong> — envoi d&apos;emails et gestion des listes (France/UE)</li>
             <li style={{ marginBottom: 4 }}><strong style={{ color: '#1C1C1C' }}>Supabase</strong> — stockage sécurisé des données</li>
-            <li style={{ marginBottom: 4 }}><strong style={{ color: '#1C1C1C' }}>Resend</strong> — notifications internes (candidatures uniquement)</li>
+            <li style={{ marginBottom: 4 }}><strong style={{ color: '#1C1C1C' }}>Resend</strong> — notifications internes</li>
             <li style={{ marginBottom: 4 }}><strong style={{ color: '#1C1C1C' }}>Vercel</strong> — hébergement du site</li>
             <li style={{ marginBottom: 4 }}><strong style={{ color: '#1C1C1C' }}>PostHog</strong> — analytics anonymisées (hébergement EU)</li>
           </ul>
@@ -91,7 +89,7 @@ export default function ConfidentialitePage() {
 
         <Section title="Durée de conservation">
           <p>
-            Les données sont conservées tant que vous êtes abonné à la newsletter ou que votre candidature est en cours d&apos;examen. Les candidatures non retenues sont supprimées dans un délai de 12 mois.
+            Les données sont conservées tant que vous êtes abonné à la newsletter.
           </p>
           <p>
             Vous pouvez demander la suppression de vos données à tout moment.
