@@ -2,8 +2,18 @@ import { createUnsubscribeToken } from './unsubscribe-token'
 
 const BREVO_API = 'https://api.brevo.com/v3'
 
+// Liste #5 : ancien déclencheur du workflow Brevo « Automatisation #2 ».
+// On n'y ajoute plus personne depuis que la séquence tourne sur notre cron
+// (`lib/sequence.ts`) ; elle ne sert plus qu'à en sortir les désinscrits, le temps
+// que les contacts entrés avant la bascule finissent leur parcours côté Brevo.
 function getSequenceListId() {
   return Number(process.env.BREVO_SEQUENCE_LIST_ID ?? '5')
+}
+
+// Liste « Désinscrits » : c'est elle qui sert de condition de sortie du workflow Brevo.
+// La blacklist seule ne coupe pas un workflow — ses emails partent en transactionnel.
+function getUnsubscribedListId() {
+  return Number(process.env.BREVO_UNSUBSCRIBED_LIST_ID ?? '7')
 }
 
 function getApiKey() {
@@ -52,26 +62,25 @@ type BrevoContactPayload = {
   email: string
   campaigns: string[]
   socialHandle?: string | null
-  phone?: string | null
   firstName?: string | null
+  unsubscribed?: boolean
 }
 
-export async function upsertBrevoContact({ email, campaigns, socialHandle, phone, firstName }: BrevoContactPayload) {
+export async function upsertBrevoContact({ email, campaigns, socialHandle, firstName, unsubscribed }: BrevoContactPayload) {
   const apiKey = getApiKey()
   if (!apiKey) return
 
-  // Liste #5 : déclenche l'automation "séquence commune" (#2) dans Brevo
-  const listIds = [process.env.BREVO_LIST_ID, getSequenceListId()]
-    .map(Number)
-    .filter(Boolean)
+  // Plus d'ajout à la liste séquence : c'est notre cron qui déroule la séquence
+  // désormais. Un désinscrit qui redemande une ressource la reçoit (envoi
+  // transactionnel unitaire) mais n'est remis dans aucune liste.
+  const listIds = unsubscribed ? [] : [process.env.BREVO_LIST_ID].map(Number).filter(Boolean)
   const attributes: Record<string, string> = {
     CAMPAIGNS: campaigns.join(','),
   }
   const unsubToken = createUnsubscribeToken(email)
   if (unsubToken) attributes.UNSUB_TOKEN = unsubToken
   if (socialHandle) attributes.SOCIAL_HANDLE = socialHandle
-  if (phone) attributes.PHONE = phone
-  if (firstName) attributes.FIRSTNAME = firstName
+  if (firstName) attributes.PRENOM = firstName
 
   const body: Record<string, unknown> = {
     email,
@@ -125,13 +134,25 @@ export async function getBlacklistedEmails(): Promise<Set<string>> {
   return result
 }
 
-// Désinscription : sortie de la liste séquence, tags vidés, blacklist Brevo.
-// La blacklist est ce qui coupe réellement une automation déjà démarrée.
+// Désinscription : entrée dans la liste « Désinscrits » (condition de sortie du workflow),
+// sortie de la liste séquence, tags vidés, blacklist Brevo.
+// La blacklist ne suffit pas : les emails du workflow partent en transactionnel et
+// l'ignorent. Seule l'appartenance à la liste « Désinscrits » éjecte du workflow.
 export async function unsubscribeBrevoContact(email: string) {
   const apiKey = getApiKey()
   if (!apiKey) return
 
   const headers = { 'api-key': apiKey, 'Content-Type': 'application/json', Accept: 'application/json' }
+
+  const addRes = await fetch(`${BREVO_API}/contacts/lists/${getUnsubscribedListId()}/contacts/add`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ emails: [email] }),
+  })
+  // 400 = contact déjà dans la liste, 404 = contact inconnu de Brevo : sans gravité
+  if (!addRes.ok && ![400, 404].includes(addRes.status)) {
+    console.error('Brevo unsubscribed-list add error:', await addRes.text().catch(() => ''))
+  }
 
   const removeRes = await fetch(`${BREVO_API}/contacts/lists/${getSequenceListId()}/contacts/remove`, {
     method: 'POST',
@@ -153,15 +174,9 @@ export async function unsubscribeBrevoContact(email: string) {
   }
 }
 
-export async function sendCampaignEmail(email: string, campaign: string) {
+async function sendTemplate(email: string, templateId: number): Promise<boolean> {
   const apiKey = getApiKey()
-  if (!apiKey) return
-
-  const templateId = CAMPAIGN_TEMPLATES[campaign]
-  if (!templateId) {
-    console.error(`No Brevo template configured for campaign: ${campaign}`)
-    return
-  }
+  if (!apiKey) return false
 
   const res = await fetch(`${BREVO_API}/smtp/email`, {
     method: 'POST',
@@ -171,6 +186,23 @@ export async function sendCampaignEmail(email: string, campaign: string) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}))
-    console.error('Brevo send email error:', err)
+    console.error('Brevo send email error:', templateId, email, err)
+    return false
   }
+  return true
+}
+
+export async function sendCampaignEmail(email: string, campaign: string) {
+  const templateId = CAMPAIGN_TEMPLATES[campaign]
+  if (!templateId) {
+    console.error(`No Brevo template configured for campaign: ${campaign}`)
+    return
+  }
+  await sendTemplate(email, templateId)
+}
+
+// Étape de séquence (lib/sequence.ts) : le booléen évite de faire avancer le
+// compteur d'étape d'un contact dont l'email n'est pas parti.
+export async function sendSequenceEmail(email: string, templateId: number): Promise<boolean> {
+  return sendTemplate(email, templateId)
 }

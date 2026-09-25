@@ -35,10 +35,13 @@ export async function POST(request: NextRequest) {
 
     const { data: existing } = await supabase
       .from('email_subscribers')
-      .select('id, campaigns')
+      .select('id, campaigns, unsubscribed')
       .eq('email', email)
       .maybeSingle()
 
+    // Un désinscrit qui redemande une ressource la reçoit, mais ne repasse pas
+    // par la séquence : on garde son statut pour que Brevo ne le remette pas en liste #5
+    const unsubscribed = existing?.unsubscribed === true
     const isNewCampaign = !existing?.campaigns?.includes(campaign)
     const allCampaigns: string[] = existing
       ? isNewCampaign
@@ -47,7 +50,10 @@ export async function POST(request: NextRequest) {
       : [campaign]
 
     if (!existing) {
+      // Démarre la séquence de bienvenue (cron quotidien, lib/sequence.ts).
+      // Uniquement à la première capture : on ne rejoue jamais la séquence.
       const { error: insertError } = await supabase.from('email_subscribers').insert({
+        sequence_started_at: new Date().toISOString(),
         email,
         source: campaign,
         campaigns: allCampaigns,
@@ -71,7 +77,7 @@ export async function POST(request: NextRequest) {
         .eq('email', email)
     }
 
-    await upsertBrevoContact({ email, campaigns: allCampaigns, socialHandle, phone, firstName })
+    await upsertBrevoContact({ email, campaigns: allCampaigns, socialHandle, firstName, unsubscribed })
 
     if (isNewCampaign) {
       await sendCampaignEmail(email, campaign)

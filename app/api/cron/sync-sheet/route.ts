@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { getBlacklistedEmails } from '@/lib/brevo'
+import { runSequence } from '@/lib/sequence'
 import {
   SHEET_TAB,
   getSheetAccessToken,
@@ -73,10 +74,14 @@ export async function GET(request: NextRequest) {
     newlyUnsubscribed = toMark.length
   }
 
+  // --- Étape A bis : séquence de bienvenue (remplace le workflow Brevo) ---
+  // Après la synchro de la blacklist, donc sur des désinscriptions à jour.
+  const sequence = await runSequence(blacklist)
+
   // --- Étape B : Supabase → Sheet (append-only + maj du flag unsubscribed) ---
   const token = await getSheetAccessToken()
   if (!token) {
-    return NextResponse.json({ ok: true, newlyUnsubscribed, sheet: 'skipped (no token)' })
+    return NextResponse.json({ ok: true, newlyUnsubscribed, sequence, sheet: 'skipped (no token)' })
   }
 
   const subscribers = await fetchAllSubscribers(supabase)
@@ -141,6 +146,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     ok: true,
     newlyUnsubscribed,
+    sequence,
     appended: newRows.length,
     flagsUpdated: flagUpdates.length,
     sheetTotal: sheetMap.size + newRows.length,

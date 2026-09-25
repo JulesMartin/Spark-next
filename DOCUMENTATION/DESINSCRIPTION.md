@@ -12,11 +12,27 @@
 4. `POST /api/unsubscribe` :
    - Supabase : `campaigns = []`, `unsubscribed = true`, `unsubscribed_at = now()`
      — **la ligne n'est jamais supprimée**, seuls les tags sont vidés
-   - Brevo : sortie de la liste séquence (`BREVO_SEQUENCE_LIST_ID`, défaut `5`),
+   - Brevo : ajout à la liste **Désinscrits** (`BREVO_UNSUBSCRIBED_LIST_ID`, défaut `7`),
+     sortie de la liste séquence (`BREVO_SEQUENCE_LIST_ID`, défaut `5`),
      attribut `CAMPAIGNS` vidé, et `emailBlacklisted: true`
 
-La blacklist est ce qui coupe réellement une automation déjà démarrée — sortir de la
-liste seul n'arrête pas un workflow en cours.
+## Pourquoi la blacklist ne suffit pas
+
+Les emails du workflow « Automatisation #2 » (templates 25 → 29) partent en
+**transactionnel** : ils apparaissent dans `/v3/smtp/statistics/events`. Or Brevo
+n'applique `emailBlacklisted` qu'aux envois **marketing**. Un contact blacklisté reste
+donc dans le workflow et continue de dérouler ses étapes.
+
+Mesuré le 25/09/2026 avant correction : 17 des 32 désinscrits avaient reçu 1 à 4 emails
+de séquence **après** leur désinscription.
+
+Seule solution : une **condition de sortie** dans le workflow Brevo, basée sur
+l'appartenance à la liste **Désinscrits** (#7) que l'API remplit. À configurer dans
+l'éditeur Brevo — il n'existe aucune API publique pour éjecter un contact d'un workflow.
+
+Corollaire : un désinscrit qui remplit à nouveau un formulaire reçoit bien sa ressource
+(envoi transactionnel unitaire) mais n'est **pas** remis dans la liste séquence
+(`upsertBrevoContact` reçoit `unsubscribed: true` et n'envoie aucun `listIds`).
 
 Le cron `sync-sheet` lit déjà la blacklist Brevo et propage vers Supabase + Google Sheet,
 donc les désinscriptions faites depuis le lien natif de Brevo restent cohérentes.
@@ -25,15 +41,21 @@ donc les désinscriptions faites depuis le lien natif de Brevo restent cohérent
 
 1. **Brevo** → Contacts → Paramètres → Attributs → créer un attribut **texte** nommé
    `UNSUB_TOKEN`.
-2. **Env** : `UNSUBSCRIBE_SECRET` (déjà dans `.env.local`) à ajouter dans Vercel
+2. **Env** : `UNSUBSCRIBE_SECRET` et `BREVO_UNSUBSCRIBED_LIST_ID` (déjà dans `.env.local`) à ajouter dans Vercel
    (Production + Preview). Ne jamais la changer : tous les liens déjà envoyés
    deviendraient invalides.
-3. **Backfill** des contacts existants :
+3. **Brevo** → créer la liste **Désinscrits** (#7) et, dans le workflow
+   « Automatisation #2 » → *Paramètres du workflow* → **Conditions de sortie** :
+   « le contact est dans la liste Désinscrits ». À défaut de conditions de sortie,
+   insérer une étape *Si/Sinon* avant chaque email : si dans la liste Désinscrits → fin.
+4. **Backfill** des contacts existants :
    ```bash
-   node scripts/backfill-unsub-token.mjs --dry   # vérification
-   node scripts/backfill-unsub-token.mjs         # écriture
+   node scripts/backfill-unsub-token.mjs --dry          # tokens
+   node scripts/backfill-unsub-token.mjs
+   node scripts/backfill-unsubscribed-list.mjs --dry    # blacklistés → liste Désinscrits
+   node scripts/backfill-unsubscribed-list.mjs
    ```
-4. Coller le bloc footer ci-dessous en bas de chaque template Brevo.
+5. Coller le bloc footer ci-dessous en bas de chaque template Brevo.
 
 ## Bloc footer à coller dans les templates Brevo
 

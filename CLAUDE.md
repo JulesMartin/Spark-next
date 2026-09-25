@@ -112,6 +112,7 @@ Lien dashboard Supabase : https://supabase.com/dashboard (ouvrir le projet spark
 | `/api/capture` | POST | Capture email campagne → Supabase + Brevo upsert + envoi template |
 | `/api/subscribe` | POST | Lead magnet → Supabase + Brevo upsert (sans template) |
 | `/api/candidature` | POST | Candidature invité → Supabase + notif email Resend |
+| `/api/cron/sequence` | GET | Déclenchement manuel de la séquence de bienvenue (protégé par `CRON_SECRET`) |
 | `/api/revalidate` | POST | ISR revalidation manuelle (`/` + `/interviews/[slug]` + `/blog/[slug]`) |
 | `/api/auth/signout` | POST | Déconnexion Supabase |
 
@@ -134,6 +135,8 @@ const CAMPAIGN_TEMPLATES: Record<string, number> = {
 2. `upsertBrevoContact` → crée/met à jour le contact avec attribut `CAMPAIGN = slug`
 3. `sendCampaignEmail` → envoie le template Brevo correspondant au slug
 
+**Séquence de bienvenue** : elle ne tourne plus dans Brevo Automation mais dans notre cron (`lib/sequence.ts`, appelé par `/api/cron/sync-sheet` chaque jour à 9h). Motif : l'offre gratuite Brevo plafonne à 2 000 contacts uniques entrés en automatisation, compteur qui ne se vide jamais. Les emails restent les templates Brevo 25 → 29, envoyés en transactionnel. Calendrier dans la constante `SEQUENCE`. Seuls les contacts avec `sequence_started_at` non nul sont concernés : ceux capturés avant la bascule finissent leur parcours dans Brevo.
+
 **Flux `/api/subscribe`** (`/prompts-ia`) :
 1. Insert dans Supabase `email_subscribers`
 2. `upsertBrevoContact` seulement — pas d'envoi de template (l'automation Brevo prend le relais via l'attribut CAMPAIGN)
@@ -142,6 +145,7 @@ const CAMPAIGN_TEMPLATES: Record<string, number> = {
 - `BREVO_API_KEY` — clé API
 - `BREVO_LIST_ID` — ID liste Brevo (optionnel)
 - `BREVO_SEQUENCE_LIST_ID` — ID liste "séquence commune" (optionnel) : tout lead capturé y est ajouté, une automation Brevo déclenchée par l'ajout à cette liste envoie la séquence
+- `BREVO_UNSUBSCRIBED_LIST_ID` — ID liste "Désinscrits" (défaut `7`) : la désinscription y ajoute le contact, et le workflow Brevo l'utilise comme condition de sortie (la blacklist seule ne coupe pas un workflow, ses emails partent en transactionnel)
 
 Voir `documentation/LISTE_MAILS.md` pour le guide complet d'ajout d'une nouvelle campagne.
 
@@ -255,6 +259,8 @@ SUPABASE_SERVICE_ROLE_KEY
 BREVO_API_KEY
 BREVO_LIST_ID                    # optionnel
 BREVO_SEQUENCE_LIST_ID           # optionnel — liste qui déclenche la séquence commune
+BREVO_UNSUBSCRIBED_LIST_ID       # optionnel — liste « Désinscrits » (défaut 7), condition de sortie du workflow
+SEQUENCE_DAILY_CAP               # optionnel — max d'envois de séquence par passage du cron (défaut 120)
 RESEND_API_KEY
 RESEND_FROM_EMAIL                # ex: Spark <contact@jules-api.com>
 CONTACT_EMAIL                    # destinataire notifs candidatures
