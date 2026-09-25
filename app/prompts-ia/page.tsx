@@ -29,7 +29,7 @@ export default function PromptsIAPage() {
         <div className="grid md:grid-cols-[1fr_1fr] gap-16 md:gap-24 items-start">
 
           {/* Left — offer */}
-          <div>
+          <div className="min-w-0">
             <span className="font-body text-xs font-medium tracking-[0.25em] uppercase text-accent">
               Ressource gratuite
             </span>
@@ -56,7 +56,9 @@ export default function PromptsIAPage() {
           </div>
 
           {/* Right — form */}
-          <div className="md:sticky md:top-28 md:pt-2">
+          {/* min-w-0 : sans ça, la largeur intrinsèque de l'input téléphone fait
+              déborder la colonne du padding de la page sur mobile */}
+          <div className="min-w-0 md:sticky md:top-28 md:pt-2">
             <div className="bg-surface border border-edge p-8 md:p-10">
               <p className="font-body text-xs font-medium tracking-[0.2em] uppercase text-muted mb-6">
                 Accès immédiat · Gratuit

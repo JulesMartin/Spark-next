@@ -82,6 +82,10 @@ export default function Newsletter() {
       </div>
 
       <style>{`
+        /* Sans min-width:0, la largeur intrinsèque de l'input téléphone (181px) + son
+           bloc indicatif (106px) impose 287px à la colonne, qui déborde alors du
+           padding droit de la carte sur mobile. */
+        .newsletter-grid > * { min-width: 0; }
         @media (max-width: 700px) {
           .newsletter-grid { grid-template-columns: 1fr !important; }
         }

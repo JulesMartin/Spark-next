@@ -280,5 +280,6 @@ SANITY_API_TOKEN
 - Le site public doit être exceptionnel visuellement — éditorial, sharp, mémorable.
 - Pas de commentaires sauf si le WHY est non-obvious.
 - Pas de gestion d'erreur pour des cas impossibles — faire confiance aux garanties framework.
+- **`PhoneInput` impose une largeur minimale d'environ 290px** (bloc indicatif 106px + largeur intrinsèque de l'`<input>` 181px). Tout conteneur grille ou flex qui l'accueille doit porter `min-width: 0`, sinon la colonne déborde du padding de son parent sur mobile — invisible au-dessus de 700px de large.
 - Ne jamais publier directement dans Sanity — toujours `status: "draft"`.
 - Ne jamais créer de doublon de slug Sanity.

@@ -37,6 +37,16 @@ Corollaire : un désinscrit qui remplit à nouveau un formulaire reçoit bien sa
 Le cron `sync-sheet` lit déjà la blacklist Brevo et propage vers Supabase + Google Sheet,
 donc les désinscriptions faites depuis le lien natif de Brevo restent cohérentes.
 
+## État au 26/09/2026
+
+- Liste Brevo **Désinscrits (#7)** créée.
+- Condition de sortie posée sur le workflow « Automatisation #2 » par Jules.
+- Les 32 contacts blacklistés existants ont été versés dans la liste #7 via
+  `scripts/backfill-unsubscribed-list.mjs`, et le seul encore présent dans la liste
+  séquence en a été retiré.
+- Six désinscrits n'avaient pas fini leur séquence au moment de la bascule : ce sont
+  eux qui valident la condition de sortie (aucun nouvel envoi attendu).
+
 ## Mise en place (une seule fois)
 
 1. **Brevo** → Contacts → Paramètres → Attributs → créer un attribut **texte** nommé

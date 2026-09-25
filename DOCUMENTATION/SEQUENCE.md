@@ -64,7 +64,12 @@ environ 1h après la capture, il part maintenant le lendemain à 9h UTC (11h Par
 - **Échec d'envoi = étape non consommée.** `sendSequenceEmail` renvoie un booléen ;
   sans succès, `sequence_step` n'avance pas et l'email repartira demain.
 
-## Bascule (septembre 2026)
+## Bascule (25/09/2026)
+
+Migration Supabase appliquée, cron en production, route de déclenchement manuel
+vérifiée (`{"due":0,...}` au premier appel, aucun envoi parasite).
+
+
 
 Seuls les contacts capturés **après** la bascule ont un `sequence_started_at`. Les
 ~1 900 déjà dans la liste Brevo #5 terminent leur parcours dans l'ancien workflow ;
