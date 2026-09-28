@@ -25,6 +25,7 @@ function getApiKey() {
 // Map campaign slug → Brevo template ID
 // Add one line here for each new campaign
 const CAMPAIGN_TEMPLATES: Record<string, number> = {
+  'jev-laya-decisions-ia-typees-dm': 61,
   'arena-skill-100-claude-en-competition-dm': 60,
   'secrets-github-url-gitdiagram-gitingest-gitmcp-test-dm': 59,
   'secrets-github-url-gitdiagram-gitingest-gitmcp-dm': 57,
