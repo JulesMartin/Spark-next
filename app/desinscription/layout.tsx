@@ -1,19 +1,5 @@
-import { Raleway, Assistant } from 'next/font/google'
+import { assistant, raleway } from '@/app/fonts'
 import type { ReactNode } from 'react'
-
-const raleway = Raleway({
-  subsets: ['latin'],
-  weight: ['700', '800', '900'],
-  variable: '--font-raleway',
-  display: 'swap',
-})
-
-const assistant = Assistant({
-  subsets: ['latin'],
-  weight: ['400', '600'],
-  variable: '--font-assistant',
-  display: 'swap',
-})
 
 export default function DesinscriptionLayout({ children }: { children: ReactNode }) {
   return (
