@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { runSequence } from '@/lib/sequence'
+import { getBlacklistedEmails } from '@/lib/brevo'
+import { runCampaignSequences } from '@/lib/campaign-sequence'
+import { getDailyCap, runSequence } from '@/lib/sequence'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -13,6 +15,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const sequence = await runSequence()
-  return NextResponse.json({ ok: true, sequence })
+  const blacklist = await getBlacklistedEmails()
+  const sequence = await runSequence(blacklist)
+  const campaignSequences = await runCampaignSequences(blacklist, getDailyCap() - sequence.sent)
+  return NextResponse.json({ ok: true, sequence, campaignSequences })
 }

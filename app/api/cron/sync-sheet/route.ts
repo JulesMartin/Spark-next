@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { getBlacklistedEmails } from '@/lib/brevo'
-import { runSequence } from '@/lib/sequence'
+import { getDailyCap, runSequence } from '@/lib/sequence'
+import { runCampaignSequences, type CampaignSequenceResult } from '@/lib/campaign-sequence'
 import {
   SHEET_TAB,
   getSheetAccessToken,
@@ -76,10 +77,20 @@ export async function GET(request: NextRequest) {
   // Après la synchro de la blacklist, donc sur des désinscriptions à jour.
   const sequence = await runSequence(blacklist)
 
+  // --- Étape A ter : séquences de campagne, sur ce qu'il reste du plafond quotidien ---
+  // Une panne ici (table pas encore créée…) ne doit pas bloquer la synchro du Sheet.
+  let campaignSequences: CampaignSequenceResult | { error: string }
+  try {
+    campaignSequences = await runCampaignSequences(blacklist, getDailyCap() - sequence.sent)
+  } catch (error) {
+    console.error('Campaign sequences error:', error)
+    campaignSequences = { error: error instanceof Error ? error.message : 'unknown' }
+  }
+
   // --- Étape B : Supabase → Sheet (append-only + maj du flag unsubscribed) ---
   const token = await getSheetAccessToken()
   if (!token) {
-    return NextResponse.json({ ok: true, newlyUnsubscribed, sequence, sheet: 'skipped (no token)' })
+    return NextResponse.json({ ok: true, newlyUnsubscribed, sequence, campaignSequences, sheet: 'skipped (no token)' })
   }
 
   const subscribers = await fetchAllSubscribers(supabase)
@@ -145,6 +156,7 @@ export async function GET(request: NextRequest) {
     ok: true,
     newlyUnsubscribed,
     sequence,
+    campaignSequences,
     appended: newRows.length,
     flagsUpdated: flagUpdates.length,
     sheetTotal: sheetMap.size + newRows.length,

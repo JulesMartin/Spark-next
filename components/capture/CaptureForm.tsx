@@ -4,10 +4,12 @@ import { useState } from 'react'
 import posthog from 'posthog-js'
 import PhoneInput from '@/components/shared/PhoneInput'
 import { DEFAULT_PHONE_COUNTRY } from '@/lib/phone-country-codes'
+import { getCampaignConfig, redirectUrl } from '@/lib/campaigns'
 
 const CALENDLY_URL = 'https://calendly.com/jules-api/new-meeting'
 
 export default function CaptureForm({ campaign }: { campaign: string }) {
+  const config = getCampaignConfig(campaign)
   const [firstName, setFirstName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -32,7 +34,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           campaign,
           social_handle: socialHandle.trim() || undefined,
           website,
-          phone: `${dialCode.trim()} ${phone.trim()}`,
+          ...(config ? {} : { phone: `${dialCode.trim()} ${phone.trim()}` }),
         }),
       })
       const data = await res.json()
@@ -47,11 +49,24 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           has_social_handle: !!socialHandle.trim(),
         })
         setStatus('success')
+        if (config) window.location.assign(redirectUrl(config, data.emailSent !== false))
       }
     } catch {
       setErrorMsg('Une erreur est survenue. Réessayez.')
       setStatus('error')
     }
+  }
+
+  if (status === 'success' && config) {
+    return (
+      <p
+        role="status"
+        className="text-center text-sm font-black uppercase tracking-widest text-black py-6"
+        style={{ fontFamily: 'var(--font-raleway)' }}
+      >
+        C&apos;est noté, on continue…
+      </p>
+    )
   }
 
   if (status === 'success') {
@@ -125,19 +140,21 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           />
         </div>
 
-        <div className="flex-1">
-          <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
-            Pseudo
-          </p>
-          <input
-            type="text"
-            value={socialHandle}
-            onChange={(e) => setSocialHandle(e.target.value)}
-            placeholder="@ton_pseudo"
-            className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
-            style={{ fontFamily: 'var(--font-assistant)' }}
-          />
-        </div>
+        {!config && (
+          <div className="flex-1">
+            <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
+              Pseudo
+            </p>
+            <input
+              type="text"
+              value={socialHandle}
+              onChange={(e) => setSocialHandle(e.target.value)}
+              placeholder="@ton_pseudo"
+              className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
+              style={{ fontFamily: 'var(--font-assistant)' }}
+            />
+          </div>
+        )}
       </div>
 
       <div className="w-full mb-3 flex flex-col gap-3">
@@ -156,22 +173,24 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           />
         </div>
 
-        <div className="min-w-0">
-          <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
-            Téléphone *
-          </p>
-          <PhoneInput
-            variant="brutalist"
-            value={phone}
-            onChange={setPhone}
-            dialCode={dialCode}
-            onDialCodeChange={setDialCode}
-          />
-        </div>
+        {!config && (
+          <div className="min-w-0">
+            <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
+              Téléphone *
+            </p>
+            <PhoneInput
+              variant="brutalist"
+              value={phone}
+              onChange={setPhone}
+              dialCode={dialCode}
+              onDialCodeChange={setDialCode}
+            />
+          </div>
+        )}
       </div>
 
       <p className="text-[10px] text-black/60 mb-3 text-center" style={{ fontFamily: 'var(--font-assistant)' }}>
-        Informations jamais revendues.{' '}
+        {config ? `${config.consent} ` : ''}Informations jamais revendues.{' '}
         <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="underline">
           Politique de confidentialité
         </a>
@@ -187,7 +206,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           fontFamily: 'var(--font-raleway)',
         }}
       >
-        {status === 'loading' ? 'Envoi…' : 'Recevoir gratuitement'}
+        {status === 'loading' ? 'Envoi…' : (config?.button ?? 'Recevoir gratuitement')}
       </button>
 
       {status === 'error' && (

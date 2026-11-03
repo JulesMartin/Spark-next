@@ -46,6 +46,7 @@ const CAMPAIGN_TEMPLATES: Record<string, number> = {
   'graph-dm-dm': 37,
   'cowork-dm': 3,
   'prompts-ia': Number(process.env.BREVO_TEMPLATE_PROMPTS_IA ?? '0'),
+  'auto-post-guide': Number(process.env.BREVO_TEMPLATE_AUTO_POST_GUIDE ?? '0'),
   'contenu-dm': 7,
   'audit-dm': 8,
   'fable-dm': 9,
@@ -196,13 +197,17 @@ async function sendTemplate(email: string, templateId: number): Promise<boolean>
   return true
 }
 
-export async function sendCampaignEmail(email: string, campaign: string) {
+export function hasCampaignTemplate(campaign: string): boolean {
+  return Object.hasOwn(CAMPAIGN_TEMPLATES, campaign) && CAMPAIGN_TEMPLATES[campaign] > 0
+}
+
+export async function sendCampaignEmail(email: string, campaign: string): Promise<boolean> {
   const templateId = CAMPAIGN_TEMPLATES[campaign]
   if (!templateId) {
     console.error(`No Brevo template configured for campaign: ${campaign}`)
-    return
+    return false
   }
-  await sendTemplate(email, templateId)
+  return sendTemplate(email, templateId)
 }
 
 // Étape de séquence (lib/sequence.ts) : le booléen évite de faire avancer le

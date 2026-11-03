@@ -17,7 +17,7 @@ export const SEQUENCE: { gapDays: number; templateId: number; label: string }[] 
 // Garde-fou : l'offre gratuite Brevo plafonne à 300 emails/jour, dont ~215 déjà
 // consommés par les ressources de capture. Au-delà du plafond, les contacts
 // restent dus et partent au prochain passage — rien n'est perdu, seulement décalé.
-function getDailyCap() {
+export function getDailyCap() {
   return Number(process.env.SEQUENCE_DAILY_CAP ?? '120')
 }
 

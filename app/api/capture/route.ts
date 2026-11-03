@@ -3,6 +3,8 @@ import { createServiceClient } from '@/lib/supabase/service'
 import { upsertBrevoContact, sendCampaignEmail } from '@/lib/brevo'
 import { getPostHogClient } from '@/lib/posthog-server'
 import { sanitizeName, sanitizeEmail, sanitizePhone, sanitizeHandle, sanitizeCampaign } from '@/lib/sanitize'
+import { getCampaignConfig } from '@/lib/campaigns'
+import { enrollAndSendResource } from '@/lib/campaign-sequence'
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,7 +18,9 @@ export async function POST(request: NextRequest) {
     const email = sanitizeEmail(body.email)
     const campaign = sanitizeCampaign(body.campaign, 'default')
     const socialHandle = sanitizeHandle(body.social_handle)
-    const phone = sanitizePhone(body.phone)
+    const config = getCampaignConfig(campaign)
+    // Les campagnes configurées ne demandent ni téléphone ni pseudo.
+    const phone = config ? null : sanitizePhone(body.phone)
 
     if (!firstName) {
       return NextResponse.json({ error: 'Prénom requis.' }, { status: 400 })
@@ -24,7 +28,7 @@ export async function POST(request: NextRequest) {
     if (!email) {
       return NextResponse.json({ error: 'Adresse email invalide.' }, { status: 400 })
     }
-    if (!phone) {
+    if (!phone && !config) {
       return NextResponse.json({ error: 'Numéro de téléphone requis.' }, { status: 400 })
     }
     if (!campaign) {
@@ -43,10 +47,12 @@ export async function POST(request: NextRequest) {
     // par la séquence : on garde son statut pour que Brevo ne le remette pas en liste #5
     const unsubscribed = existing?.unsubscribed === true
     const isNewCampaign = !existing?.campaigns?.includes(campaign)
+    // Une campagne avec sa propre suite de mails ne démarre pas la séquence de bienvenue.
+    const ownSequence = config?.sequence ?? null
     // La séquence démarre à la première capture, et pour un contact déjà en base qui
     // revient sur une nouvelle campagne — c'est ce que faisait le workflow Brevo.
     // Jamais deux fois : `sequence_started_at` posé une fois ne bouge plus.
-    const startSequence = isNewCampaign && !unsubscribed && !existing?.sequence_started_at
+    const startSequence = !ownSequence && isNewCampaign && !unsubscribed && !existing?.sequence_started_at
     const allCampaigns: string[] = existing
       ? isNewCampaign
         ? [...(existing.campaigns ?? []), campaign]
@@ -55,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     if (!existing) {
       const { error: insertError } = await supabase.from('email_subscribers').insert({
-        sequence_started_at: new Date().toISOString(),
+        ...(ownSequence ? {} : { sequence_started_at: new Date().toISOString() }),
         email,
         source: campaign,
         campaigns: allCampaigns,
@@ -82,7 +88,16 @@ export async function POST(request: NextRequest) {
 
     await upsertBrevoContact({ email, campaigns: allCampaigns, socialHandle, firstName, unsubscribed })
 
-    if (isNewCampaign) {
+    let emailSent = true
+    if (ownSequence) {
+      emailSent = await enrollAndSendResource(email, campaign, ownSequence)
+    } else if (config) {
+      // Pas de cron pour renvoyer ce guide : on le dit tout de suite, un nouvel essai le renvoie.
+      emailSent = await sendCampaignEmail(email, campaign)
+      if (!emailSent) {
+        return NextResponse.json({ error: "Le mail n'a pas pu partir. Réessaie dans un instant." }, { status: 502 })
+      }
+    } else if (isNewCampaign) {
       await sendCampaignEmail(email, campaign)
     }
 
@@ -98,7 +113,7 @@ export async function POST(request: NextRequest) {
     })
     await posthog.shutdown()
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, emailSent })
   } catch (error) {
     console.error('Capture route error:', error)
     return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })

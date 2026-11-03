@@ -112,7 +112,8 @@ Lien dashboard Supabase : https://supabase.com/dashboard (ouvrir le projet spark
 | `/api/capture` | POST | Capture email campagne → Supabase + Brevo upsert + envoi template |
 | `/api/subscribe` | POST | Lead magnet → Supabase + Brevo upsert (sans template) |
 | `/api/candidature` | POST | Candidature invité → Supabase + notif email Resend |
-| `/api/cron/sequence` | GET | Déclenchement manuel de la séquence de bienvenue (protégé par `CRON_SECRET`) |
+| `/api/cron/sequence` | GET | Déclenchement manuel des séquences, bienvenue et campagnes (protégé par `CRON_SECRET`) |
+| `/api/webhooks/stripe` | POST | Achat Auto-Post → arrêt des relances (voir `DOCUMENTATION/CAPTURE_AUTO_POST.md`) |
 | `/api/revalidate` | POST | ISR revalidation manuelle (`/` + `/interviews/[slug]` + `/blog/[slug]`) |
 | `/api/auth/signout` | POST | Déconnexion Supabase |
 
@@ -123,6 +124,8 @@ Lien dashboard Supabase : https://supabase.com/dashboard (ouvrir le projet spark
 Config dans `lib/brevo.ts`.
 
 **`CAMPAIGN_TEMPLATES`** : mappe un slug de campagne → ID template Brevo. Ajouter une ligne ici pour chaque nouvelle campagne.
+
+**Slugs en `-ap`** : guides créés depuis le studio Auto-Post (n8n ajoute la ligne). Page Auto-Post, redirection vers la landing, séquence de bienvenue (`lib/campaigns.ts`) ; 404 sans modèle Brevo. Slug : 50 caractères au plus (`sanitizeCampaign`).
 
 ```ts
 const CAMPAIGN_TEMPLATES: Record<string, number> = {
@@ -210,6 +213,7 @@ text        #000000
 ### Typographie
 - **Display / titres** : Fraunces (variable `--font-fraunces`) → classe Tailwind `font-display`
 - **Body** : DM Sans (variable `--font-dm-sans`) → classe Tailwind `font-body`
+- **Polices hébergées dans le dépôt** (`app/fonts/index.ts`, `next/font/local`, sous-ensemble latin) : Fraunces, DM Sans, Raleway, Assistant. Ne pas revenir à `next/font/google` : Google renvoie parfois des adresses `/l/font?…&…` que Turbopack refuse, et le build Vercel échoue au hasard (29/09 et 02/11/2026).
 - **Pages capture uniquement** : Raleway (`--font-raleway`) + Assistant (`--font-assistant`) — chargés dans `app/capture/layout.tsx`
 
 ### Règles visuelles site public

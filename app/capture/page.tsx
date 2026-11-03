@@ -1,39 +1,49 @@
 import type { Metadata } from 'next'
 import CaptureForm from '@/components/capture/CaptureForm'
 import Footer from '@/components/public/Footer'
+import { notFound } from 'next/navigation'
+import { getCampaignConfig } from '@/lib/campaigns'
+import { hasCampaignTemplate } from '@/lib/brevo'
 
-export const metadata: Metadata = {
-  title: 'Ressource gratuite — Spark',
-  description: 'Reçois ta ressource gratuite directement dans ta boîte mail.',
-  robots: { index: false },
+type Props = { searchParams: Promise<{ c?: string }> }
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const { c } = await searchParams
+  const config = getCampaignConfig(c)
+  return {
+    title: config ? `${config.badge.replace(/^✦\s*/, '')} — ${config.brand}` : 'Ressource gratuite — Spark',
+    description: config?.lead ?? 'Reçois ta ressource gratuite directement dans ta boîte mail.',
+    robots: { index: false },
+  }
 }
 
-export default async function CapturePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ c?: string }>
-}) {
+export default async function CapturePage({ searchParams }: Props) {
   const params = await searchParams
   const campaign = params.c ?? 'default'
+  const config = getCampaignConfig(campaign)
+  // Une page Auto-Post sans mail à envoyer n'existe pas (site pas encore redéployé, modèle absent, adresse inventée).
+  if (config && !hasCampaignTemplate(campaign)) notFound()
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#FCFCD0' }}>
       {/* Nav */}
       <nav className="px-6 py-4 border-b-2 border-black flex items-center justify-between">
         <a
-          href="/"
+          href={config?.brandHref ?? '/'}
           className="text-sm font-black uppercase tracking-[0.2em] text-black"
           style={{ fontFamily: 'var(--font-raleway)' }}
         >
-          SPARK
+          {config?.brand ?? 'SPARK'}
         </a>
-        <a
-          href="/"
-          className="text-xs text-black/50 hover:text-black transition-colors"
-          style={{ fontFamily: 'var(--font-assistant)' }}
-        >
-          Accéder au site
-        </a>
+        {!config && (
+          <a
+            href="/"
+            className="text-xs text-black/50 hover:text-black transition-colors"
+            style={{ fontFamily: 'var(--font-assistant)' }}
+          >
+            Accéder au site
+          </a>
+        )}
       </nav>
 
       {/* Main */}
@@ -45,7 +55,7 @@ export default async function CapturePage({
               className="text-xs font-black uppercase tracking-[0.2em] text-black px-3 py-1 border-2 border-black"
               style={{ background: '#FEE04F', fontFamily: 'var(--font-raleway)' }}
             >
-              ✦ Ressource gratuite
+              {config?.badge ?? '✦ Ressource gratuite'}
             </span>
           </div>
 
@@ -54,14 +64,18 @@ export default async function CapturePage({
             className="text-4xl sm:text-5xl font-black uppercase leading-[1.05] tracking-tight text-black mb-4"
             style={{ fontFamily: 'var(--font-raleway)' }}
           >
-            Reçois ta ressource dans ta boîte mail
+            {config?.title ?? 'Reçois ta ressource dans ta boîte mail'}
           </h1>
 
           <p
             className="text-base text-black/60 mb-8"
             style={{ fontFamily: 'var(--font-assistant)' }}
           >
-            Pense bien à regarder dans l&apos;onglet <strong>Promotions</strong>, <strong>Spam</strong> ou <strong>Courrier indésirable</strong> pour trouver le mail.
+            {config?.lead ?? (
+              <>
+                Pense bien à regarder dans l&apos;onglet <strong>Promotions</strong>, <strong>Spam</strong> ou <strong>Courrier indésirable</strong> pour trouver le mail.
+              </>
+            )}
           </p>
 
           {/* Form card */}
@@ -74,7 +88,17 @@ export default async function CapturePage({
         </div>
       </main>
 
-      <Footer />
+      {config ? (
+        <footer
+          className="px-6 py-6 border-t-2 border-black flex justify-center gap-6 text-xs text-black/60"
+          style={{ fontFamily: 'var(--font-assistant)' }}
+        >
+          <a href="/mentions-legales" className="underline">Mentions légales</a>
+          <a href="/confidentialite" className="underline">Confidentialité</a>
+        </footer>
+      ) : (
+        <Footer />
+      )}
     </div>
   )
 }
