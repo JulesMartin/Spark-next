@@ -25,6 +25,7 @@ function getApiKey() {
 // Map campaign slug → Brevo template ID
 // Add one line here for each new campaign
 const CAMPAIGN_TEMPLATES: Record<string, number> = {
+  'effets-3-les-prompts-ap': 68,
   '6-prompts-pour-6-effets-ap': 67,
   '5-effets-5-prompts-2-ap': 66,
   '8-effets-8-prompts-ap': 65,
