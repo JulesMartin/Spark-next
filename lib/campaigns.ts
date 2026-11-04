@@ -8,11 +8,11 @@
 export type CampaignConfig = {
   brand: string
   brandHref: string
-  badge: string
+  badge: string | null
   title: string
-  lead: string
+  lead: string | null
   button: string
-  consent: string
+  consent: string | null
   redirectTo: string
   // Suite de mails propre à la campagne (`campaign_sequences`) ; null = la séquence de bienvenue habituelle.
   sequence: string | null
@@ -22,11 +22,11 @@ export const CAMPAIGN_CONFIGS: Record<string, CampaignConfig> = {
   'auto-post-guide': {
     brand: 'Auto-Post',
     brandHref: 'https://auto-post.jules-api.com/',
-    badge: '✦ Guide gratuit',
+    badge: null,
     title: 'Reçois le guide dans ta boîte mail',
-    lead: 'Tu reçois le guide par mail et tu découvres Auto-Post juste après.',
+    lead: null,
     button: 'Recevoir le guide',
-    consent: 'Tu reçois le guide, puis quelques mails sur Auto-Post. Désinscription en un clic.',
+    consent: null,
     redirectTo:
       'https://auto-post.jules-api.com/?guide=1&utm_source=instagram&utm_medium=capture&utm_campaign=auto-post-guide',
     sequence: 'auto-post',
@@ -44,7 +44,7 @@ export function isAutoPostGuide(campaign: string | null | undefined): boolean {
 function autoPostGuideConfig(campaign: string): CampaignConfig {
   return {
     ...CAMPAIGN_CONFIGS['auto-post-guide'],
-    consent: 'Tu reçois le guide, puis quelques mails de ma part. Désinscription en un clic.',
+    consent: null,
     redirectTo: `https://auto-post.jules-api.com/?guide=1&utm_source=instagram&utm_medium=capture&utm_campaign=${encodeURIComponent(campaign)}`,
     sequence: null,
   }

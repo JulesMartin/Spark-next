@@ -18,7 +18,7 @@ export const fraunces = localFont({
 
 export const dmSans = localFont({
   src: './dm-sans-latin.woff2',
-  weight: '300 500',
+  weight: '100 1000',
   variable: '--font-dm-sans',
   display: 'swap',
 })
@@ -34,5 +34,13 @@ export const assistant = localFont({
   src: './assistant-latin.woff2',
   weight: '400 600',
   variable: '--font-assistant',
+  display: 'swap',
+})
+
+// Titres de la page de capture Auto-Post : la même police que la landing.
+export const anton = localFont({
+  src: './anton-latin.woff2',
+  weight: '400',
+  variable: '--font-anton',
   display: 'swap',
 })

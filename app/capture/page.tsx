@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import CaptureForm from '@/components/capture/CaptureForm'
 import Footer from '@/components/public/Footer'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getCampaignConfig } from '@/lib/campaigns'
 import { hasCampaignTemplate } from '@/lib/brevo'
@@ -11,8 +12,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const { c } = await searchParams
   const config = getCampaignConfig(c)
   return {
-    title: config ? `${config.badge.replace(/^✦\s*/, '')} — ${config.brand}` : 'Ressource gratuite — Spark',
-    description: config?.lead ?? 'Reçois ta ressource gratuite directement dans ta boîte mail.',
+    title: config ? `${config.title} — ${config.brand}` : 'Ressource gratuite — Spark',
+    description: config?.lead ?? (config ? config.title : 'Reçois ta ressource gratuite directement dans ta boîte mail.'),
     robots: { index: false },
   }
 }
@@ -24,25 +25,72 @@ export default async function CapturePage({ searchParams }: Props) {
   // Une page Auto-Post sans mail à envoyer n'existe pas (site pas encore redéployé, modèle absent, adresse inventée).
   if (config && !hasCampaignTemplate(campaign)) notFound()
 
+  if (config) {
+    // Pages Auto-Post : mêmes couleurs, polices et formes que la landing (auto-post.jules-api.com).
+    return (
+      <div className="min-h-screen flex flex-col" style={{ background: '#00223e', color: '#f2ebdd', fontFamily: 'var(--font-dm-sans), system-ui, sans-serif' }}>
+        <nav className="px-6 sm:px-10 py-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(242,235,221,0.16)' }}>
+          <a
+            href={config.brandHref}
+            className="uppercase tracking-[0.04em] text-xl"
+            style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', color: '#f2ebdd' }}
+          >
+            Auto-<span style={{ color: '#ffa17f' }}>Post</span>
+          </a>
+        </nav>
+
+        <main className="flex-1 flex items-center justify-center px-5 sm:px-10 py-14 sm:py-20">
+          <div className="w-full max-w-5xl">
+            <h1
+              className="uppercase leading-[1.3] mb-10 sm:mb-14 text-[clamp(2.8rem,9vw,6.5rem)]"
+              style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', fontWeight: 400, color: '#f2ebdd' }}
+            >
+              {config.title}
+            </h1>
+            {config.lead && (
+              <p className="text-lg sm:text-xl mb-8 max-w-3xl" style={{ color: 'rgba(242,235,221,0.74)' }}>
+                {config.lead}
+              </p>
+            )}
+            <div
+              className="w-full p-6 sm:p-12"
+              style={{ background: 'rgba(242,235,221,0.06)', border: '1px solid rgba(242,235,221,0.16)', borderRadius: 20 }}
+            >
+              <CaptureForm campaign={campaign} />
+            </div>
+          </div>
+        </main>
+
+        <footer
+          className="px-6 py-6 flex justify-center gap-6 text-xs"
+          style={{ borderTop: '1px solid rgba(242,235,221,0.16)', color: 'rgba(242,235,221,0.6)' }}
+        >
+          <a href="/mentions-legales" className="underline">Mentions légales</a>
+          <a href="/confidentialite" className="underline">Confidentialité</a>
+        </footer>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#FCFCD0' }}>
       {/* Nav */}
       <nav className="px-6 py-4 border-b-2 border-black flex items-center justify-between">
-        <a
-          href={config?.brandHref ?? '/'}
+        <Link
+          href="/"
           className="text-sm font-black uppercase tracking-[0.2em] text-black"
           style={{ fontFamily: 'var(--font-raleway)' }}
         >
-          {config?.brand ?? 'SPARK'}
-        </a>
-        {!config && (
-          <a
+          SPARK
+        </Link>
+        {(
+          <Link
             href="/"
             className="text-xs text-black/50 hover:text-black transition-colors"
             style={{ fontFamily: 'var(--font-assistant)' }}
           >
             Accéder au site
-          </a>
+          </Link>
         )}
       </nav>
 
@@ -55,7 +103,7 @@ export default async function CapturePage({ searchParams }: Props) {
               className="text-xs font-black uppercase tracking-[0.2em] text-black px-3 py-1 border-2 border-black"
               style={{ background: '#FEE04F', fontFamily: 'var(--font-raleway)' }}
             >
-              {config?.badge ?? '✦ Ressource gratuite'}
+              ✦ Ressource gratuite
             </span>
           </div>
 
@@ -64,18 +112,17 @@ export default async function CapturePage({ searchParams }: Props) {
             className="text-4xl sm:text-5xl font-black uppercase leading-[1.05] tracking-tight text-black mb-4"
             style={{ fontFamily: 'var(--font-raleway)' }}
           >
-            {config?.title ?? 'Reçois ta ressource dans ta boîte mail'}
+            Reçois ta ressource dans ta boîte mail
           </h1>
 
           <p
             className="text-base text-black/60 mb-8"
             style={{ fontFamily: 'var(--font-assistant)' }}
           >
-            {config?.lead ?? (
-              <>
+                          <>
                 Pense bien à regarder dans l&apos;onglet <strong>Promotions</strong>, <strong>Spam</strong> ou <strong>Courrier indésirable</strong> pour trouver le mail.
               </>
-            )}
+
           </p>
 
           {/* Form card */}
@@ -88,17 +135,7 @@ export default async function CapturePage({ searchParams }: Props) {
         </div>
       </main>
 
-      {config ? (
-        <footer
-          className="px-6 py-6 border-t-2 border-black flex justify-center gap-6 text-xs text-black/60"
-          style={{ fontFamily: 'var(--font-assistant)' }}
-        >
-          <a href="/mentions-legales" className="underline">Mentions légales</a>
-          <a href="/confidentialite" className="underline">Confidentialité</a>
-        </footer>
-      ) : (
-        <Footer />
-      )}
+      <Footer />
     </div>
   )
 }

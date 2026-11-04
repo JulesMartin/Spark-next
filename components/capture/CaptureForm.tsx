@@ -57,12 +57,21 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
     }
   }
 
+  const apInput: React.CSSProperties = {
+    fontFamily: 'var(--font-dm-sans), system-ui, sans-serif',
+    background: 'rgba(0,0,0,0.28)',
+    color: '#f2ebdd',
+    border: '1px solid rgba(242,235,221,0.16)',
+    borderRadius: 14,
+  }
+  const apLabel: React.CSSProperties = { fontFamily: 'var(--font-dm-sans), system-ui, sans-serif', color: '#f2ebdd' }
+
   if (status === 'success' && config) {
     return (
       <p
         role="status"
-        className="text-center text-sm font-black uppercase tracking-widest text-black py-6"
-        style={{ fontFamily: 'var(--font-raleway)' }}
+        className="text-center text-xl uppercase tracking-wide py-6"
+        style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', color: '#f2ebdd' }}
       >
         C&apos;est noté, on continue…
       </p>
@@ -110,6 +119,40 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
     )
   }
 
+  if (config) {
+    return (
+      <form onSubmit={handleSubmit} className="w-full">
+        {/* Honeypot */}
+        <input type="text" name="website" value={website} onChange={(e) => setWebsite(e.target.value)} className="hidden" tabIndex={-1} aria-hidden="true" autoComplete="off" />
+        <div className="grid grid-cols-1 min-[700px]:grid-cols-2 gap-5 mb-6">
+          <label className="block">
+            <span className="block text-sm font-semibold mb-2" style={apLabel}>Prénom *</span>
+            <input type="text" required value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Ton prénom" className="w-full px-5 py-4 text-base outline-none placeholder:text-[#f2ebdd]/40 focus:!border-[#ffa17f]" style={apInput} />
+          </label>
+          <label className="block">
+            <span className="block text-sm font-semibold mb-2" style={apLabel}>Email *</span>
+            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ton@email.com" className="w-full px-5 py-4 text-base outline-none placeholder:text-[#f2ebdd]/40 focus:!border-[#ffa17f]" style={apInput} />
+          </label>
+        </div>
+        <button
+          type="submit"
+          disabled={status === 'loading'}
+          className="w-full min-h-[64px] px-8 text-lg disabled:opacity-60 cursor-pointer transition-transform hover:-translate-y-0.5"
+          style={{ background: '#ffa17f', color: '#00223e', borderRadius: 999, border: '2px solid transparent', fontFamily: 'var(--font-dm-sans), system-ui, sans-serif', fontWeight: 700 }}
+        >
+          {status === 'loading' ? 'Envoi…' : config.button}
+        </button>
+        <p className="mt-5 text-xs text-center" style={{ color: 'rgba(242,235,221,0.6)', fontFamily: 'var(--font-dm-sans), system-ui, sans-serif' }}>
+          {config.consent ? `${config.consent} ` : ''}Informations jamais revendues.{' '}
+          <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="underline">Politique de confidentialité</a>
+        </p>
+        {status === 'error' && (
+          <p className="mt-3 text-sm text-center" style={{ color: '#ffb4a0' }}>{errorMsg}</p>
+        )}
+      </form>
+    )
+  }
+
   return (
     <form onSubmit={handleSubmit} className="w-full">
       {/* Honeypot */}
@@ -140,7 +183,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           />
         </div>
 
-        {!config && (
+        {(
           <div className="flex-1">
             <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
               Pseudo
@@ -173,7 +216,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           />
         </div>
 
-        {!config && (
+        {(
           <div className="min-w-0">
             <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
               Téléphone *
@@ -190,7 +233,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
       </div>
 
       <p className="text-[10px] text-black/60 mb-3 text-center" style={{ fontFamily: 'var(--font-assistant)' }}>
-        {config ? `${config.consent} ` : ''}Informations jamais revendues.{' '}
+        Informations jamais revendues.{' '}
         <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="underline">
           Politique de confidentialité
         </a>
@@ -206,7 +249,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
           fontFamily: 'var(--font-raleway)',
         }}
       >
-        {status === 'loading' ? 'Envoi…' : (config?.button ?? 'Recevoir gratuitement')}
+        {status === 'loading' ? 'Envoi…' : 'Recevoir gratuitement'}
       </button>
 
       {status === 'error' && (
