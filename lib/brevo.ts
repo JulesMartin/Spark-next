@@ -25,6 +25,7 @@ function getApiKey() {
 // Map campaign slug → Brevo template ID
 // Add one line here for each new campaign
 const CAMPAIGN_TEMPLATES: Record<string, number> = {
+  'motion-design-premium-en-10-minutes-ap': 74,
   'guide-claude-motion-animer-ses-donnees-10-promp-ap': 73,
   'guide-dots-agenda-agent-ia-ap': 72,
   'claude-code-gratuit-avec-free-llm-api-ap': 71,
