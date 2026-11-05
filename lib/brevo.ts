@@ -186,14 +186,14 @@ export async function unsubscribeBrevoContact(email: string) {
   }
 }
 
-async function sendTemplate(email: string, templateId: number): Promise<boolean> {
+async function sendTemplate(email: string, templateId: number, params?: Record<string, string>): Promise<boolean> {
   const apiKey = getApiKey()
   if (!apiKey) return false
 
   const res = await fetch(`${BREVO_API}/smtp/email`, {
     method: 'POST',
     headers: { 'api-key': apiKey, 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ to: [{ email }], templateId }),
+    body: JSON.stringify({ to: [{ email }], templateId, ...(params ? { params } : {}) }),
   })
 
   if (!res.ok) {
@@ -214,7 +214,9 @@ export async function sendCampaignEmail(email: string, campaign: string): Promis
     console.error(`No Brevo template configured for campaign: ${campaign}`)
     return false
   }
-  return sendTemplate(email, templateId)
+  // `params.CAMPAIGN` = le slug : le modèle des guides Auto-Post s'en sert pour garder la vidéo d'origine dans le lien vers la landing (utm_campaign).
+  // Les autres modèles ne l'utilisent pas : Brevo l'ignore.
+  return sendTemplate(email, templateId, { CAMPAIGN: campaign })
 }
 
 // Étape de séquence (lib/sequence.ts) : le booléen évite de faire avancer le
