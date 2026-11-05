@@ -23,8 +23,8 @@ export const CAMPAIGN_CONFIGS: Record<string, CampaignConfig> = {
     brand: 'Auto-Post',
     brandHref: 'https://auto-post.jules-api.com/',
     badge: null,
-    title: 'Reçois le guide dans ta boîte mail',
-    lead: null,
+    title: 'Reçois ta ressource dans ta boîte mail',
+    lead: "Pense bien à regarder dans l'onglet Promotions, Spam ou Courrier indésirable pour trouver le mail.",
     button: 'Recevoir le guide',
     consent: null,
     redirectTo:
