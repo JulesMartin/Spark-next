@@ -25,6 +25,7 @@ function getApiKey() {
 // Map campaign slug → Brevo template ID
 // Add one line here for each new campaign
 const CAMPAIGN_TEMPLATES: Record<string, number> = {
+  'moneyprinter-turbo-ta-video-ia-prete-en-une-lig-ap': 77,
   'ton-studio-de-montage-ia-avec-claude-ap': 76,
   '9-depots-github-gratuits-pour-remplacer-tes-abo-ap': 75,
   'motion-design-premium-en-10-minutes-ap': 74,
