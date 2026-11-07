@@ -25,6 +25,7 @@ function getApiKey() {
 // Map campaign slug → Brevo template ID
 // Add one line here for each new campaign
 const CAMPAIGN_TEMPLATES: Record<string, number> = {
+  'animations-style-vox-avec-claude-et-auto-post-ap': 82,
   'de-l-idee-a-la-video-qui-rapporte-ap': 81,
   'videos-animees-avec-claude-ap': 80,
   'des-reels-en-illimite-avec-un-skill-claude-ap': 79,
