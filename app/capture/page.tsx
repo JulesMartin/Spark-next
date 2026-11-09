@@ -2,11 +2,11 @@ import type { Metadata } from 'next'
 import CaptureForm from '@/components/capture/CaptureForm'
 import Footer from '@/components/public/Footer'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
-import { getCampaignConfig } from '@/lib/campaigns'
+import { notFound, redirect } from 'next/navigation'
+import { getCampaignConfig, isAutoPostGuide } from '@/lib/campaigns'
 import { hasCampaignTemplate } from '@/lib/brevo'
 
-type Props = { searchParams: Promise<{ c?: string }> }
+type Props = { searchParams: Promise<{ c?: string; classic?: string }> }
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const { c } = await searchParams
@@ -25,6 +25,14 @@ export default async function CapturePage({ searchParams }: Props) {
   // Une page Auto-Post sans mail à envoyer n'existe pas (site pas encore redéployé, modèle absent, adresse inventée).
   if (config && !hasCampaignTemplate(campaign)) notFound()
 
+  // Les guides Auto-Post s'ouvrent en pop-up par-dessus la landing (moins de visiteurs perdus entre les deux sites).
+  // `?classic=1` garde cette page ; CAPTURE_POPUP=0 la remet pour tout le monde.
+  if (config && isAutoPostGuide(campaign) && params.classic !== '1' && process.env.CAPTURE_POPUP !== '0') {
+    redirect(
+      `https://auto-post.jules-api.com/?c=${encodeURIComponent(campaign)}&utm_source=instagram&utm_medium=capture&utm_campaign=${encodeURIComponent(campaign)}`
+    )
+  }
+
   if (config) {
     // Pages Auto-Post : mêmes couleurs, polices et formes que la landing (auto-post.jules-api.com).
     return (
@@ -40,20 +48,20 @@ export default async function CapturePage({ searchParams }: Props) {
         </nav>
 
         <main className="flex-1 flex items-center justify-center px-5 sm:px-10 py-14 sm:py-20">
-          <div className="w-full max-w-5xl">
+          <div className="w-full max-w-lg">
             <h1
-              className="uppercase leading-[1.3] mb-10 sm:mb-14 text-[clamp(2.8rem,9vw,6.5rem)]"
+              className="uppercase leading-[1.2] mb-5 text-[clamp(2rem,7.5vw,3rem)]"
               style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', fontWeight: 400, color: '#f2ebdd' }}
             >
               {config.title}
             </h1>
             {config.lead && (
-              <p className="text-lg sm:text-xl mb-8 max-w-3xl" style={{ color: 'rgba(242,235,221,0.74)' }}>
+              <p className="text-base sm:text-lg mb-8" style={{ color: 'rgba(242,235,221,0.74)' }}>
                 {config.lead}
               </p>
             )}
             <div
-              className="w-full p-6 sm:p-12"
+              className="w-full p-6 sm:p-8"
               style={{ background: 'rgba(242,235,221,0.06)', border: '1px solid rgba(242,235,221,0.16)', borderRadius: 20 }}
             >
               <CaptureForm campaign={campaign} />

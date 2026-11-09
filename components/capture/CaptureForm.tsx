@@ -124,7 +124,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
       <form onSubmit={handleSubmit} className="w-full">
         {/* Honeypot */}
         <input type="text" name="website" value={website} onChange={(e) => setWebsite(e.target.value)} className="hidden" tabIndex={-1} aria-hidden="true" autoComplete="off" />
-        <div className="grid grid-cols-1 min-[700px]:grid-cols-2 gap-5 mb-6">
+        <div className="grid grid-cols-1 gap-5 mb-6">
           <label className="block">
             <span className="block text-sm font-semibold mb-2" style={apLabel}>Prénom *</span>
             <input type="text" required value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Ton prénom" className="w-full px-5 py-4 text-base outline-none placeholder:text-[#f2ebdd]/40 focus:!border-[#ffa17f]" style={apInput} />

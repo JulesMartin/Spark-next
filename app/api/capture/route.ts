@@ -6,7 +6,32 @@ import { sanitizeName, sanitizeEmail, sanitizePhone, sanitizeHandle, sanitizeCam
 import { getCampaignConfig } from '@/lib/campaigns'
 import { enrollAndSendResource } from '@/lib/campaign-sequence'
 
+// La landing Auto-Post affiche le formulaire en pop-up et l'envoie ici depuis un autre domaine.
+const ALLOWED_ORIGINS = ['https://auto-post.jules-api.com', 'https://video-agent-landing.vercel.app']
+
+function corsHeaders(request: NextRequest): Record<string, string> {
+  const origin = request.headers.get('origin')
+  if (!origin || !ALLOWED_ORIGINS.includes(origin)) return {}
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
+    Vary: 'Origin',
+  }
+}
+
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, { status: 204, headers: corsHeaders(request) })
+}
+
 export async function POST(request: NextRequest) {
+  const res = await capture(request)
+  for (const [k, v] of Object.entries(corsHeaders(request))) res.headers.set(k, v)
+  return res
+}
+
+async function capture(request: NextRequest): Promise<NextResponse> {
   try {
     const body = await request.json()
 
