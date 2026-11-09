@@ -25,6 +25,7 @@ function getApiKey() {
 // Map campaign slug → Brevo template ID
 // Add one line here for each new campaign
 const CAMPAIGN_TEMPLATES: Record<string, number> = {
+  'l-accroche-qui-retient-l-appel-qui-convertit-ap': 97,
   'le-reel-aux-18-effets-prompt-par-prompt-ap': 96,
   '19-effets-pour-que-personne-ne-scrolle-ap': 95,
   'zero-seconde-de-montage-ap': 94,
