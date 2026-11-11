@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
   const rel = decodeURIComponent(pathname.replace(/^\/atelier\/?/, ''))
   const last = rel.split('/').pop() ?? ''
   if (rel.split('/').includes('..')) return new NextResponse('Introuvable', { status: 404 })
-  if (rel !== '' && !rel.endsWith('/') && !last.includes('.')) {
+  if (!pathname.endsWith('/') && (rel === '' || !last.includes('.'))) {
     return NextResponse.redirect(new URL(`${pathname}/`, request.url), 308)
   }
 
