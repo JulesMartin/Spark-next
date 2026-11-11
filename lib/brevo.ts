@@ -214,6 +214,25 @@ export async function unsubscribeBrevoContact(email: string) {
   }
 }
 
+// Retire l'adresse de la liste de blocage transactionnelle (lien de désinscription d'un mail
+// Brevo, plainte, hard bounce) : tant qu'elle y est, Brevo accepte l'envoi puis le jette sans erreur.
+// Renvoie true si l'adresse était bloquée.
+export async function unblockTransactionalContact(email: string): Promise<boolean> {
+  const apiKey = getApiKey()
+  if (!apiKey) return false
+
+  const res = await fetch(`${BREVO_API}/smtp/blockedContacts/${encodeURIComponent(email)}`, {
+    method: 'DELETE',
+    headers: { 'api-key': apiKey, Accept: 'application/json' },
+  })
+  if (res.status === 404) return false
+  if (!res.ok) {
+    console.error('Brevo unblock error:', email, await res.text().catch(() => ''))
+    return false
+  }
+  return true
+}
+
 async function sendTemplate(email: string, templateId: number, params?: Record<string, string>): Promise<boolean> {
   const apiKey = getApiKey()
   if (!apiKey) return false

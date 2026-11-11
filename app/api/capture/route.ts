@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { upsertBrevoContact, sendCampaignEmail } from '@/lib/brevo'
+import { upsertBrevoContact, sendCampaignEmail, unblockTransactionalContact } from '@/lib/brevo'
 import { getPostHogClient } from '@/lib/posthog-server'
 import { sanitizeName, sanitizeEmail, sanitizePhone, sanitizeHandle, sanitizeCampaign } from '@/lib/sanitize'
 import { getCampaignConfig } from '@/lib/campaigns'
@@ -68,12 +68,18 @@ async function capture(request: NextRequest): Promise<NextResponse> {
       .eq('email', email)
       .maybeSingle()
 
-    // Un désinscrit qui redemande une ressource la reçoit, mais ne repasse pas
-    // par la séquence : on garde son statut pour que Brevo ne le remette pas en liste #5
-    const unsubscribed = existing?.unsubscribed === true
     const isNewCampaign = !existing?.campaigns?.includes(campaign)
     // Une campagne avec sa propre suite de mails ne démarre pas la séquence de bienvenue.
     const ownSequence = config?.sequence ?? null
+    const willSend = !!config || isNewCampaign
+    // La personne redemande elle-même la ressource : on la débloque côté Brevo, sinon l'envoi
+    // est jeté en silence. Un blocage vaut désinscription (souvent le lien d'un mail Brevo, que
+    // Supabase ignore) : on la marque désinscrite pour que la séquence ne lui réécrive pas.
+    const wasBlocked = willSend && (await unblockTransactionalContact(email))
+    // Un désinscrit qui redemande une ressource la reçoit, mais ne repasse pas
+    // par la séquence : on garde son statut pour que Brevo ne le remette pas en liste #5
+    const unsubscribed = existing?.unsubscribed === true || wasBlocked
+    const markUnsubscribed = wasBlocked && existing?.unsubscribed !== true
     // La séquence démarre à la première capture, et pour un contact déjà en base qui
     // revient sur une nouvelle campagne — c'est ce que faisait le workflow Brevo.
     // Jamais deux fois : `sequence_started_at` posé une fois ne bouge plus.
@@ -86,7 +92,8 @@ async function capture(request: NextRequest): Promise<NextResponse> {
 
     if (!existing) {
       const { error: insertError } = await supabase.from('email_subscribers').insert({
-        ...(ownSequence ? {} : { sequence_started_at: new Date().toISOString() }),
+        ...(ownSequence || unsubscribed ? {} : { sequence_started_at: new Date().toISOString() }),
+        ...(markUnsubscribed ? { unsubscribed: true, unsubscribed_at: new Date().toISOString() } : {}),
         email,
         source: campaign,
         campaigns: allCampaigns,
@@ -98,12 +105,13 @@ async function capture(request: NextRequest): Promise<NextResponse> {
         console.error('Supabase insert error:', insertError)
         return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })
       }
-    } else if (isNewCampaign || socialHandle || phone || firstName) {
+    } else if (isNewCampaign || socialHandle || phone || firstName || markUnsubscribed) {
       await supabase
         .from('email_subscribers')
         .update({
           campaigns: allCampaigns,
           ...(startSequence ? { sequence_started_at: new Date().toISOString() } : {}),
+          ...(markUnsubscribed ? { unsubscribed: true, unsubscribed_at: new Date().toISOString() } : {}),
           ...(socialHandle ? { social_handle: socialHandle } : {}),
           ...(phone ? { phone } : {}),
           ...(firstName ? { first_name: firstName } : {}),
