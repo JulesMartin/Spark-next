@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/service'
 import { DARK, SHAPES, decoSVG, treeSVG } from '@/lib/skool-art'
-import { EARLY_SPOTS, FOUNDER_SPOTS, LAUNCH_PRICE, isWaitlistClosed } from '@/lib/waitlist'
+import { EARLY_SPOTS, LAUNCH_PRICE, isWaitlistClosed } from '@/lib/waitlist'
 import { WaitlistProvider } from '@/components/skool/WaitlistState'
 import WaitlistForm from '@/components/skool/WaitlistForm'
 import Countdown from '@/components/skool/Countdown'
@@ -74,7 +74,7 @@ const STEPS = [
 const GIVES = [
   `Accès à la communauté pour ${LAUNCH_PRICE} €/mois à vie`,
   'Une sélection d’opportunités de business IA',
-  'Un pack de messages de prospection',
+  'Un skill pour définir ton offre',
   'Un call 1-1 offert (optionnel)',
 ]
 

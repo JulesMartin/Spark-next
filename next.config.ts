@@ -1,6 +1,9 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  outputFileTracingIncludes: {
+    '/api/waitlist': ['./content/waitlist/**/*'],
+  },
   async rewrites() {
     return [
       {

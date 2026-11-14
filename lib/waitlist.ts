@@ -4,7 +4,7 @@
 export const WAITLIST_DEADLINE = '2026-11-18T23:59:59+01:00'
 export const WAITLIST_DEADLINE_LABEL = 'mercredi 18 novembre à 23 h 59'
 
-// Les 100 premiers : 9 €/mois à vie + Opportunity Radar. Les 50 premiers : en plus, le call 1-1 (optionnel) et le pack de messages.
+// Les 100 premiers : 9 €/mois à vie + sélection d'opportunités IA et skill de création d'offre (pièces jointes du mail). Les 50 premiers : en plus, le call 1-1 (optionnel).
 export const EARLY_SPOTS = 100
 export const FOUNDER_SPOTS = 50
 export const LAUNCH_PRICE = 9

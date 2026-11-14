@@ -33,6 +33,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })
     }
 
+    await supabase
+      .from('ai_lab_waitlist')
+      .update({ unsubscribed_at: new Date().toISOString() })
+      .eq('email', email)
+
     await unsubscribeBrevoContact(email)
 
     const posthog = getPostHogClient()

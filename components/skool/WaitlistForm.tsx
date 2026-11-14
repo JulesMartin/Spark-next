@@ -17,8 +17,8 @@ function Done({ r }: { r: WaitlistResult }) {
       <div className="done" role="status">
         <h3>Bravo, tu es dans les 50 premiers.</h3>
         <p>
-          {prefix}Ton prix de {LAUNCH_PRICE} €/mois à vie est réservé, avec le pack de messages de prospection
-          et, si tu en as envie, un call 1-1 offert. Tu recevras l&apos;Opportunity Radar par e-mail avant l&apos;ouverture.
+          {prefix}Ton prix de {LAUNCH_PRICE} €/mois à vie est réservé, avec le skill pour définir ton offre
+          et, si tu en as envie, un call 1-1 offert. Tu reçois par e-mail la sélection d&apos;opportunités de business IA. Regarde bien tes promotions et spam.
         </p>
       </div>
     )
@@ -27,8 +27,8 @@ function Done({ r }: { r: WaitlistResult }) {
       <div className="done" role="status">
         <h3>Bravo, tu es dans les 100 premiers.</h3>
         <p>
-          {prefix}Ton prix de {LAUNCH_PRICE} €/mois à vie est réservé. Tu recevras l&apos;Opportunity Radar par
-          e-mail avant l&apos;ouverture, puis ton lien d&apos;accès le jour J.
+          {prefix}Ton prix de {LAUNCH_PRICE} €/mois à vie est réservé. Tu reçois par e-mail la sélection
+          d&apos;opportunités de business IA et le skill pour définir ton offre, puis ton lien d&apos;accès le jour J. Regarde bien tes promotions et spam.
         </p>
       </div>
     )
@@ -36,15 +36,15 @@ function Done({ r }: { r: WaitlistResult }) {
     <div className="done" role="status">
       <h3>Mince, tu y étais presque.</h3>
       <p>
-        {prefix}Les {EARLY_SPOTS} premières places sont parties. Mais je te réserve quand même une surprise :
-        check ta boîte mail dans les prochains jours.
+        {prefix}Les {EARLY_SPOTS} premières places sont parties. Mais je t&apos;envoie quand même par e-mail
+        la sélection d&apos;opportunités de business IA et le skill pour définir ton offre. Regarde bien tes promotions et spam.
       </p>
     </div>
   )
 }
 
 export default function WaitlistForm() {
-  const { remaining, closed, result, setResult } = useWaitlist()
+  const { closed, result, setResult } = useWaitlist()
   const [email, setEmail] = useState('')
   const [platform, setPlatform] = useState<(typeof PLATFORMS)[number][0]>('instagram')
   const [handle, setHandle] = useState('')
@@ -153,6 +153,7 @@ export default function WaitlistForm() {
       <button className="btn ghost" type="submit" disabled={status === 'loading'}>
         {status === 'loading' ? 'Inscription…' : cta}
       </button>
+      <p className="rgpd">Regarde bien tes promotions et spam après ton inscription.</p>
       {error && <p className="wl-err" role="alert">{error}</p>}
       <p className="rgpd"><a href="/confidentialite">Politique de confidentialité</a></p>
     </form>
