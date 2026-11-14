@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/service'
 import { DARK, SHAPES, decoSVG, treeSVG } from '@/lib/skool-art'
-import { EARLY_SPOTS, LAUNCH_PRICE, isWaitlistClosed } from '@/lib/waitlist'
+import { EARLY_SPOTS, isWaitlistClosed } from '@/lib/waitlist'
 import { WaitlistProvider } from '@/components/skool/WaitlistState'
 import WaitlistForm from '@/components/skool/WaitlistForm'
 import Countdown from '@/components/skool/Countdown'
@@ -71,11 +71,11 @@ const STEPS = [
   ['Improve', 'Améliorer à partir de tes résultats'],
 ]
 
-const GIVES = [
-  `Accès à la communauté pour ${LAUNCH_PRICE} €/mois à vie`,
-  'Une sélection d’opportunités de business IA',
-  'Un skill pour définir ton offre',
-  'Un call 1-1 offert (optionnel)',
+const GIVES: { text: string; places?: number; skool?: boolean }[] = [
+  { text: 'Accès à la communauté Skool pour 30 centimes/jour à vie', places: 100, skool: true },
+  { text: 'Un call 1-1 offert (optionnel)', places: 50 },
+  { text: '35 opportunités de business IA' },
+  { text: 'Un skill pour définir ton offre' },
 ]
 
 const YOUTUBE = 'https://www.youtube.com/channel/UCbfucDBGTg_qarA8qJpMe-A'
@@ -122,15 +122,23 @@ export default async function SkoolPage() {
 
         <div className="rvb vsl-wrap" data-d="800"><Vsl /></div>
 
+        <div className="rvb hero-form" id="inscription" data-d="900">
+          <WaitlistForm />
+        </div>
+
         <ul className="gives" aria-label="Ce que tu reçois en t'inscrivant">
-          {GIVES.map((t) => (
-            <li className="give" key={t}><b>{t}</b></li>
+          {GIVES.map(({ text, places, skool }, i) => (
+            <li className={skool ? 'give hl' : 'give'} key={text} data-d={1050 + i * 90}>
+              <b>
+                {text}
+                {skool && <Image className="sk-card" src="/skool/skool-logo.png" alt="" width={44} height={44} />}
+              </b>
+              {places && <span className="pl"><strong>{places}</strong> places</span>}
+            </li>
           ))}
         </ul>
 
-        <div className="rvb hero-form" id="inscription" data-d="950">
-          <WaitlistForm />
-        </div>
+
 
         {/* 02 · DANS LE LAB */}
         <h2 id="s02">Tu es tenu par la main jusqu&apos;à tes premiers résultats</h2>

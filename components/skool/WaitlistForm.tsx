@@ -18,7 +18,7 @@ function Done({ r }: { r: WaitlistResult }) {
         <h3>Bravo, tu es dans les 50 premiers.</h3>
         <p>
           {prefix}Ton prix de {LAUNCH_PRICE} €/mois à vie est réservé, avec le skill pour définir ton offre
-          et, si tu en as envie, un call 1-1 offert. Tu reçois par e-mail la sélection d&apos;opportunités de business IA. Regarde bien tes promotions et spam.
+          et, si tu en as envie, un call 1-1 offert. Tu reçois par e-mail la sélection d&apos;opportunités de business IA. Regarde bien ton onglet spam et promotion dans tes mails.
         </p>
       </div>
     )
@@ -28,7 +28,7 @@ function Done({ r }: { r: WaitlistResult }) {
         <h3>Bravo, tu es dans les 100 premiers.</h3>
         <p>
           {prefix}Ton prix de {LAUNCH_PRICE} €/mois à vie est réservé. Tu reçois par e-mail la sélection
-          d&apos;opportunités de business IA et le skill pour définir ton offre, puis ton lien d&apos;accès le jour J. Regarde bien tes promotions et spam.
+          d&apos;opportunités de business IA et le skill pour définir ton offre, puis ton lien d&apos;accès le jour J. Regarde bien ton onglet spam et promotion dans tes mails.
         </p>
       </div>
     )
@@ -37,7 +37,7 @@ function Done({ r }: { r: WaitlistResult }) {
       <h3>Mince, tu y étais presque.</h3>
       <p>
         {prefix}Les {EARLY_SPOTS} premières places sont parties. Mais je t&apos;envoie quand même par e-mail
-        la sélection d&apos;opportunités de business IA et le skill pour définir ton offre. Regarde bien tes promotions et spam.
+        la sélection d&apos;opportunités de business IA et le skill pour définir ton offre. Regarde bien ton onglet spam et promotion dans tes mails.
       </p>
     </div>
   )
@@ -153,7 +153,7 @@ export default function WaitlistForm() {
       <button className="btn ghost" type="submit" disabled={status === 'loading'}>
         {status === 'loading' ? 'Inscription…' : cta}
       </button>
-      <p className="rgpd">Regarde bien tes promotions et spam après ton inscription.</p>
+      <p className="rgpd wl-spam">Regarde bien ton onglet spam et promotion dans tes mails.</p>
       {error && <p className="wl-err" role="alert">{error}</p>}
       <p className="rgpd"><a href="/confidentialite">Politique de confidentialité</a></p>
     </form>
