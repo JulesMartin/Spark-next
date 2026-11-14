@@ -271,3 +271,21 @@ export async function sendCampaignEmail(email: string, campaign: string): Promis
 export async function sendSequenceEmail(email: string, templateId: number): Promise<boolean> {
   return sendTemplate(email, templateId)
 }
+
+// Liste d'attente Claude to Client : ajoute le contact à une liste dédiée, sans toucher
+// à ses attributs CAMPAIGNS ni l'inscrire dans la liste générale (pas de séquence).
+export async function addContactToList(email: string, listId: number) {
+  const apiKey = getApiKey()
+  if (!apiKey || !listId) return
+
+  const res = await fetch(`${BREVO_API}/contacts`, {
+    method: 'POST',
+    headers: { 'api-key': apiKey, 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ email, listIds: [listId], updateEnabled: true }),
+  })
+
+  if (!res.ok && res.status !== 204) {
+    const err = await res.json().catch(() => ({}))
+    console.error('Brevo list add error:', err)
+  }
+}

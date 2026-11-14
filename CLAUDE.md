@@ -16,6 +16,7 @@
 | CMS blog | Sanity (project `u7ptqvl2`, dataset `production`) |
 | Email automation | Brevo (contacts + envois transactionnels) |
 | Email notif candidatures | Resend (domaine vérifié `jules-api.com`) |
+| Analytics + replays | PostHog EU (`instrumentation-client.ts`, `lib/posthog-server.ts`) — même projet que la landing Auto-Post, voir `DOCUMENTATION/POSTHOG.md` |
 | Déploiement | Vercel |
 
 ---
@@ -32,6 +33,7 @@
 /prompts-ia              → Lead magnet (233 prompts + 10 skills Claude)
 /capture?c=[slug]        → Page de capture générique par campagne
 /studio                  → Sanity Studio embarqué (Next.js route)
+/skool                   → Liste d'attente Claude to Client (style du hub, CSS isolé `app/skool/skool.css`, réglages dans `lib/waitlist.ts`)
 ```
 
 ---
@@ -114,6 +116,7 @@ Lien dashboard Supabase : https://supabase.com/dashboard (ouvrir le projet spark
 | `/api/candidature` | POST | Candidature invité → Supabase + notif email Resend |
 | `/api/cron/sequence` | GET | Déclenchement manuel des séquences, bienvenue et campagnes (protégé par `CRON_SECRET`) |
 | `/api/webhooks/stripe` | POST | Achat Auto-Post → arrêt des relances (voir `DOCUMENTATION/CAPTURE_AUTO_POST.md`) |
+| `/api/waitlist` | POST | Liste d'attente Claude to Client → RPC Supabase `join_ai_lab_waitlist` (table `ai_lab_waitlist`) + liste Brevo `BREVO_WAITLIST_LIST_ID` + e-mail Resend |
 | `/api/revalidate` | POST | ISR revalidation manuelle (`/` + `/interviews/[slug]` + `/blog/[slug]`) |
 | `/api/auth/signout` | POST | Déconnexion Supabase |
 
@@ -137,6 +140,8 @@ const CAMPAIGN_TEMPLATES: Record<string, number> = {
 1. Insert dans Supabase `email_subscribers` (si email nouveau)
 2. `upsertBrevoContact` → crée/met à jour le contact avec attribut `CAMPAIGN = slug`
 3. `sendCampaignEmail` → envoie le template Brevo correspondant au slug
+
+Avant l'envoi, `unblockTransactionalContact` retire l'adresse de la liste de blocage transactionnelle de Brevo. Sans ça, une personne désinscrite par un lien Brevo ne reçoit rien et aucune erreur ne remonte. Si l'adresse était bloquée, elle est marquée `unsubscribed` dans Supabase (voir `DOCUMENTATION/DESINSCRIPTION.md`). Pour diagnostiquer un mail jamais reçu, regarde d'abord les événements Brevo de l'adresse (`blocked` ?).
 
 **Séquence de bienvenue** : elle ne tourne plus dans Brevo Automation mais dans notre cron (`lib/sequence.ts`, appelé par `/api/cron/sync-sheet` chaque jour à 9h). Motif : l'offre gratuite Brevo plafonne à 2 000 contacts uniques entrés en automatisation, compteur qui ne se vide jamais. Les emails restent les templates Brevo 25 → 29, envoyés en transactionnel. Calendrier dans la constante `SEQUENCE`. Seuls les contacts avec `sequence_started_at` non nul sont concernés : ceux capturés avant la bascule finissent leur parcours dans Brevo.
 
@@ -264,6 +269,7 @@ BREVO_API_KEY
 BREVO_LIST_ID                    # optionnel
 BREVO_SEQUENCE_LIST_ID           # optionnel — liste qui déclenche la séquence commune
 BREVO_UNSUBSCRIBED_LIST_ID       # optionnel — liste « Désinscrits » (défaut 7), condition de sortie du workflow
+BREVO_WAITLIST_LIST_ID           # liste Brevo de la waitlist Claude to Client (/skool)
 SEQUENCE_DAILY_CAP               # optionnel — max d'envois de séquence par passage du cron (défaut 120)
 RESEND_API_KEY
 RESEND_FROM_EMAIL                # ex: Spark <contact@jules-api.com>
@@ -272,6 +278,8 @@ RESEND_AUDIENCE_ID               # Resend audience (non utilisé activement)
 NEXT_PUBLIC_SANITY_PROJECT_ID    # u7ptqvl2
 NEXT_PUBLIC_SANITY_DATASET       # production
 SANITY_API_TOKEN
+NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN  # phc_vm5u… (projet « Default project » 317893) ; type Config sur Vercel, pas Sensitive
+NEXT_PUBLIC_POSTHOG_HOST           # https://eu.i.posthog.com
 ```
 
 ---

@@ -44,3 +44,18 @@ export const anton = localFont({
   variable: '--font-anton',
   display: 'swap',
 })
+
+// Page /skool (Claude to Client) : même charte que le hub de la section membres.
+export const montserrat = localFont({
+  src: './montserrat-latin.woff2',
+  weight: '100 900',
+  variable: '--font-montserrat',
+  display: 'swap',
+})
+
+export const albertSans = localFont({
+  src: './albert-sans-latin.woff2',
+  weight: '100 900',
+  variable: '--font-albert-sans',
+  display: 'swap',
+})
