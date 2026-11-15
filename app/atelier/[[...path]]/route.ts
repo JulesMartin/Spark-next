@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { ATELIER_BUCKET, ATELIER_COOKIE, hasAccess } from '@/lib/atelier-access'
+import { ATELIER_BUCKET, ATELIER_COOKIE, accessLevel, requiredLevelForPath } from '@/lib/atelier-access'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,9 +23,12 @@ const TYPES: Record<string, string> = {
 export async function GET(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  if (!hasAccess(request.cookies.get(ATELIER_COOKIE)?.value)) {
+  const level = accessLevel(request.cookies.get(ATELIER_COOKIE)?.value)
+  const needed = requiredLevelForPath(pathname)
+  if (level < 1 || level < needed) {
     const login = new URL('/atelier-acces', request.url)
     login.searchParams.set('next', pathname)
+    if (level >= 1) login.searchParams.set('erreur', 'palier') // connecté, mais pas encore à ce palier
     return NextResponse.redirect(login, 307)
   }
 

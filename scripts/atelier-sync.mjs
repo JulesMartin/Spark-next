@@ -1,7 +1,7 @@
 // Envoie le contenu de l'espace membres vers le bucket privé Supabase « atelier ».
 // Usage (depuis spark-next) : node --env-file=.env.local scripts/atelier-sync.mjs
 // Les fichiers ne sont JAMAIS dans le dépôt Git (public) : ils vivent dans presentation-skool/.
-// Le script prépare d'abord les zips de chaque vidéo (preparer-classroom.sh), envoie tout,
+// Le script prépare d'abord les zips de chaque vidéo (outils/preparer-classroom.sh), envoie tout,
 // puis supprime du bucket les fichiers qui n'existent plus en local.
 import { createClient } from '@supabase/supabase-js'
 import { execFileSync } from 'node:child_process'
@@ -31,17 +31,31 @@ function walk(dir, skipTop = []) {
 const files = [] // { local, key }
 
 // 1. Accueil (hub) à la racine du bucket
-files.push({ local: join(SRC, 'hub/index.html'), key: 'index.html' })
+files.push({ local: join(SRC, 'videos/hub/index.html'), key: 'index.html' })
 
-// 2. Chaque vidéo qui contient des fichiers
-const videos = readdirSync(SRC).filter((d) => /^video-\d+$/.test(d) && readdirSync(join(SRC, d)).length > 0)
+// 1 bis. Images communes à toutes les vidéos (logos…) : videos/commun/ → /atelier/commun/ (ouvert à tout membre connecté)
+const COMMUN = join(SRC, 'videos/commun')
+if (existsSync(COMMUN)) for (const p of walk(COMMUN)) files.push({ local: p, key: 'commun/' + relative(COMMUN, p) })
+
+// 2. Chaque vidéo PRÊTE (règle de Jules : une vidéo pas prête n'est pas publiée, on la saute simplement).
+//    Prête = son dossier contient des fichiers ET son nom de thème est écrit dans classroom/video-N/nom-du-dossier.txt.
+const VIDEOS = join(SRC, 'videos')
+const videos = readdirSync(VIDEOS).filter((d) => {
+  if (!/^video-\d+$/.test(d) || readdirSync(join(VIDEOS, d)).filter((n) => n !== '.DS_Store').length === 0) return false
+  const nom = join(SRC, 'classroom', d, 'nom-du-dossier.txt')
+  if (!existsSync(nom) || !readFileSync(nom, 'utf8').trim()) { console.log(`${d} : pas prête (pas de classroom/${d}/nom-du-dossier.txt), non publiée`); return false }
+  return true
+})
 for (const v of videos) {
   // Pages, images et documents (sans skills : ils passent par les zips)
-  for (const p of walk(join(SRC, v), ['skills'])) {
-    files.push({ local: p, key: `${v}/` + relative(join(SRC, v), p) })
+  for (const p of walk(join(VIDEOS, v), ['skills'])) {
+    files.push({ local: p, key: `${v}/` + relative(join(VIDEOS, v), p) })
   }
+  // La présentation s'appelle presentation.html sur l'ordinateur ; l'adresse du site reste /atelier/video-N/ (copie en index.html).
+  const pres = join(VIDEOS, v, 'presentation.html')
+  if (existsSync(pres) && !existsSync(join(VIDEOS, v, 'index.html'))) files.push({ local: pres, key: `${v}/index.html` })
   // Zips préparés pour le Classroom
-  execFileSync('bash', [join(SRC, 'preparer-classroom.sh'), v], { stdio: 'ignore' })
+  execFileSync('bash', [join(SRC, 'outils/preparer-classroom.sh'), v], { stdio: 'ignore' })
   const dir = join(SRC, 'classroom', v, 'fichiers-a-telecharger')
   for (const name of readdirSync(dir).filter((n) => n.endsWith('.zip'))) {
     files.push({ local: join(dir, name), key: `telechargements/${v}/${name}` })

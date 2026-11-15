@@ -54,7 +54,11 @@ export default async function AtelierAccesPage({
         <h1>Espace membres</h1>
         <p>Entre le mot de passe donné dans le Classroom de la communauté pour accéder à la présentation, aux documents, aux skills et aux images.</p>
 
-        {erreur && <div className="err" role="alert">Mot de passe incorrect. Recopie-le exactement, sans espace en trop.</div>}
+        {erreur === 'palier' ? (
+          <div className="err" role="alert">Cette section demande le mot de passe de sa leçon dans le Classroom. Entre-le ici pour l'ouvrir.</div>
+        ) : erreur ? (
+          <div className="err" role="alert">Mot de passe incorrect. Recopie-le exactement, sans espace en trop.</div>
+        ) : null}
 
         <form method="POST" action="/api/atelier/login">
           <input type="hidden" name="next" value={safeNext(next)} />
