@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 async function countSignups(): Promise<number> {
   try {
     const { count, error } = await createServiceClient()
-      .from('ai_lab_waitlist')
+      .from('claude_to_client_waitlist')
       .select('id', { count: 'exact', head: true })
     if (error) throw error
     return count ?? 0

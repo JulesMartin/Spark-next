@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     }
 
     await supabase
-      .from('ai_lab_waitlist')
+      .from('claude_to_client_waitlist')
       .update({ unsubscribed_at: new Date().toISOString() })
       .eq('email', email)
 

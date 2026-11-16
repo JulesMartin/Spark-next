@@ -116,7 +116,7 @@ Lien dashboard Supabase : https://supabase.com/dashboard (ouvrir le projet spark
 | `/api/candidature` | POST | Candidature invité → Supabase + notif email Resend |
 | `/api/cron/sequence` | GET | Déclenchement manuel des séquences, bienvenue et campagnes (protégé par `CRON_SECRET`) |
 | `/api/webhooks/stripe` | POST | Achat Auto-Post → arrêt des relances (voir `DOCUMENTATION/CAPTURE_AUTO_POST.md`) |
-| `/api/waitlist` | POST | Liste d'attente Claude to Client → RPC Supabase `join_ai_lab_waitlist` (table `ai_lab_waitlist`) + liste Brevo `BREVO_WAITLIST_LIST_ID` + e-mail Resend |
+| `/api/waitlist` | POST | Liste d'attente Claude to Client → RPC Supabase `join_claude_to_client_waitlist` (table `claude_to_client_waitlist`) + liste Brevo `BREVO_WAITLIST_LIST_ID` + e-mail Resend |
 | `/api/revalidate` | POST | ISR revalidation manuelle (`/` + `/interviews/[slug]` + `/blog/[slug]`) |
 | `/api/auth/signout` | POST | Déconnexion Supabase |
 

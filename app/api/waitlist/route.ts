@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServiceClient()
     const { data, error } = await supabase
-      .rpc('join_ai_lab_waitlist', {
+      .rpc('join_claude_to_client_waitlist', {
         p_email: email,
         p_utm_source: utm.utm_source,
         p_utm_medium: utm.utm_medium,
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       const platform = PLATFORMS.includes(body.platform) ? body.platform : null
       if (handle && platform) {
         const { error: socialError } = await supabase
-          .from('ai_lab_waitlist')
+          .from('claude_to_client_waitlist')
           .update({ social_platform: platform, social_handle: handle })
           .eq('email', email)
         if (socialError) console.error('Waitlist social update error:', socialError)
