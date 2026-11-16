@@ -1,18 +1,28 @@
 import { createHmac, createHash, timingSafeEqual } from 'node:crypto'
 
-export const ATELIER_COOKIE = 'atelier_access'
-export const ATELIER_BUCKET = 'atelier'
-export const ATELIER_COOKIE_MAX_AGE = 60 * 60 * 24 * 30
+export const SECTION_COOKIE = 'section_access'
+// Ancien nom du cookie (avant le passage d'« atelier » à « section ») : encore accepté pour ne déconnecter personne.
+export const LEGACY_COOKIE = 'atelier_access'
+export const SECTION_BUCKET = 'section'
+
+// Cookie d'accès d'une requête : le nouveau, sinon l'ancien.
+export function accessCookie(cookies: { get(name: string): { value: string } | undefined }): string | undefined {
+  return cookies.get(SECTION_COOKIE)?.value ?? cookies.get(LEGACY_COOKIE)?.value
+}
+export const SECTION_COOKIE_MAX_AGE = 60 * 60 * 24 * 30
 
 // Mots de passe par palier :
-//   ATELIER_PASSWORD     = palier 1 (vidéo 1)
-//   ATELIER_PASSWORD_2   = palier 2 (ouvre les vidéos 1 et 2)
-//   ATELIER_PASSWORD_3   = palier 3 (ouvre les vidéos 1, 2 et 3) … etc.
+//   SECTION_PASSWORD     = palier 1 (vidéo 1)
+//   SECTION_PASSWORD_2   = palier 2 (ouvre les vidéos 1 et 2)
+//   SECTION_PASSWORD_3   = palier 3 (ouvre les vidéos 1, 2 et 3) … etc.
+// Les anciens noms ATELIER_PASSWORD… sont encore lus en secours.
 // Un abonné qui résilie garde son palier : il n'ouvre jamais les vidéos suivantes.
 const MAX_LEVEL = 50
 
 export function passwordForLevel(level: number): string | null {
-  const v = level === 1 ? process.env.ATELIER_PASSWORD : process.env[`ATELIER_PASSWORD_${level}`]
+  const v = level === 1
+    ? process.env.SECTION_PASSWORD ?? process.env.ATELIER_PASSWORD
+    : process.env[`SECTION_PASSWORD_${level}`] ?? process.env[`ATELIER_PASSWORD_${level}`]
   return v ? v : null
 }
 
@@ -51,7 +61,7 @@ export function accessLevel(cookieValue: string | undefined): number {
     return t && safeEqual(m[2], t) ? level : 0
   }
   // Ancien cookie (avant les paliers) = palier 1
-  const legacy = process.env.ATELIER_PASSWORD
+  const legacy = passwordForLevel(1)
   if (legacy) {
     const old = createHmac('sha256', legacy).update('atelier-access-v1').digest('hex')
     if (safeEqual(cookieValue, old)) return 1
@@ -70,16 +80,18 @@ export function levelForPassword(candidate: string): number {
   return found
 }
 
+// (les libellés « atelier-access-v… » ci-dessus signent les cookies déjà donnés : ne pas les changer, sinon tout le monde est déconnecté)
+
 // Numéro de vidéo d'un chemin du bucket (video-N/… ou telechargements/video-N/…), 0 si commun à tous.
 export function requiredLevel(key: string): number {
   const m = /^(?:telechargements\/)?video-(\d+)(?:\/|$)/.exec(key)
   return m ? Number(m[1]) : 0
 }
 
-// Palier requis pour une adresse du site (/atelier/video-2/…), sans planter sur un % mal formé.
+// Palier requis pour une adresse du site (/section/video-2/…), sans planter sur un % mal formé.
 export function requiredLevelForPath(pathname: string): number {
   try {
-    return requiredLevel(decodeURIComponent(pathname).replace(/^\/atelier\/?/, ''))
+    return requiredLevel(decodeURIComponent(pathname).replace(/^\/section\/?/, ''))
   } catch {
     return 0
   }
@@ -87,7 +99,7 @@ export function requiredLevelForPath(pathname: string): number {
 
 // Empêche une redirection vers un autre site après la connexion.
 export function safeNext(next: unknown): string {
-  return typeof next === 'string' && /^\/atelier(\/[^\\]*)?$/.test(next) && !next.includes('//')
+  return typeof next === 'string' && /^\/section(\/[^\\]*)?$/.test(next) && !next.includes('//')
     ? next
-    : '/atelier/'
+    : '/section/'
 }

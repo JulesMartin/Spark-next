@@ -20,6 +20,14 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  // Anciennes adresses de l'espace membres (/atelier) : redirigées vers /section, pour que les liens déjà donnés marchent toujours.
+  async redirects() {
+    return [
+      { source: '/atelier', destination: '/section/', permanent: true },
+      { source: '/atelier/:path*', destination: '/section/:path*', permanent: true },
+      { source: '/atelier-acces', destination: '/section-acces', permanent: true },
+    ]
+  },
   skipTrailingSlashRedirect: true,
   images: {
     remotePatterns: [

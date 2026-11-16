@@ -1,5 +1,5 @@
-// Envoie le contenu de l'espace membres vers le bucket privé Supabase « atelier ».
-// Usage (depuis spark-next) : node --env-file=.env.local scripts/atelier-sync.mjs
+// Envoie le contenu de l'espace membres vers le bucket privé Supabase « section ».
+// Usage (depuis spark-next) : node --env-file=.env.local scripts/section-sync.mjs
 // Les fichiers ne sont JAMAIS dans le dépôt Git (public) : ils vivent dans presentation-skool/.
 // Le script prépare d'abord les zips de chaque vidéo (outils/preparer-classroom.sh), envoie tout,
 // puis supprime du bucket les fichiers qui n'existent plus en local.
@@ -8,8 +8,8 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative, extname } from 'node:path'
 
-const SRC = process.env.ATELIER_SRC ?? '/Users/julesmartin/Desktop/presentation-skool'
-const BUCKET = 'atelier'
+const SRC = process.env.SECTION_SRC ?? '/Users/julesmartin/Desktop/presentation-skool'
+const BUCKET = 'section'
 const SKIP = new Set(['.DS_Store', 'modele-document.html'])
 
 const TYPES = {
@@ -33,7 +33,7 @@ const files = [] // { local, key }
 // 1. Accueil (hub) à la racine du bucket
 files.push({ local: join(SRC, 'videos/hub/index.html'), key: 'index.html' })
 
-// 1 bis. Images communes à toutes les vidéos (logos…) : videos/commun/ → /atelier/commun/ (ouvert à tout membre connecté)
+// 1 bis. Images communes à toutes les vidéos (logos…) : videos/commun/ → /section/commun/ (ouvert à tout membre connecté)
 const COMMUN = join(SRC, 'videos/commun')
 if (existsSync(COMMUN)) for (const p of walk(COMMUN)) files.push({ local: p, key: 'commun/' + relative(COMMUN, p) })
 
@@ -51,7 +51,7 @@ for (const v of videos) {
   for (const p of walk(join(VIDEOS, v), ['skills'])) {
     files.push({ local: p, key: `${v}/` + relative(join(VIDEOS, v), p) })
   }
-  // La présentation s'appelle presentation.html sur l'ordinateur ; l'adresse du site reste /atelier/video-N/ (copie en index.html).
+  // La présentation s'appelle presentation.html sur l'ordinateur ; l'adresse du site reste /section/video-N/ (copie en index.html).
   const pres = join(VIDEOS, v, 'presentation.html')
   if (existsSync(pres) && !existsSync(join(VIDEOS, v, 'index.html'))) files.push({ local: pres, key: `${v}/index.html` })
   // Zips préparés pour le Classroom

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { ATELIER_BUCKET, ATELIER_COOKIE, accessLevel, requiredLevelForPath } from '@/lib/atelier-access'
+import { SECTION_BUCKET, accessCookie, accessLevel, requiredLevelForPath } from '@/lib/section-access'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,17 +23,17 @@ const TYPES: Record<string, string> = {
 export async function GET(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  const level = accessLevel(request.cookies.get(ATELIER_COOKIE)?.value)
+  const level = accessLevel(accessCookie(request.cookies))
   const needed = requiredLevelForPath(pathname)
   if (level < 1 || level < needed) {
-    const login = new URL('/atelier-acces', request.url)
+    const login = new URL('/section-acces', request.url)
     login.searchParams.set('next', pathname)
     if (level >= 1) login.searchParams.set('erreur', 'palier') // connecté, mais pas encore à ce palier
     return NextResponse.redirect(login, 307)
   }
 
   // Les liens relatifs des pages (images, autres pages) exigent un slash final sur les dossiers.
-  const rel = decodeURIComponent(pathname.replace(/^\/atelier\/?/, ''))
+  const rel = decodeURIComponent(pathname.replace(/^\/section\/?/, ''))
   const last = rel.split('/').pop() ?? ''
   if (rel.split('/').includes('..')) return new NextResponse('Introuvable', { status: 404 })
   if (!pathname.endsWith('/') && (rel === '' || !last.includes('.'))) {
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
   const key = rel === '' || rel.endsWith('/') ? `${rel}index.html` : rel
   const ext = key.split('.').pop()!.toLowerCase()
 
-  const { data, error } = await createServiceClient().storage.from(ATELIER_BUCKET).download(key)
+  const { data, error } = await createServiceClient().storage.from(SECTION_BUCKET).download(key)
   if (error || !data) return new NextResponse('Introuvable', { status: 404 })
 
   const headers: Record<string, string> = {
