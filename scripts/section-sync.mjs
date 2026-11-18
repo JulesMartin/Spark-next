@@ -30,8 +30,9 @@ function walk(dir, skipTop = []) {
 
 const files = [] // { local, key }
 
-// 1. Accueil (hub) à la racine du bucket
+// 1. Page d'entrée (mot de passe) à la racine du bucket, et page des ressources (les trois vidéos) sur /section/ressources/
 files.push({ local: join(SRC, 'videos/hub/index.html'), key: 'index.html' })
+files.push({ local: join(SRC, 'videos/hub/ressources.html'), key: 'ressources/index.html' })
 
 // 1 bis. Images communes à toutes les vidéos (logos…) : videos/commun/ → /section/commun/ (ouvert à tout membre connecté)
 const COMMUN = join(SRC, 'videos/commun')
