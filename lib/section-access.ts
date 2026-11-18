@@ -145,9 +145,5 @@ export function sameOrigin(request: { headers: Headers }): boolean {
   }
 }
 
-// Page où aller après la connexion : uniquement une page de /section/ (jamais un autre site).
+// Après la connexion, on arrive toujours sur la page des ressources (jamais sur la page d'où le membre vient).
 export const AFTER_LOGIN = '/section/ressources/'
-export function safeNext(next: unknown): string {
-  if (typeof next !== 'string' || !/^\/section(\/[^\\]*)?$/.test(next) || next.includes('//')) return AFTER_LOGIN
-  return /^\/section\/?$/.test(next) ? AFTER_LOGIN : next
-}

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { SECTION_BUCKET, SECTION_COOKIE, hasSession, safeNext } from '@/lib/section-access'
+import { AFTER_LOGIN, SECTION_BUCKET, SECTION_COOKIE, hasSession } from '@/lib/section-access'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,17 +24,12 @@ export async function GET(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   const connected = await hasSession(request.cookies.get(SECTION_COOKIE)?.value)
-  // /section/ est la page d'entrée (le mot de passe, rien d'autre) : toujours visible quand on n'est pas connecté.
-  // Une fois connecté, on n'y reste pas : direction la page demandée, sinon les ressources.
+  // /section/ est la page d'entrée (le mot de passe, rien d'autre) : visible quand on n'est pas connecté.
+  // Une fois connecté, on n'y reste pas : direction la page des ressources.
+  // Sans session, toute autre page (même un lien direct vers un hub) renvoie vers la page d'entrée.
   const isEntry = /^\/section\/?$/.test(pathname)
-  if (isEntry && connected) {
-    return NextResponse.redirect(new URL(safeNext(request.nextUrl.searchParams.get('next')), request.url), 307)
-  }
-  if (!connected && !isEntry) {
-    const entry = new URL('/section/', request.url)
-    entry.searchParams.set('next', pathname)
-    return NextResponse.redirect(entry, 307)
-  }
+  if (isEntry && connected) return NextResponse.redirect(new URL(AFTER_LOGIN, request.url), 307)
+  if (!connected && !isEntry) return NextResponse.redirect(new URL('/section/', request.url), 307)
 
   // Les liens relatifs des pages (images, autres pages) exigent un slash final sur les dossiers.
   let rel: string
