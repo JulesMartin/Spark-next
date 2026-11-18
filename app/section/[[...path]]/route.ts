@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
-import { SECTION_BUCKET, accessCookie, accessLevel, requiredLevelForPath } from '@/lib/section-access'
+import { SECTION_BUCKET, SECTION_COOKIE, hasAccess } from '@/lib/section-access'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,17 +23,22 @@ const TYPES: Record<string, string> = {
 export async function GET(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  const level = accessLevel(accessCookie(request.cookies))
-  const needed = requiredLevelForPath(pathname)
-  if (level < 1 || level < needed) {
-    const login = new URL('/section-acces', request.url)
-    login.searchParams.set('next', pathname)
-    if (level >= 1) login.searchParams.set('erreur', 'palier') // connecté, mais pas encore à ce palier
-    return NextResponse.redirect(login, 307)
+  const connected = hasAccess(request.cookies.get(SECTION_COOKIE)?.value)
+  // L'accueil (/section/) est la page d'entrée : il s'affiche toujours, avec le champ du mot de passe tant qu'on n'est pas connecté.
+  const isHome = /^\/section\/?$/.test(pathname)
+  if (!connected && !isHome) {
+    const home = new URL('/section/', request.url)
+    home.searchParams.set('next', pathname)
+    return NextResponse.redirect(home, 307)
   }
 
   // Les liens relatifs des pages (images, autres pages) exigent un slash final sur les dossiers.
-  const rel = decodeURIComponent(pathname.replace(/^\/section\/?/, ''))
+  let rel: string
+  try {
+    rel = decodeURIComponent(pathname.replace(/^\/section\/?/, ''))
+  } catch {
+    return new NextResponse('Introuvable', { status: 404 })
+  }
   const last = rel.split('/').pop() ?? ''
   if (rel.split('/').includes('..')) return new NextResponse('Introuvable', { status: 404 })
   if (!pathname.endsWith('/') && (rel === '' || !last.includes('.'))) {
@@ -52,6 +57,12 @@ export async function GET(request: NextRequest) {
     'X-Robots-Tag': 'noindex, nofollow',
   }
   if (ext === 'zip') headers['Content-Disposition'] = `attachment; filename="${last}"`
+
+  // Accueil : on marque la page « connecté » pour qu'elle masque le champ du mot de passe et ouvre les vidéos.
+  if (isHome && ext === 'html') {
+    const html = (await data.text()).replace('<html lang="fr">', connected ? '<html lang="fr" data-acces="1">' : '<html lang="fr">')
+    return new NextResponse(html, { headers })
+  }
 
   return new NextResponse(data.stream(), { headers })
 }

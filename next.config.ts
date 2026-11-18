@@ -25,7 +25,8 @@ const nextConfig: NextConfig = {
     return [
       { source: '/atelier', destination: '/section/', permanent: true },
       { source: '/atelier/:path*', destination: '/section/:path*', permanent: true },
-      { source: '/atelier-acces', destination: '/section-acces', permanent: true },
+      { source: '/atelier-acces', destination: '/section/', permanent: true },
+      { source: '/section-acces', destination: '/section/', permanent: false },
     ]
   },
   skipTrailingSlashRedirect: true,
