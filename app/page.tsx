@@ -1,17 +1,18 @@
-import Header from '@/components/public/Header'
+import SiteShell from '@/components/public/SiteShell'
 import HeroSection from '@/components/public/HeroSection'
+import SocialLinks from '@/components/public/SocialLinks'
+import SkoolSection from '@/components/public/SkoolSection'
 import FeaturedInterview from '@/components/public/FeaturedInterview'
 import InterviewGrid from '@/components/public/InterviewGrid'
-import Newsletter from '@/components/public/Newsletter'
-import SkoolSection from '@/components/public/SkoolSection'
 import LastBlogCard from '@/components/public/LastBlogCard'
-import SocialLinks from '@/components/public/SocialLinks'
-import Footer from '@/components/public/Footer'
 import { fetchYouTubeVideos } from '@/lib/youtube-feed'
 import { sanityClient } from '@/lib/sanity/client'
-import { type SanityPost } from '@/components/public/BlogContent'
+import { type SanityPost } from '@/lib/blog'
 
 export const revalidate = 3600
+
+// Vidéos du catalogue sous « Dernière vidéo » : deux rangées de trois.
+const CATALOGUE_SIZE = 6
 
 async function getLatestPost(): Promise<SanityPost | null> {
   const posts = await sanityClient.fetch<SanityPost[]>(
@@ -29,20 +30,25 @@ export default async function HomePage() {
   ])
 
   const featured = videos[0] ?? null
-  const rawGrid = videos.slice(1)
-  const grid = rawGrid.slice(0, Math.floor(rawGrid.length / 3) * 3)
+  const grid = videos.slice(1, 1 + CATALOGUE_SIZE)
+
+  // Sections numérotées dans l'ordre où elles apparaissent.
+  const sections = [
+    { id: 'communaute', label: 'Communauté' },
+    ...(featured ? [{ id: 'derniere-video', label: 'Dernière vidéo' }] : []),
+    ...(grid.length > 0 ? [{ id: 'interviews', label: 'Catalogue' }] : []),
+    ...(latestPost ? [{ id: 'dernier-article', label: 'Dernier article' }] : []),
+  ]
+  const num = (id: string) => String(sections.findIndex((s) => s.id === id) + 1).padStart(2, '0')
 
   return (
-    <main className="min-h-screen bg-bg">
-      <Header />
+    <SiteShell tree="soft">
       <HeroSection featured={featured} />
       <SocialLinks />
-      <SkoolSection />
-      <FeaturedInterview video={featured} />
-      <Newsletter />
-      {grid.length > 0 && <InterviewGrid videos={grid} />}
-      {latestPost && <LastBlogCard post={latestPost} />}
-      <Footer />
-    </main>
+      <SkoolSection num={num('communaute')} />
+      <FeaturedInterview video={featured} num={num('derniere-video')} />
+      {grid.length > 0 && <InterviewGrid videos={grid} num={num('interviews')} />}
+      {latestPost && <LastBlogCard post={latestPost} num={num('dernier-article')} />}
+    </SiteShell>
   )
 }

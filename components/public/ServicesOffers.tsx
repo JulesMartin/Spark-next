@@ -1,24 +1,25 @@
-import Link from 'next/link'
+import { DARK, LIGHT, SHAPES, decoSVG } from '@/lib/skool-art'
+import { CALENDLY_URL, Deco } from './site-ui'
 
 const COACHING_FEATURES = [
-  'Sessions en visio, individuelles ou en équipe, à votre rythme',
-  'Programme 100% adapté à votre niveau et vos objectifs',
-  'Claude, automatisations N8N, agents IA, workflows, autres outils selon vos besoins',
+  'Sessions en visio, individuelles ou en équipe, à ton rythme',
+  'Programme 100% adapté à ton niveau et tes objectifs',
+  'Claude, automatisations N8N, agents IA, workflows, autres outils selon tes besoins',
   'Création de workflows que les entreprises adorent',
   "Accès à mes prompts et templates prêts à l'emploi",
 ]
 
 const SETUP_FEATURES = [
-  'Audit de vos processus et identification des tâches répétitives',
+  'Audit de tes processus et identification des tâches répétitives',
   'Mise en place de workflows (Claude, N8N, Make…)',
-  'Connexion de vos outils : email, agenda, facturation, CRM…',
+  'Connexion de tes outils : email, agenda, facturation, CRM…',
   'Respect des normes de sécurité, RGPD et données clients',
 ]
 
 const SETUP_EXTRA = [
   'Suivi, itérations et optimisation dans la durée',
   "Création de site web / modification du site existant si nécessaire afin d'intégrer les automatisations",
-  'Création de dashboard pour un meilleur suivi des métriques de votre business',
+  'Création de dashboard pour un meilleur suivi des métriques de ton business',
 ]
 
 const SITE_FEATURES = [
@@ -28,173 +29,65 @@ const SITE_FEATURES = [
 ]
 
 const SITE_EXTRA = [
-  'Automatisations intégrées directement dans votre site',
-  'Connexion à vos outils : paiement, prise de rendez-vous, CRM…',
+  'Automatisations intégrées directement dans ton site',
+  'Connexion à tes outils : paiement, prise de rendez-vous, CRM…',
   'Évolutions et maintenance après le lancement',
 ]
 
-function FeatureList({ features, light, margin = '24px 0 0' }: { features: string[]; light?: boolean; margin?: string }) {
-  return (
-    <ul style={{ listStyle: 'none', padding: 0, margin, display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {features.map(f => (
-        <li
-          key={f}
-          style={{ display: 'flex', gap: 11, alignItems: 'flex-start', fontSize: 15, color: light ? '#474747' : 'rgba(255,255,255,.8)', lineHeight: 1.5 }}
-        >
-          <span style={{ color: '#EAAF48', fontWeight: 700, flexShrink: 0, marginTop: 1 }}>→</span>
-          {f}
-        </li>
-      ))}
-    </ul>
-  )
-}
+const OFFERS: {
+  title: string; subtitle: string; features: string[]; extra?: string[]; audience: string; deco: string; dark?: boolean
+}[] = [
+  {
+    title: "Mise en place d'automatisation",
+    subtitle: 'Je construis tes automatisations à ta place',
+    features: SETUP_FEATURES,
+    extra: SETUP_EXTRA,
+    audience: 'Pour les indépendants comme pour les entreprises.',
+    deco: decoSVG(SHAPES.one, LIGHT, 41),
+  },
+  {
+    title: 'Coaching automatisation',
+    subtitle: 'Apprends à automatiser, seul ou avec ton équipe',
+    features: COACHING_FEATURES,
+    audience: 'Disponible en individuel ou pour ton équipe.',
+    deco: decoSVG(SHAPES.two, DARK, 43),
+    dark: true,
+  },
+  {
+    title: 'Création de site web / MVP',
+    subtitle: 'Je conçois ton site ou ton produit de A à Z',
+    features: SITE_FEATURES,
+    extra: SITE_EXTRA,
+    audience: "Pour lancer une présence en ligne ou valider une idée de produit.",
+    deco: decoSVG(SHAPES.side, LIGHT, 47),
+  },
+]
 
-function OfferCard({ title, subtitle, features, extraLabel, extraFeatures, audience, cta, ctaHref, light }: {
-  title: string
-  subtitle: string
-  features: string[]
-  extraLabel?: string
-  extraFeatures?: string[]
-  audience: string
-  cta: string
-  ctaHref: string
-  light?: boolean
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', borderRadius: 12, overflow: 'hidden' }}>
-      <div style={{ background: '#EAAF48', padding: 'clamp(18px,2.2vw,28px) clamp(24px,3vw,40px)' }}>
-        <h2
-          style={{ fontSize: 'clamp(22px,2.4vw,30px)', fontWeight: 700, letterSpacing: '-0.03em', color: '#1C1C1C', lineHeight: 1.1, margin: 0 }}
-          className="font-display"
-        >
-          {title}
-        </h2>
-      </div>
-      <div
-        style={{
-          background: light ? '#fff' : '#1C1C1C',
-          padding: 'clamp(24px,3vw,40px)',
-          display: 'flex',
-          flexDirection: 'column',
-          flex: 1,
-        }}
-      >
-        <h3
-          style={{ fontSize: 'clamp(15px,1.7vw,21px)', fontWeight: 700, letterSpacing: '-0.02em', color: light ? '#1C1C1C' : '#fff', marginTop: 0, lineHeight: 1.2 }}
-          className="font-display"
-        >
-          {subtitle}
-        </h3>
-        <FeatureList features={features} light={light} />
-        {extraFeatures && (
-          <>
-            <p
-              style={{
-                fontSize: 15,
-                fontWeight: 700,
-                color: light ? '#1C1C1C' : '#fff',
-                marginTop: 20,
-                marginBottom: 0,
-              }}
-            >
-              {extraLabel}
-            </p>
-            <div
-              style={{
-                background: light ? '#F2F1EC' : 'rgba(255,255,255,.06)',
-                borderRadius: 10,
-                padding: 'clamp(16px,2vw,22px)',
-                marginTop: 12,
-              }}
-            >
-              <FeatureList features={extraFeatures} light={light} margin="0" />
-            </div>
-          </>
-        )}
-        <p
-          style={{
-            fontSize: 14,
-            color: light ? '#6E6E6E' : 'rgba(255,255,255,.55)',
-            marginTop: 24,
-            lineHeight: 1.5,
-          }}
-        >
-          {audience}
-        </p>
-        <div style={{ marginTop: 'auto', paddingTop: 28 }}>
-          <Link
-            href={ctaHref}
-            style={{
-              display: 'inline-block',
-              background: light ? '#1C1C1C' : '#EAAF48',
-              color: light ? '#fff' : '#1C1C1C',
-              fontSize: 15,
-              fontWeight: 700,
-              padding: '13px 26px',
-              textDecoration: 'none',
-              letterSpacing: '-0.01em',
-              borderRadius: 8,
-            }}
-          >
-            {cta} →
-          </Link>
-        </div>
-      </div>
-    </div>
-  )
+function Ticks({ items }: { items: string[] }) {
+  return <ul className="ticks">{items.map((f) => <li key={f}>{f}</li>)}</ul>
 }
 
 export default function ServicesOffers() {
   return (
-    <section
-      style={{
-        maxWidth: 1200,
-        marginInline: 'auto',
-        paddingInline: 'clamp(20px,5vw,56px)',
-        paddingBottom: 'clamp(64px,9vw,120px)',
-      }}
-    >
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 14 }} className="offers-grid">
-        <OfferCard
-          title="Mise en place d'automatisation"
-          subtitle="Je construis vos automatisations à votre place"
-          features={SETUP_FEATURES}
-          extraLabel="Services supplémentaires :"
-          extraFeatures={SETUP_EXTRA}
-          audience="Pour les indépendants comme pour les entreprises."
-          cta="Réserver un appel"
-          ctaHref="https://calendly.com/jules-api/new-meeting"
-          light
-        />
-        <OfferCard
-          title="Coaching automatisation"
-          subtitle="Apprenez à automatiser, seul ou avec votre équipe"
-          features={COACHING_FEATURES}
-          audience="Disponible en individuel ou pour votre équipe."
-          cta="Réserver un appel"
-          ctaHref="https://calendly.com/jules-api/new-meeting"
-        />
-        <OfferCard
-          title="Création de site web / MVP"
-          subtitle="Je conçois votre site ou votre produit de A à Z"
-          features={SITE_FEATURES}
-          extraLabel="Services supplémentaires :"
-          extraFeatures={SITE_EXTRA}
-          audience="Pour lancer une présence en ligne ou valider une idée de produit."
-          cta="Réserver un appel"
-          ctaHref="https://calendly.com/jules-api/new-meeting"
-          light
-        />
-      </div>
-
-      <style>{`
-        @media (max-width: 1000px) {
-          .offers-grid { grid-template-columns: 1fr 1fr !important; }
-        }
-        @media (max-width: 700px) {
-          .offers-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
-    </section>
+    <div className="offers">
+      {OFFERS.map((o) => (
+        <div className={`offer card ${o.dark ? 'deepc' : 'lavc'}`} key={o.title}>
+          <Deco html={o.deco} />
+          <h2 className="dot-title">{o.title}</h2>
+          <h3>{o.subtitle}</h3>
+          <Ticks items={o.features} />
+          {o.extra && (
+            <>
+              <p className="extra-lb">Services supplémentaires :</p>
+              <div className="extra"><Ticks items={o.extra} /></div>
+            </>
+          )}
+          <p className="aud">{o.audience}</p>
+          <div className="acts">
+            <a className="btn big i-cal" href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">Réserver un appel</a>
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }

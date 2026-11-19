@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import Header from '@/components/public/Header'
-import Footer from '@/components/public/Footer'
+import SiteShell from '@/components/public/SiteShell'
 import ServicesSection from '@/components/public/ServicesSection'
 
 export const metadata: Metadata = {
@@ -12,8 +11,7 @@ export const metadata: Metadata = {
 
 export default function ServicesPage() {
   return (
-    <main className="min-h-screen bg-bg">
-      <Header />
+    <SiteShell>
 
       {/* Hero */}
       <section
@@ -48,7 +46,7 @@ export default function ServicesPage() {
           }}
           className="font-display"
         >
-          Passez à l&apos;action avec l&apos;automatisation
+          Passe à l&apos;action avec l&apos;automatisation
         </h1>
         <p
           style={{
@@ -59,9 +57,9 @@ export default function ServicesPage() {
           }}
         >
           L&apos;IA transforme déjà la façon dont les professionnels travaillent et dont les entreprises opèrent.
-          La question n&apos;est plus de savoir si vous devez l&apos;intégrer, mais comment le faire efficacement.
+          La question n&apos;est plus de savoir si tu dois l&apos;intégrer, mais comment le faire efficacement.
           <br /><br />
-          Que vous travailliez seul ou avec une équipe, je vous accompagne avec des méthodes concrètes,
+          Que tu travailles seul ou avec une équipe, je t&apos;accompagne avec des méthodes concrètes,
           testées, directement applicables.
         </p>
       </section>
@@ -87,18 +85,17 @@ export default function ServicesPage() {
             lineHeight: 1.6,
           }}
         >
-          Pas sûr de l&apos;offre qui vous correspond ?{' '}
+          Pas sûr de l&apos;offre qui te correspond ?{' '}
           <Link
             href="https://calendly.com/jules-api/new-meeting"
             style={{ color: '#1C1C1C', fontWeight: 600, textDecoration: 'underline', textUnderlineOffset: 3 }}
           >
-            Réservez un appel
+            Réserve un appel
           </Link>{' '}
           et on en discute ensemble.
         </p>
       </section>
 
-      <Footer />
-    </main>
+      </SiteShell>
   )
 }

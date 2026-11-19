@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { dmSans, fraunces } from '@/app/fonts'
 import './globals.css'
+import './site.css'
 
 export const metadata: Metadata = {
   title: 'Spark — Interviews & Médias',

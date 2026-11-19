@@ -1,5 +1,6 @@
-import Header from '@/components/public/Header'
-import Footer from '@/components/public/Footer'
+import type { CSSProperties } from 'react'
+import SiteShell from '@/components/public/SiteShell'
+import Prose from '@/components/public/Prose'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -42,98 +43,46 @@ export default async function InterviewPage({
     (interview.youtube_url ? getYouTubeThumbnail(interview.youtube_url) : null)
 
   return (
-    <main className="min-h-screen bg-bg">
-      <Header />
+    <SiteShell>
+      <article className="doc" style={{ maxWidth: 900 }}>
+        <Link className="btn i-back in0" href="/">Toutes les interviews</Link>
 
-      <article className="max-w-4xl mx-auto px-6 md:px-12 py-16 md:py-24">
-        {/* Back link */}
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 font-body text-xs uppercase tracking-[0.15em] text-muted hover:text-cream transition-colors mb-12 group"
-        >
-          <span className="inline-block transition-transform duration-200 group-hover:-translate-x-1">←</span>
-          Toutes les interviews
-        </Link>
-
-        {/* Header */}
-        <header className="mb-12 pb-12 border-b border-edge">
-          <span className="font-body text-xs font-medium tracking-[0.25em] uppercase text-accent block mb-6">
-            Interview
-          </span>
-          <h1 className="font-display text-5xl md:text-6xl font-black text-cream leading-none tracking-tight mb-4">
-            {interview.guest_name}
-          </h1>
-          {interview.guest_title && (
-            <p className="font-body text-muted text-lg">{interview.guest_title}</p>
-          )}
-          {interview.published_at && (
-            <p className="font-body text-muted text-sm mt-4">
-              {formatDate(interview.published_at)}
-            </p>
-          )}
+        <header className="doc-head in0" style={{ '--d': 120 } as CSSProperties}>
+          <span className="eyebrow">Interview</span>
+          <h1>{interview.guest_name}</h1>
+          {interview.guest_title && <p className="lead">{interview.guest_title}</p>}
+          {interview.published_at && <p className="meta">{formatDate(interview.published_at)}</p>}
         </header>
 
-        {/* Video embed */}
         {youtubeId ? (
-          <div className="aspect-video w-full mb-12 border border-edge overflow-hidden">
+          <div className="video-embed rvb">
             <iframe
               src={`https://www.youtube.com/embed/${youtubeId}`}
               title={interview.title}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
-              className="w-full h-full"
             />
           </div>
         ) : thumbnail ? (
-          <div className="relative aspect-video w-full mb-12 border border-edge overflow-hidden">
-            <Image
-              src={thumbnail}
-              alt={interview.title}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 896px) 100vw, 896px"
-            />
+          <div className="video-embed rvb">
+            <Image src={thumbnail} alt={interview.title} fill priority sizes="(max-width: 900px) 100vw, 900px" />
           </div>
         ) : null}
 
-        {/* Description */}
         {interview.description && (
-          <div className="mb-12">
-            <p className="font-body text-cream/80 text-xl leading-relaxed">
-              {interview.description}
-            </p>
-          </div>
+          <p className="lead" style={{ marginTop: 'var(--g5)', fontSize: 'clamp(18px,1.6vw,22px)', color: 'var(--ink)' }}>
+            {interview.description}
+          </p>
         )}
 
-        {/* Body */}
-        {interview.body && (
-          <div className="font-body text-cream/70 leading-relaxed prose prose-invert max-w-none">
-            {interview.body.split('\n').map((para, i) =>
-              para.trim() ? (
-                <p key={i} className="mb-4">
-                  {para}
-                </p>
-              ) : null
-            )}
-          </div>
-        )}
+        {interview.body && <Prose body={interview.body} />}
 
-        {/* Tags */}
         {interview.tags && interview.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-12 pt-12 border-t border-edge">
-            {interview.tags.map((tag) => (
-              <span
-                key={tag}
-                className="font-body text-xs font-medium tracking-wider uppercase text-muted border border-edge px-2 py-1 rounded-sm"
-              >
-                {tag}
-              </span>
-            ))}
+          <div className="tags">
+            {interview.tags.map((tag) => <span key={tag} className="tag">{tag}</span>)}
           </div>
         )}
       </article>
-      <Footer />
-    </main>
+    </SiteShell>
   )
 }

@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
       })
       if (insertError) {
         console.error('Supabase insert error:', insertError)
-        return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })
+        return NextResponse.json({ error: 'Une erreur est survenue. Réessaie.' }, { status: 500 })
       }
     } else if (isNewCampaign || phone || firstName) {
       await supabase
@@ -97,6 +97,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Subscribe route error:', error)
-    return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })
+    return NextResponse.json({ error: 'Une erreur est survenue. Réessaie.' }, { status: 500 })
   }
 }

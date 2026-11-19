@@ -27,6 +27,8 @@ const nextConfig: NextConfig = {
       { source: '/atelier/:path*', destination: '/section/:path*', permanent: true },
       { source: '/atelier-acces', destination: '/section/', permanent: true },
       { source: '/section-acces', destination: '/section/', permanent: false },
+      // Le lead magnet « 233 prompts IA » est retiré : les anciens liens mènent à la communauté Claude to Client.
+      { source: '/prompts-ia', destination: '/#communaute', permanent: false },
     ]
   },
   skipTrailingSlashRedirect: true,

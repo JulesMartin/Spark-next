@@ -103,7 +103,7 @@ async function capture(request: NextRequest): Promise<NextResponse> {
       })
       if (insertError) {
         console.error('Supabase insert error:', insertError)
-        return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })
+        return NextResponse.json({ error: 'Une erreur est survenue. Réessaie.' }, { status: 500 })
       }
     } else if (isNewCampaign || socialHandle || phone || firstName || markUnsubscribed) {
       await supabase
@@ -149,6 +149,6 @@ async function capture(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ success: true, emailSent })
   } catch (error) {
     console.error('Capture route error:', error)
-    return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })
+    return NextResponse.json({ error: 'Une erreur est survenue. Réessaie.' }, { status: 500 })
   }
 }

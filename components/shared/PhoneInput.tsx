@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { PHONE_COUNTRIES } from '@/lib/phone-country-codes'
 
-type Variant = 'brutalist' | 'rounded'
+type Variant = 'brutalist' | 'rounded' | 'violet'
 
 export default function PhoneInput({
   value,
@@ -36,11 +36,13 @@ export default function PhoneInput({
   }, [])
 
   const isBrutalist = variant === 'brutalist'
-  const border = isBrutalist ? '2px solid #000' : `1.5px solid ${dark ? 'rgba(255,255,255,.15)' : '#E9E9E9'}`
-  const bg = isBrutalist ? '#fff' : dark ? 'rgba(255,255,255,.07)' : '#fff'
-  const textColor = isBrutalist ? '#000' : dark ? '#fff' : '#1C1C1C'
-  const radius = isBrutalist ? 0 : 10
-  const fontFamily = isBrutalist ? 'var(--font-assistant)' : undefined
+  // 'violet' : charte du site (pages .site), bordure fine encre, coins 8,4 px, indicatif sur fond lavande
+  const isViolet = variant === 'violet'
+  const border = isBrutalist ? '2px solid #000' : isViolet ? '1px solid #15110E' : `1.5px solid ${dark ? 'rgba(255,255,255,.15)' : '#E9E9E9'}`
+  const bg = isBrutalist ? '#fff' : isViolet ? 'rgba(255,255,255,.9)' : dark ? 'rgba(255,255,255,.07)' : '#fff'
+  const textColor = isBrutalist ? '#000' : isViolet ? '#15110E' : dark ? '#fff' : '#1C1C1C'
+  const radius = isBrutalist ? 0 : isViolet ? 8.4 : 10
+  const fontFamily = isBrutalist ? 'var(--font-assistant)' : isViolet ? 'var(--fb)' : undefined
   const placeholderColor = isBrutalist ? 'rgba(0,0,0,.4)' : undefined
 
   const matchedCountry = PHONE_COUNTRIES.find((c) => c.dial === dialCode)
@@ -73,10 +75,10 @@ export default function PhoneInput({
           style={{
             width: `calc(${Math.max(dialCode.length, 2)}ch + 14px)`,
             alignSelf: 'center',
-            border: isBrutalist ? '1.5px solid rgba(0,0,0,.35)' : `1.5px solid ${dark ? 'rgba(255,255,255,.25)' : '#D8D6CE'}`,
+            border: isBrutalist ? '1.5px solid rgba(0,0,0,.35)' : isViolet ? '1px solid rgba(75,19,105,.28)' : `1.5px solid ${dark ? 'rgba(255,255,255,.25)' : '#D8D6CE'}`,
             borderRadius: 4,
             outline: 'none',
-            background: isBrutalist ? '#FCFCD0' : dark ? 'rgba(255,255,255,.1)' : '#F2F1EC',
+            background: isBrutalist ? '#FCFCD0' : isViolet ? '#EBDDFB' : dark ? 'rgba(255,255,255,.1)' : '#F2F1EC',
             margin: '6px 0',
             padding: '6px 4px 6px 6px',
             fontSize: 14,
@@ -99,7 +101,7 @@ export default function PhoneInput({
             alignSelf: 'stretch',
             background: 'none',
             border: 'none',
-            borderLeft: '2.5px solid #000',
+            borderLeft: isViolet ? '1px solid rgba(75,19,105,.22)' : '2.5px solid #000',
             cursor: 'pointer',
             padding: '0 8px',
             lineHeight: 1,
@@ -133,8 +135,8 @@ export default function PhoneInput({
           border,
           borderTopRightRadius: radius,
           borderBottomRightRadius: radius,
-          padding: '12px 16px',
-          fontSize: 14,
+          padding: isViolet ? '13px 14px' : '12px 16px',
+          fontSize: isViolet ? 16 : 14,
           color: textColor,
           outline: 'none',
           boxSizing: 'border-box',
@@ -158,8 +160,8 @@ export default function PhoneInput({
           transition: 'max-height 220ms ease, opacity 180ms ease, transform 180ms ease',
           background: isBrutalist ? '#fff' : dark ? '#1C1C1C' : '#fff',
           border,
-          borderRadius: isBrutalist ? 0 : 10,
-          boxShadow: isBrutalist ? '3px 3px 0 #1A1A1A' : '0 8px 24px rgba(0,0,0,.18)',
+          borderRadius: isBrutalist ? 0 : isViolet ? 12 : 10,
+          boxShadow: isBrutalist ? '3px 3px 0 #1A1A1A' : isViolet ? '0 18px 40px -16px rgba(75,19,105,.45)' : '0 8px 24px rgba(0,0,0,.18)',
           zIndex: 20,
           pointerEvents: open ? 'auto' : 'none',
         }}
@@ -184,7 +186,9 @@ export default function PhoneInput({
                 c.dial === dialCode
                   ? isBrutalist
                     ? '#FEE04F'
-                    : dark
+                    : isViolet
+                      ? '#EBDDFB'
+                      : dark
                       ? 'rgba(255,255,255,.08)'
                       : '#F2F1EC'
                   : 'transparent',

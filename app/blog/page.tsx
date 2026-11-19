@@ -1,9 +1,8 @@
-import Header from '@/components/public/Header'
-import Footer from '@/components/public/Footer'
-import Newsletter from '@/components/public/Newsletter'
+import SiteShell from '@/components/public/SiteShell'
 import SkoolSection from '@/components/public/SkoolSection'
-import BlogContent, { type SanityPost } from '@/components/public/BlogContent'
+import BlogContent from '@/components/public/BlogContent'
 import { sanityClient } from '@/lib/sanity/client'
+import { type SanityPost } from '@/lib/blog'
 
 export const revalidate = 60
 
@@ -19,12 +18,9 @@ export default async function BlogPage() {
   const posts = await getBlogPosts()
 
   return (
-    <main className="min-h-screen bg-bg">
-      <Header />
+    <SiteShell>
       <BlogContent posts={posts} />
-      <SkoolSection />
-      <Newsletter />
-      <Footer />
-    </main>
+      <SkoolSection num={posts.length > 1 ? '02' : '01'} compact />
+    </SiteShell>
   )
 }

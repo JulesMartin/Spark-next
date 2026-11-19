@@ -52,7 +52,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         if (config) window.location.assign(redirectUrl(config, data.emailSent !== false))
       }
     } catch {
-      setErrorMsg('Une erreur est survenue. Réessayez.')
+      setErrorMsg('Une erreur est survenue. Réessaie.')
       setStatus('error')
     }
   }
@@ -80,41 +80,17 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
 
   if (status === 'success') {
     return (
-      <div
-        className="border-2 border-black p-8 text-center"
-        style={{ background: '#FEE04F', boxShadow: '4px 4px 0 #1A1A1A' }}
-      >
-        <p
-          className="text-2xl font-black uppercase tracking-tight text-black mb-2"
-          style={{ fontFamily: 'var(--font-raleway)' }}
-        >
-          C&apos;est dans ta boîte.
+      <div className="done" role="status">
+        <h2>C&apos;est dans ta boîte.</h2>
+        <p>Vérifie tes mails — c&apos;est probablement dans ton onglet spam ou promotion.</p>
+        <p>
+          Si tu souhaites faire un <strong>audit gratuit</strong> de ton business ou te{' '}
+          <strong>former</strong> à vendre des <strong>automatisations</strong> et{' '}
+          <strong>sites web</strong>, tu peux réserver un appel avec moi.
         </p>
-        <p className="text-sm text-black/70 mb-4" style={{ fontFamily: 'var(--font-assistant)' }}>
-          Vérifie tes mails — c&apos;est probablement dans ton onglet spam ou promotion.
-        </p>
-        <div
-          className="border-2 border-black px-4 py-3 mb-5"
-          style={{ background: '#FCFCD0', width: 'calc(100% + 40px)', marginInline: '-20px' }}
-        >
-          <p
-            className="text-black"
-            style={{ fontFamily: 'var(--font-assistant)', fontSize: '15px', lineHeight: 1.5 }}
-          >
-            Si tu souhaites faire un <strong>audit gratuit</strong> de ton business ou te{' '}
-            <strong>former</strong> à vendre des <strong>automatisations</strong> et{' '}
-            <strong>sites web</strong>, tu peux réserver un appel avec moi.
-          </p>
+        <div className="acts">
+          <a className="btn solid big i-cal" href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">Réserver un appel</a>
         </div>
-        <a
-          href={CALENDLY_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block border-2 border-black px-6 py-3 text-sm font-black uppercase tracking-widest text-black transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-          style={{ background: '#FFFFFF', boxShadow: '3px 3px 0 #1A1A1A', fontFamily: 'var(--font-raleway)' }}
-        >
-          Réserver un appel
-        </a>
       </div>
     )
   }
@@ -154,7 +130,7 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
+    <form onSubmit={handleSubmit} className="fm">
       {/* Honeypot */}
       <input
         type="text"
@@ -167,97 +143,44 @@ export default function CaptureForm({ campaign }: { campaign: string }) {
         autoComplete="off"
       />
 
-      <div className="w-full mb-3 flex flex-col min-[480px]:flex-row gap-3">
-        <div className="flex-1">
-          <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
-            Prénom *
-          </p>
-          <input
-            type="text"
-            required
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            placeholder="Ton prénom"
-            className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
-            style={{ fontFamily: 'var(--font-assistant)' }}
-          />
+      <div className="row">
+        <div>
+          <label htmlFor="cf-first">Prénom *</label>
+          <input id="cf-first" type="text" required value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Ton prénom" autoComplete="given-name" />
         </div>
-
-        {(
-          <div className="flex-1">
-            <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
-              Pseudo
-            </p>
-            <input
-              type="text"
-              value={socialHandle}
-              onChange={(e) => setSocialHandle(e.target.value)}
-              placeholder="@ton_pseudo"
-              className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
-              style={{ fontFamily: 'var(--font-assistant)' }}
-            />
-          </div>
-        )}
+        <div>
+          <label htmlFor="cf-handle">Pseudo</label>
+          <input id="cf-handle" type="text" value={socialHandle} onChange={(e) => setSocialHandle(e.target.value)} placeholder="@ton_pseudo" />
+        </div>
       </div>
 
-      <div className="w-full mb-3 flex flex-col gap-3">
-        <div className="min-w-0">
-          <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
-            Email *
-          </p>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="ton@email.com"
-            className="w-full border-2 border-black px-4 py-3 text-sm text-black placeholder:text-black/40 outline-none focus:border-black bg-white"
-            style={{ fontFamily: 'var(--font-assistant)' }}
-          />
-        </div>
-
-        {(
-          <div className="min-w-0">
-            <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
-              Téléphone *
-            </p>
-            <PhoneInput
-              variant="brutalist"
-              value={phone}
-              onChange={setPhone}
-              dialCode={dialCode}
-              onDialCodeChange={setDialCode}
-            />
-          </div>
-        )}
+      <div>
+        <label htmlFor="cf-email">Email *</label>
+        <input id="cf-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ton@email.com" autoComplete="email" />
       </div>
 
-      <p className="text-[10px] text-black/60 mb-3 text-center" style={{ fontFamily: 'var(--font-assistant)' }}>
-        Informations jamais revendues.{' '}
-        <a href="/confidentialite" target="_blank" rel="noopener noreferrer" className="underline">
-          Politique de confidentialité
-        </a>
-      </p>
+      {/* min-width:0 : sans lui, la largeur propre du champ téléphone fait déborder la colonne sur mobile */}
+      <div style={{ minWidth: 0 }}>
+        <span className="lb">Téléphone *</span>
+        <PhoneInput
+          variant="violet"
+          value={phone}
+          onChange={setPhone}
+          dialCode={dialCode}
+          onDialCodeChange={setDialCode}
+        />
+      </div>
 
-      <button
-        type="submit"
-        disabled={status === 'loading'}
-        className="w-full border-2 border-black py-3 text-sm font-black uppercase tracking-widest text-black transition-all disabled:opacity-60 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer"
-        style={{
-          background: '#FEE04F',
-          boxShadow: '3px 3px 0 #1A1A1A',
-          fontFamily: 'var(--font-raleway)',
-        }}
-      >
+      <button type="submit" className="go" disabled={status === 'loading'}>
         {status === 'loading' ? 'Envoi…' : 'Recevoir gratuitement'}
       </button>
 
-      {status === 'error' && (
-        <p className="mt-2 text-xs text-red-600" style={{ fontFamily: 'var(--font-assistant)' }}>
-          {errorMsg}
-        </p>
-      )}
+      {status === 'error' && <p className="err">{errorMsg}</p>}
 
+      <p className="rgpd">
+        Informations jamais revendues.{' '}
+        <a href="/confidentialite" target="_blank" rel="noopener noreferrer">Politique de confidentialité</a>
+      </p>
     </form>
   )
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import CaptureForm from '@/components/capture/CaptureForm'
-import Footer from '@/components/public/Footer'
-import Link from 'next/link'
+import SiteShell from '@/components/public/SiteShell'
+import type { CSSProperties } from 'react'
 import { notFound, redirect } from 'next/navigation'
 import { getCampaignConfig, isAutoPostGuide } from '@/lib/campaigns'
 import { hasCampaignTemplate } from '@/lib/brevo'
@@ -81,69 +81,20 @@ export default async function CapturePage({ searchParams }: Props) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: '#FCFCD0' }}>
-      {/* Nav */}
-      <nav className="px-6 py-4 border-b-2 border-black flex items-center justify-between">
-        <Link
-          href="/"
-          className="text-sm font-black uppercase tracking-[0.2em] text-black"
-          style={{ fontFamily: 'var(--font-raleway)' }}
-        >
-          SPARK
-        </Link>
-        {(
-          <Link
-            href="/"
-            className="text-xs text-black/50 hover:text-black transition-colors"
-            style={{ fontFamily: 'var(--font-assistant)' }}
-          >
-            Accéder au site
-          </Link>
-        )}
-      </nav>
+    <SiteShell nav={false} back={{ href: '/', label: 'Accéder au site' }} clearing={false} tree="soft">
+      {/* L'arbre de points pousse en transparence derrière le titre ; son pied se cache derrière le formulaire. */}
+      <section className="formpage hero-tree" style={{ maxWidth: 600 }}>
+        <div className="treebox" aria-hidden="true" />
+        <h1 className="in0" style={{ '--d': 100 } as CSSProperties}>Reçois ta ressource dans ta boîte mail</h1>
+        <p className="lead in0" data-avoid style={{ '--d': 200 } as CSSProperties}>
+          Pense bien à regarder dans l&apos;onglet <strong>Promotions</strong>, <strong>Spam</strong> ou{' '}
+          <strong>Courrier indésirable</strong> pour trouver le mail.
+        </p>
 
-      {/* Main */}
-      <main className="flex-1 flex items-start justify-center px-4 py-16 min-h-0">
-        <div className="w-full max-w-md">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 mb-6">
-            <span
-              className="text-xs font-black uppercase tracking-[0.2em] text-black px-3 py-1 border-2 border-black"
-              style={{ background: '#FEE04F', fontFamily: 'var(--font-raleway)' }}
-            >
-              ✦ Ressource gratuite
-            </span>
-          </div>
-
-          {/* Headline */}
-          <h1
-            className="text-4xl sm:text-5xl font-black uppercase leading-[1.05] tracking-tight text-black mb-4"
-            style={{ fontFamily: 'var(--font-raleway)' }}
-          >
-            Reçois ta ressource dans ta boîte mail
-          </h1>
-
-          <p
-            className="text-base text-black/60 mb-8"
-            style={{ fontFamily: 'var(--font-assistant)' }}
-          >
-                          <>
-                Pense bien à regarder dans l&apos;onglet <strong>Promotions</strong>, <strong>Spam</strong> ou <strong>Courrier indésirable</strong> pour trouver le mail.
-              </>
-
-          </p>
-
-          {/* Form card */}
-          <div
-            className="bg-white border-2 border-black p-6"
-            style={{ boxShadow: '6px 6px 0 #1A1A1A' }}
-          >
-            <CaptureForm campaign={campaign} />
-          </div>
+        <div className="formcard in0" data-avoid data-tree-foot style={{ '--d': 320 } as CSSProperties}>
+          <CaptureForm campaign={campaign} />
         </div>
-      </main>
-
-      <Footer />
-    </div>
+      </section>
+    </SiteShell>
   )
 }

@@ -30,7 +30,7 @@
 /blog/[slug]             → Détail article (Sanity)
 /a-propos                → Page À propos de Jules Martin
 /devenir-invite          → Formulaire candidature invité
-/prompts-ia              → Lead magnet (233 prompts + 10 skills Claude)
+/prompts-ia              → redirigé vers /#communaute (lead magnet « 233 prompts » retiré le 19/11/2026)
 /capture?c=[slug]        → Page de capture générique par campagne
 /studio                  → Sanity Studio embarqué (Next.js route)
 /skool                   → Liste d'attente Claude to Client (style du hub, CSS isolé `app/skool/skool.css`, réglages dans `lib/waitlist.ts`)
@@ -48,7 +48,7 @@
 
 **Capture (`/capture?c=[slug]`)** — formulaire générique. Le paramètre `c` définit la campagne. Appelle `/api/capture`.
 
-**Prompts IA (`/prompts-ia`)** — lead magnet fixe. Appelle `/api/subscribe` (source `prompts-ia`).
+**Prompts IA (`/prompts-ia`)** — retiré le 19/11/2026 (page et formulaire supprimés, redirection vers la communauté). `/api/subscribe` (source `prompts-ia`) reste en place mais plus aucune page ne l'appelle.
 
 **Devenir invité (`/devenir-invite`)** — formulaire candidature. Appelle `/api/candidature`.
 
@@ -78,7 +78,7 @@ Interviews gérées depuis le dashboard.
 | `published_at` | timestamptz | |
 
 ### `email_subscribers`
-Capturés depuis `/capture` et `/prompts-ia`.
+Capturés depuis `/capture` (et l'ancien `/prompts-ia`, retiré).
 
 | Colonne | Type | Notes |
 |---|---|---|
@@ -198,34 +198,45 @@ Déclenché quand l'utilisateur dit **"publie [url]"**. Voir `documentation/WORK
 
 ## Design system
 
-### Palette (site public sombre)
-```
-bg          #0D0D0D      (Tailwind: bg-bg)
-surface     #161616      (bg-surface)
-border      #222222      (border-border / border-edge)
-text        #F0EDE8      (text-cream)
-muted       #888888      (text-muted)
-accent      #EAAF48      (text-accent / bg-accent)
-```
+Depuis le 19/11/2026, **tout le site public** (accueil, services, blog, articles, à propos, interviews, pages légales,
+`/reserver`, `/capture` Spark, `/desinscription`) suit la **charte violette du hub de la section membres**
+(`presentation-skool/videos/hub`, même famille que `/skool`). Le tableau de bord et `/login` gardent l'ancien style ;
+les pages de capture **Auto-Post** (`/capture?c=…-ap`) gardent la charte de la landing Auto-Post.
 
-### Palette (pages capture — fond clair)
+### Où est le style
+- `app/site.css` (importé dans `app/layout.tsx`) : toute la charte, **isolée sous `.site`** (ne touche ni `/skool` → `.skl`, ni le dashboard).
+- `components/public/SiteShell.tsx` : coquille de chaque page publique (polices, blobs, en-tête, clairière, pied de page, animations).
+  Props : `tree` (arbre de points ; `'soft'` = en transparence derrière le texte, utilisé sur l'accueil et la page de capture Spark), `nav={false}` + `back={{ href, label }}` (barre simple des pages formulaires), `clearing`.
+  L'arbre se place dans l'élément `.treebox` du bloc `.hero-tree` ; avec `data-tree-foot` (ex. le formulaire de `/capture`), son pied se cache derrière cet élément ; les points libres évitent `h1` et `[data-avoid]`.
+- `components/public/SiteMotion.tsx` : apparition des blocs au scroll, arbre de points (canvas, éclate au scroll), clairière, signature « Spark » du pied de page.
+- `components/public/site-ui.tsx` : `Emblem`, `Deco` (arbre dessiné d'une carte), `SectionTitle` (filet + grand numéro), `PlayDisc`, `formatDate`, liens communs (`SKOOL_URL`, `CALENDLY_URL`, `YOUTUBE_URL`).
+- Arbres et graines : `lib/skool-art.ts` (`decoSVG`, `treeSVG`, `SHAPES`, palettes `LIGHT` / `DARK`).
+
+### Palette (variables CSS sous `.site`)
 ```
-bg          #FCFCD0      (jaune paille)
-highlight   #FEE04F      (jaune vif — boutons, badges)
-text        #000000
+--bg    #FDF6FF   papier lavande (fond)
+--ink   #15110E   texte, filets
+--lav   #D6C2F5   lavande (panneaux, boutons sur fond sombre)
+--pur   #8752B8   violet de la charte (boutons pleins, numéros, sur-titres)
+--deep  #4B1369   violet foncé (cartes sombres, pied de page)
+--mist  #EBDDFB   dégradé du haut de page
+--soft  #5a4d63   texte secondaire
 ```
 
 ### Typographie
-- **Display / titres** : Fraunces (variable `--font-fraunces`) → classe Tailwind `font-display`
-- **Body** : DM Sans (variable `--font-dm-sans`) → classe Tailwind `font-body`
-- **Polices hébergées dans le dépôt** (`app/fonts/index.ts`, `next/font/local`, sous-ensemble latin) : Fraunces, DM Sans, Raleway, Assistant. Ne pas revenir à `next/font/google` : Google renvoie parfois des adresses `/l/font?…&…` que Turbopack refuse, et le build Vercel échoue au hasard (29/09 et 02/11/2026).
-- **Pages capture uniquement** : Raleway (`--font-raleway`) + Assistant (`--font-assistant`) — chargés dans `app/capture/layout.tsx`
+- **Titres** : Montserrat 500 (`--font-montserrat`, variable CSS `--fd`), interlettrage serré.
+- **Texte** : Albert Sans (`--font-albert-sans`, `--fb`).
+- **Polices hébergées dans le dépôt** (`app/fonts/index.ts`, `next/font/local`, sous-ensemble latin) : Montserrat, Albert Sans, Fraunces, DM Sans, Raleway, Assistant, Anton. Ne pas revenir à `next/font/google` : Google renvoie parfois des adresses `/l/font?…&…` que Turbopack refuse, et le build Vercel échoue au hasard (29/09 et 02/11/2026).
+- Fraunces + DM Sans : dashboard. Anton + DM Sans : capture Auto-Post.
 
 ### Règles visuelles site public
-- Pas de border-radius sur les éléments structurels (cards, containers) — editorial sharp
-- Border-radius 2–4px uniquement sur tags et badges
-- Hover cards : `translateY(-2px)` + accent border reveal, pas de shadow lourde
-- Pages capture : style différent (fond jaune, Raleway, coins nets, shadow néo-brutaliste `6px 6px 0 #1A1A1A`)
+- Ouverture de page centrée (`.intro`) : sur-titre violet, grand titre, texte gris, s'anime en CSS seul (`.in0` + `--d`), sans attendre le JavaScript.
+- Chaque section s'ouvre par `SectionTitle` : filet noir, sur-titre, titre, **grand numéro violet à droite** (01, 02…).
+- Panneau lavande `.panel` (coins 37,4 px, **arbre à une seule branche**), cartes violet foncé `.dark .card` (18,7 px, arbres qui plient au survol), listes à filets `.lines`, grandes cartes `.feature` (`.deep` / `.light`), vignettes `.vcard`.
+- Boutons fins `.btn` (8,4 px), plein violet `.btn.solid`, icône par classe `i-go`, `i-play`, `i-read`, `i-cal`, `i-ext`, `i-back`, `i-up`.
+- Blobs violets flous en fond, en-tête collant qui se range quand on descend, pied de page violet foncé avec la grande signature « Spark ».
+- Accueil : 6 vidéos dans « Le catalogue Spark » (`CATALOGUE_SIZE` dans `app/page.tsx`). Blog : 6 catégories visibles + « Voir tout » (`TOP` dans `BlogContent.tsx`) ; les étiquettes Sanity sont regroupées et renommées dans `lib/blog.ts` (`ALIAS`, `LABELS`).
+- Communauté mise en avant : **Claude to Client** (Skool payant, `SKOOL_URL`) — ne jamais l'appeler « gratuite ». L'ancienne communauté gratuite Spark et le lead magnet « 233 prompts » sont retirés.
 
 ---
 
@@ -233,17 +244,21 @@ text        #000000
 
 ```
 components/public/
-  Header.tsx           ← sticky, blur, nav 3 liens (Interviews / Blog / À propos), logo Spark réduit (17px), sans bouton CTA
-  HeroSection.tsx      ← hero homepage avec vidéo featured
-  FeaturedInterview.tsx← grande card vidéo featured
-  InterviewGrid.tsx    ← grille 3 cols des autres vidéos
-  Newsletter.tsx       ← section abonnement newsletter
-  Footer.tsx           ← footer sombre 3 colonnes (Brand / Explorer / Spark)
-  BlogContent.tsx      ← liste articles blog
-  GuestCTA.tsx         ← CTA "Devenir invité"
-  GuestForm.tsx        ← formulaire candidature invité
-  SubscribeForm.tsx    ← formulaire lead magnet /prompts-ia
-  ParallaxBackground.tsx
+  SiteShell.tsx        ← coquille de page (voir Design system)
+  SiteMotion.tsx       ← animations (client)
+  site-ui.tsx          ← petits éléments communs
+  Header.tsx           ← marque Spark (emblème) + 4 liens en pastilles (Accueil / Mes services / Blog / À propos), sans bouton CTA
+  HeroSection.tsx      ← ouverture de l'accueil : texte à gauche (titre, texte, bouton « Rejoindre le Skool »), portrait « Dernière vidéo » + notification à droite, arbre de points en transparence derrière le texte
+  SocialLinks.tsx      ← Instagram / TikTok / YouTube
+  SkoolSection.tsx     ← communauté Claude to Client (`compact` = panneau seul)
+  FeaturedInterview.tsx← « Dernière vidéo »
+  InterviewGrid.tsx    ← « Le catalogue Spark »
+  LastBlogCard.tsx     ← « Dernier article »
+  BlogContent.tsx      ← liste du blog + filtres par catégorie
+  Prose.tsx            ← rendu du markdown des articles (##, ###, listes, **gras**, liens)
+  ServicesOffers.tsx   ← les 3 offres de /services
+  Footer.tsx           ← pied de page violet foncé (marque, Explorer, Spark, signature)
+  ServicesSection.tsx, GuestCTA.tsx, GuestForm.tsx, ParallaxBackground.tsx ← anciens, non utilisés (sauf /services-old)
 components/capture/
   CaptureForm.tsx      ← formulaire générique pages capture (honeypot inclus)
 components/dashboard/

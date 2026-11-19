@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import posthog from 'posthog-js'
 
 export default function UnsubscribeForm({ email, token }: { email: string; token: string }) {
@@ -29,87 +30,43 @@ export default function UnsubscribeForm({ email, token }: { email: string; token
         setStatus('success')
       }
     } catch {
-      setErrorMsg('Une erreur est survenue. Réessayez.')
+      setErrorMsg('Une erreur est survenue. Réessaie.')
       setStatus('error')
     }
   }
 
   if (status === 'success') {
     return (
-      <div
-        className="border-2 border-black p-8 text-center"
-        style={{ background: '#FEE04F', boxShadow: '4px 4px 0 #1A1A1A' }}
-      >
-        <p
-          className="text-2xl font-black uppercase tracking-tight text-black mb-2"
-          style={{ fontFamily: 'var(--font-raleway)' }}
-        >
-          C&apos;est fait.
-        </p>
-        <p className="text-sm text-black/70 mb-5" style={{ fontFamily: 'var(--font-assistant)' }}>
+      <div className="done" role="status">
+        <h2>C&apos;est fait.</h2>
+        <p>
           <strong>{email}</strong> ne recevra plus aucun email de ma part. Merci d&apos;être passé
           par là — la porte reste ouverte si tu changes d&apos;avis.
         </p>
-        <a
-          href="/"
-          className="inline-block border-2 border-black px-6 py-3 text-sm font-black uppercase tracking-widest text-black transition-all active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-          style={{
-            background: '#FFFFFF',
-            boxShadow: '3px 3px 0 #1A1A1A',
-            fontFamily: 'var(--font-raleway)',
-          }}
-        >
-          Retour au site
-        </a>
+        <div className="acts">
+          <Link className="btn i-back" href="/">Retour au site</Link>
+        </div>
       </div>
     )
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      <p className="text-xs text-black mb-1" style={{ fontFamily: 'var(--font-assistant)' }}>
-        Adresse concernée
-      </p>
-      <div
-        className="w-full border-2 border-black px-4 py-3 text-sm text-black mb-4 break-all"
-        style={{ background: '#FCFCD0', fontFamily: 'var(--font-assistant)' }}
-      >
-        {email}
+    <form onSubmit={handleSubmit} className="fm">
+      <div>
+        <span className="lb">Adresse concernée</span>
+        <div className="box">{email}</div>
       </div>
 
-      <label
-        className="flex items-start gap-3 border-2 border-black p-4 mb-4 cursor-pointer bg-white"
-        style={{ fontFamily: 'var(--font-assistant)' }}
-      >
-        <input
-          type="checkbox"
-          checked={confirmed}
-          onChange={(e) => setConfirmed(e.target.checked)}
-          className="mt-[2px] h-4 w-4 shrink-0 accent-black cursor-pointer"
-        />
-        <span className="text-sm text-black leading-snug">
-          Je confirme vouloir me désinscrire et ne plus recevoir aucun email.
-        </span>
+      <label className="check">
+        <input type="checkbox" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
+        <span>Je confirme vouloir me désinscrire et ne plus recevoir aucun email.</span>
       </label>
 
-      <button
-        type="submit"
-        disabled={!confirmed || status === 'loading'}
-        className="w-full border-2 border-black py-3 text-sm font-black uppercase tracking-widest text-black transition-all disabled:opacity-40 disabled:cursor-not-allowed active:translate-x-[2px] active:translate-y-[2px] active:shadow-none cursor-pointer"
-        style={{
-          background: '#FEE04F',
-          boxShadow: '3px 3px 0 #1A1A1A',
-          fontFamily: 'var(--font-raleway)',
-        }}
-      >
+      <button type="submit" className="go" disabled={!confirmed || status === 'loading'}>
         {status === 'loading' ? 'En cours…' : 'Confirmer la désinscription'}
       </button>
 
-      {status === 'error' && (
-        <p className="mt-2 text-xs text-red-600" style={{ fontFamily: 'var(--font-assistant)' }}>
-          {errorMsg}
-        </p>
-      )}
+      {status === 'error' && <p className="err">{errorMsg}</p>}
     </form>
   )
 }

@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       console.error('Supabase unsubscribe error:', updateError)
-      return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })
+      return NextResponse.json({ error: 'Une erreur est survenue. Réessaie.' }, { status: 500 })
     }
 
     await supabase
@@ -47,6 +47,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Unsubscribe route error:', error)
-    return NextResponse.json({ error: 'Une erreur est survenue. Réessayez.' }, { status: 500 })
+    return NextResponse.json({ error: 'Une erreur est survenue. Réessaie.' }, { status: 500 })
   }
 }

@@ -19,8 +19,8 @@ const AUTOMATION_SOLO_FEATURES = [
 ]
 
 const B2B_AUTO_FEATURES = [
-  "Audit de vos processus et identification des gains",
-  "Intégration d'outils IA adaptés à votre secteur",
+  "Audit de tes processus et identification des gains",
+  "Intégration d'outils IA adaptés à ton secteur",
   "Respect des normes de sécurité, RGPD, données clients",
   "Suivi, itérations et optimisation dans la durée",
 ]
@@ -33,8 +33,8 @@ const WEBSITE_SOLO_FEATURES = [
 ]
 
 const WEBSITE_B2B_FEATURES = [
-  "Implémentation des automatisations qu'il vous faut",
-  'Design adapté à votre charte graphique',
+  "Implémentation des automatisations qu'il te faut",
+  'Design adapté à ta charte graphique',
   'Formulaires, analytics et intégrations CRM inclus',
   'Optimisation SEO si nécessaire',
 ]
@@ -151,7 +151,7 @@ export default function ServicesSection() {
             marginBottom: 16,
           }}
         >
-          Cliquez sur ce qui vous correspond
+          Clique sur ce qui te correspond
         </p>
 
         <div style={{ background: '#EBEBEB', borderRadius: 16, padding: 10 }}>
@@ -243,7 +243,7 @@ export default function ServicesSection() {
                 <>
                   <ServiceCard
                     title="Implémentation d'automatisation"
-                    subtitle="Intégrez l'automatisation dans vos process"
+                    subtitle="Intègre l'automatisation dans tes process"
                     features={B2B_AUTO_FEATURES}
                     cta="Réserver un appel"
                     ctaHref="https://calendly.com/jules-api/new-meeting"
@@ -251,7 +251,7 @@ export default function ServicesSection() {
                   />
                   <ServiceCard
                     title="Création de site web automatisé"
-                    subtitle="Un site professionnel pour votre entreprise"
+                    subtitle="Un site professionnel pour ton entreprise"
                     features={WEBSITE_B2B_FEATURES}
                     cta="Réserver un appel"
                     ctaHref="https://calendly.com/jules-api/new-meeting"
